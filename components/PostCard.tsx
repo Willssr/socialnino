@@ -6,9 +6,10 @@ interface PostCardProps {
   post: Post;
   onLike: (postId: string) => void;
   onComment: (postId: string, commentText: string) => void;
+  currentUserName: string;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUserName }) => {
   const [commentText, setCommentText] = useState('');
   const [isAnimatingLike, setIsAnimatingLike] = useState(false);
 
@@ -108,15 +109,12 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
 
         {/* Comments */}
         <div className="mt-2 space-y-1">
-            {post.comments.slice(0, 2).map(comment => (
+            {post.comments.map(comment => (
                  <p key={comment.id} className="text-sm text-slate-700">
                     <span className="font-semibold text-slate-800">{comment.author}</span>{' '}
                     {comment.text}
                 </p>
             ))}
-            {post.comments.length > 2 && (
-                <button className="text-sm text-slate-500">Ver todos os {post.comments.length} comentários</button>
-            )}
         </div>
         
         {/* Add Comment */}

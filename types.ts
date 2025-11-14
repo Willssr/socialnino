@@ -41,4 +41,11 @@ export interface Story {
     avatar: string;
 }
 
-export type ActivePage = 'feed' | 'music' | 'about' | 'download';
+export interface UserProfile {
+  name: string;
+  avatar: string;
+  coverPhoto: string;
+  bio: string;
+}
+
+export type ActivePage = 'feed' | 'music' | 'about' | 'download' | 'profile';

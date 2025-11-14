@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, MusicNoteIcon, InformationCircleIcon, DownloadIcon } from './Icons';
+import { HomeIcon, MusicNoteIcon, InformationCircleIcon, DownloadIcon, UserIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
@@ -14,6 +14,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, setActivePage }) => {
     { id: 'music', label: 'Músicas', icon: MusicNoteIcon },
     { id: 'download', label: 'Baixar', icon: DownloadIcon },
     { id: 'about', label: 'Sobre', icon: InformationCircleIcon },
+    { id: 'profile', label: 'Perfil', icon: UserIcon },
   ];
 
   return (

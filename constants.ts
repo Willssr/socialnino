@@ -1,5 +1,5 @@
 
-import { Post, Song, Story } from './types';
+import { Post, Song, Story, UserProfile } from './types';
 
 export const INITIAL_STORIES: Story[] = [
     { id: 'story-1', author: 'Você', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' },
@@ -68,3 +68,10 @@ export const INITIAL_SONGS: Song[] = [
     { id: 'song-3', title: 'For Bigger Blazes', artist: 'Google', src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4' },
     { id: 'song-4', title: 'For Bigger Escapes', artist: 'Google', src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4' },
 ];
+
+export const INITIAL_USER_PROFILE: UserProfile = {
+    name: 'SocialNino User',
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+    coverPhoto: 'https://picsum.photos/id/1018/1200/400',
+    bio: 'Bem-vindo ao meu perfil! Explorando o mundo e compartilhando momentos.',
+};
