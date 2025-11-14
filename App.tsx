@@ -17,8 +17,7 @@ import Suggestions from './components/Suggestions';
 import Play from './components/Play';
 import NotificationsPanel from './components/NotificationsPanel';
 import SearchModal from './components/SearchModal';
-
-type Theme = 'light' | 'dark';
+import { useTheme } from './theme/ThemeProvider';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
@@ -27,8 +26,9 @@ const App: React.FC = () => {
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
   const [people, setPeople] = useLocalStorage<Person[]>('socialnino-people-v1', INITIAL_PEOPLE);
   const [notifications, setNotifications] = useLocalStorage<Notification[]>('socialnino-notifications-v1', INITIAL_NOTIFICATIONS);
-  const [theme, setTheme] = useLocalStorage<Theme>('socialnino-theme', 'light');
   
+  const { theme, toggleTheme } = useTheme();
+
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
@@ -37,19 +37,6 @@ const App: React.FC = () => {
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
-
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
 
   // Effect to migrate user profile data if 'stats' is missing
   useEffect(() => {
@@ -154,6 +141,7 @@ const App: React.FC = () => {
         setStories(prevStories => [...prevStories, newStory]);
         setIsAddStoryModalOpen(false);
     };
+    // Fix: Use the `storyFile` parameter passed to the function instead of an undefined `file` variable.
     reader.readAsDataURL(storyFile);
   };
   
