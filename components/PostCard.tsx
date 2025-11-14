@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Post } from '../types';
 import { HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon, DotsHorizontalIcon } from './Icons';
@@ -11,6 +10,7 @@ interface PostCardProps {
 
 const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
   const [commentText, setCommentText] = useState('');
+  const [isAnimatingLike, setIsAnimatingLike] = useState(false);
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,6 +18,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
       onComment(post.id, commentText);
       setCommentText('');
     }
+  };
+
+  const handleLikeAction = () => {
+    if (!post.isLiked) {
+      setIsAnimatingLike(true);
+      setTimeout(() => {
+        setIsAnimatingLike(false);
+      }, 800); // Animation duration
+    }
+    onLike(post.id);
   };
 
   const formatDate = (dateString: string) => {
@@ -48,20 +58,31 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment }) => {
         </button>
       </div>
 
-      {/* Post Media */}
-      {post.media.type === 'image' ? (
-        <img src={post.media.src} alt={post.caption} className="w-full object-cover" />
-      ) : (
-        <video controls src={post.media.src} className="w-full bg-black">
-          Your browser does not support the video tag.
-        </video>
-      )}
+      {/* Post Media with Double-Click Like and Animation */}
+      <div className="relative" onDoubleClick={handleLikeAction}>
+        {post.media.type === 'image' ? (
+          <img src={post.media.src} alt={post.caption} className="w-full object-cover" />
+        ) : (
+          <video controls src={post.media.src} className="w-full bg-black">
+            Your browser does not support the video tag.
+          </video>
+        )}
+        {isAnimatingLike && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <HeartIcon 
+              className="w-24 h-24 text-white drop-shadow-lg animate-heart-burst" 
+              isLiked={true} 
+            />
+          </div>
+        )}
+      </div>
+
 
       {/* Post Actions */}
       <div className="p-3">
         <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-                <button onClick={() => onLike(post.id)} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 hover:text-slate-900'}`}>
+                <button onClick={handleLikeAction} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 hover:text-slate-900'}`}>
                     <HeartIcon className="w-7 h-7" isLiked={post.isLiked}/>
                 </button>
                 <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">

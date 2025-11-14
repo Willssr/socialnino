@@ -41,4 +41,4 @@ export interface Story {
     avatar: string;
 }
 
-export type ActivePage = 'feed' | 'music' | 'about';
+export type ActivePage = 'feed' | 'music' | 'about' | 'download';

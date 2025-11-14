@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Feed from './components/Feed';
 import Music from './components/Music';
 import About from './components/About';
+import Download from './components/Download';
 import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
 import { PlusCircleIcon } from './components/Icons';
@@ -18,6 +19,8 @@ const App: React.FC = () => {
         return <Music />;
       case 'about':
         return <About />;
+      case 'download':
+        return <Download />;
       case 'feed':
       default:
         return <Feed />;
