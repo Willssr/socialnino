@@ -107,4 +107,9 @@ export const INITIAL_USER_PROFILE: UserProfile = {
     avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
     coverPhoto: 'https://picsum.photos/id/1018/1200/400',
     bio: 'Bem-vindo ao meu perfil! Explorando o mundo e compartilhando momentos.',
+    stats: {
+        posts: 0,
+        followers: 1380,
+        following: 210,
+    },
 };

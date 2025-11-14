@@ -24,7 +24,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onNavigate, onAddS
         {/* Your Story */}
         <div className="relative group flex-shrink-0 text-center w-16">
           <div className="relative">
-            <button onClick={() => onViewStory(userProfile.name)} className="block rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button onClick={() => onNavigate('profile')} className="block rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <img 
                 src={userProfile.avatar} 
                 alt="Seu story" 

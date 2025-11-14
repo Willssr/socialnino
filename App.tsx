@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
 import Music from './components/Music';
@@ -23,6 +24,15 @@ const App: React.FC = () => {
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
 
+  // Effect to migrate user profile data if 'stats' is missing
+  useEffect(() => {
+    if (userProfile && !userProfile.stats) {
+      setUserProfile(prevProfile => ({
+        ...prevProfile,
+        stats: INITIAL_USER_PROFILE.stats,
+      }));
+    }
+  }, [userProfile, setUserProfile]);
 
   const addPost = (caption: string, file: File) => {
     const reader = new FileReader();
@@ -126,7 +136,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 text-slate-800 flex flex-col">
-      <Header />
+      <Header userProfile={userProfile} onNavigate={setActivePage} />
       
       <main className="flex-grow pb-16 md:pb-0">
         <div className="container mx-auto px-0 sm:px-4">

@@ -49,6 +49,11 @@ export interface UserProfile {
   avatar: string;
   coverPhoto: string;
   bio: string;
+  stats: {
+    posts: number;
+    followers: number;
+    following: number;
+  };
 }
 
 export type ActivePage = 'feed' | 'music' | 'about' | 'download' | 'profile';

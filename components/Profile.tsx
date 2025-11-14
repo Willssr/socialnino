@@ -17,30 +17,51 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
     setIsEditing(false);
   };
 
+  const stats = [
+    { label: 'publicações', value: userPosts.length },
+    { label: 'seguidores', value: userProfile.stats?.followers.toLocaleString('pt-BR') },
+    { label: 'seguindo', value: userProfile.stats?.following.toLocaleString('pt-BR') },
+  ];
+
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Profile Header */}
+      {/* Cover Photo */}
       <div className="relative h-48 md:h-64 rounded-b-lg overflow-hidden">
         <img src={userProfile.coverPhoto} alt="Cover" className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/30"></div>
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        <div className="relative -mt-16 sm:-mt-20 flex flex-col items-center sm:items-start sm:flex-row sm:space-x-6">
+        {/* Profile Header - Redesigned based on user's component structure */}
+        <div className="relative -mt-16 sm:-mt-20 flex flex-col items-center sm:flex-row sm:items-start sm:space-x-8">
           <img
             src={userProfile.avatar}
             alt="Avatar"
-            className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white object-cover shadow-lg"
+            className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-white object-cover shadow-lg flex-shrink-0"
           />
-          <div className="mt-4 sm:mt-12 text-center sm:text-left">
-            <h1 className="text-3xl font-bold text-slate-800">{userProfile.name}</h1>
-            <p className="text-slate-600 mt-1 max-w-lg">{userProfile.bio}</p>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="mt-4 bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-indigo-600 transition-colors"
-            >
-              Editar Perfil
-            </button>
+          <div className="mt-4 sm:mt-8 flex-grow w-full text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h1 className="text-3xl font-bold text-slate-800">{userProfile.name}</h1>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="w-full sm:w-auto bg-slate-200 text-slate-800 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-300 transition-colors"
+              >
+                Editar Perfil
+              </button>
+            </div>
+
+            {/* Stats Section */}
+            <div className="flex justify-center sm:justify-start items-center space-x-8 my-4">
+              {stats.map(stat => (
+                <div key={stat.label} className="text-center sm:text-left">
+                  <span className="font-bold text-lg text-slate-900">{stat.value}</span>
+                  <span className="block text-sm text-slate-500">{stat.label}</span>
+                </div>
+              ))}
+            </div>
+            
+            {/* Bio */}
+            <p className="text-slate-600 max-w-lg mx-auto sm:mx-0">{userProfile.bio}</p>
           </div>
         </div>
       </div>
