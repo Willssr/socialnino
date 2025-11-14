@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import * as React from 'react';
 import { Story } from '../types';
 
 interface StoryViewerModalProps {
@@ -9,11 +9,11 @@ interface StoryViewerModalProps {
 const STORY_DURATION = 5000; // 5 seconds
 
 const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [currentIndex, setCurrentIndex] = React.useState(0);
+  const [progress, setProgress] = React.useState(0);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (stories[currentIndex].mediaType === 'video' && videoRef.current) {
         // For video, we'll let the video's own progress drive the UI
         return;
@@ -38,7 +38,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose })
     };
   }, [currentIndex, stories, onClose]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Reset progress when index changes
     setProgress(0);
     if (videoRef.current) {

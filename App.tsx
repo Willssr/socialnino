@@ -1,12 +1,12 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
 import Music from './components/Music';
 import About from './components/About';
-import Download from './components/Download';
 import Profile from './components/Profile';
 import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
@@ -158,8 +158,6 @@ const App: React.FC = () => {
         return <Music />;
       case 'about':
         return <About />;
-      case 'download':
-        return <Download />;
       case 'suggestions':
         return <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
       case 'profile':
