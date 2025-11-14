@@ -140,9 +140,6 @@ const App: React.FC = () => {
                   userProfile={userProfile} 
                   onUpdateProfile={setUserProfile} 
                   userPosts={userPosts}
-                  handleLike={handleLike}
-                  handleComment={handleComment}
-                  currentUserName={userProfile.name}
                 />;
       case 'feed':
       default:

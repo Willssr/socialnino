@@ -8,12 +8,9 @@ interface ProfileProps {
   userProfile: UserProfile;
   onUpdateProfile: (newProfile: UserProfile) => void;
   userPosts: Post[];
-  handleLike: (postId: string) => void;
-  handleComment: (postId: string, commentText: string) => void;
-  currentUserName: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPosts, handleLike, handleComment, currentUserName }) => {
+const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPosts }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
@@ -28,10 +25,6 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
     { label: 'seguindo', value: userProfile.stats?.following.toLocaleString('pt-BR') },
   ];
   
-  // Find the most up-to-date version of the selected post from the userPosts array
-  const updatedSelectedPost = selectedPost ? userPosts.find(p => p.id === selectedPost.id) || selectedPost : null;
-
-
   return (
     <div className="w-full max-w-4xl mx-auto">
       {/* Cover Photo */}
@@ -121,13 +114,10 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
         />
       )}
 
-      {updatedSelectedPost && (
+      {selectedPost && (
         <PostDetailModal 
-          post={updatedSelectedPost}
+          post={selectedPost}
           onClose={() => setSelectedPost(null)}
-          onLike={handleLike}
-          onComment={handleComment}
-          currentUserName={currentUserName}
         />
       )}
     </div>
