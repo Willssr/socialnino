@@ -4,11 +4,11 @@ import { DownloadIcon } from './Icons';
 const Download: React.FC = () => {
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
-      <div className="bg-white p-6 rounded-xl shadow-lg text-center">
+      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg text-center">
         <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
           Baixe o App SocialNino
         </h1>
-        <p className="text-slate-600 leading-relaxed max-w-2xl mx-auto mt-4 mb-8">
+        <p className="text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto mt-4 mb-8">
           Leve a experiência completa do SocialNino com você! Baixe nosso aplicativo para ter acesso a recursos exclusivos e uma interface otimizada para o seu celular.
         </p>
 

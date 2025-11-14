@@ -46,15 +46,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-slate-200/80 overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200/80 dark:border-slate-700 overflow-hidden">
       {/* Post Header */}
       <div className="p-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <img src={post.authorAvatar} alt={post.author} className="w-9 h-9 rounded-full" />
-          <span className="font-semibold text-sm text-slate-800">{post.author}</span>
-          <span className="text-xs text-slate-400">&bull; {formatDate(post.timestamp)}</span>
+          <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{post.author}</span>
+          <span className="text-xs text-slate-400 dark:text-slate-500">&bull; {formatDate(post.timestamp)}</span>
         </div>
-        <button className="text-slate-500">
+        <button className="text-slate-500 dark:text-slate-400">
             <DotsHorizontalIcon className="w-5 h-5"/>
         </button>
       </div>
@@ -83,35 +83,35 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
       <div className="p-3">
         <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-                <button onClick={handleLikeAction} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 hover:text-slate-900'}`}>
+                <button onClick={handleLikeAction} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}>
                     <HeartIcon className="w-7 h-7" isLiked={post.isLiked}/>
                 </button>
-                <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+                <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                     <CommentIcon className="w-7 h-7" />
                 </button>
-                <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+                <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                     <PaperAirplaneIcon className="w-7 h-7 -rotate-12" />
                 </button>
             </div>
-            <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+            <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                 <BookmarkIcon className="w-7 h-7" />
             </button>
         </div>
 
         {/* Likes Count */}
-        <p className="font-semibold text-sm text-slate-800 mt-3">{post.likes.toLocaleString('pt-BR')} curtidas</p>
+        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 mt-3">{post.likes.toLocaleString('pt-BR')} curtidas</p>
 
         {/* Caption */}
-        <p className="text-sm mt-1 text-slate-700">
-            <span className="font-semibold text-slate-800">{post.author}</span>{' '}
+        <p className="text-sm mt-1 text-slate-700 dark:text-slate-300">
+            <span className="font-semibold text-slate-800 dark:text-slate-100">{post.author}</span>{' '}
             {post.caption}
         </p>
 
         {/* Comments */}
         <div className="mt-2 space-y-1">
             {post.comments.map(comment => (
-                 <p key={comment.id} className="text-sm text-slate-700">
-                    <span className="font-semibold text-slate-800">{comment.author}</span>{' '}
+                 <p key={comment.id} className="text-sm text-slate-700 dark:text-slate-300">
+                    <span className="font-semibold text-slate-800 dark:text-slate-100">{comment.author}</span>{' '}
                     {comment.text}
                 </p>
             ))}
@@ -124,9 +124,9 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Adicione um comentário..."
-                className="flex-grow bg-transparent text-sm focus:outline-none"
+                className="flex-grow bg-transparent text-sm focus:outline-none dark:placeholder-slate-400"
             />
-            <button type="submit" className="text-indigo-500 text-sm font-semibold hover:text-indigo-700 disabled:text-indigo-300 transition-colors" disabled={!commentText.trim()}>
+            <button type="submit" className="text-indigo-500 dark:text-indigo-400 text-sm font-semibold hover:text-indigo-700 dark:hover:text-indigo-300 disabled:text-indigo-300 dark:disabled:text-indigo-600 transition-colors" disabled={!commentText.trim()}>
                 Publicar
             </button>
          </form>

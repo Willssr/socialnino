@@ -29,33 +29,33 @@ const AddStoryModal: React.FC<AddStoryModalProps> = ({ onClose, onSave }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md animation-slide-up">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-md animation-slide-up">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-slate-800">Adicionar ao seu story</h2>
-            <button type="button" onClick={onClose} className="text-slate-500 hover:text-slate-800 text-3xl leading-none">&times;</button>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Adicionar ao seu story</h2>
+            <button type="button" onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-3xl leading-none">&times;</button>
           </div>
           
           {preview ? (
             <div className="mb-4">
-              <img src={preview} alt="Pré-visualização" className="w-full h-auto max-h-[60vh] object-contain rounded-md bg-slate-100" />
+              <img src={preview} alt="Pré-visualização" className="w-full h-auto max-h-[60vh] object-contain rounded-md bg-slate-100 dark:bg-slate-700" />
             </div>
           ) : (
-            <div className="mb-4 p-8 border-2 border-dashed border-slate-300 rounded-md text-center">
-              <label htmlFor="story-file-upload" className="cursor-pointer text-indigo-600 font-semibold">
+            <div className="mb-4 p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-md text-center">
+              <label htmlFor="story-file-upload" className="cursor-pointer text-indigo-600 dark:text-indigo-400 font-semibold">
                 Selecione uma imagem ou vídeo
               </label>
               <input id="story-file-upload" type="file" accept="image/*,video/*" onChange={handleFileChange} className="hidden" />
-              <p className="text-xs text-slate-500 mt-1">Sua pré-visualização aparecerá aqui.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Sua pré-visualização aparecerá aqui.</p>
             </div>
           )}
         </div>
         
-        <div className="bg-slate-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+        <div className="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-white border border-slate-300 rounded-md text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            className="px-4 py-2 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded-md text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-500"
           >
             Cancelar
           </button>

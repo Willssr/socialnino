@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { fetchGeolocation } from '../services/geolocationService';
 import { GeolocationData } from '../types';
@@ -24,7 +25,7 @@ const Geolocation: React.FC = () => {
   }
 
   return (
-    <div className="text-center text-xs text-slate-400">
+    <div className="text-center text-xs text-slate-400 dark:text-slate-500">
         <p>Acessando de: <span className="font-semibold">{location.city}, {location.country}</span></p>
     </div>
   );

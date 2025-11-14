@@ -29,7 +29,7 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onLike
     return (
         <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4" onClick={onClose}>
             <div 
-                className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden animation-slide-up"
+                className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row overflow-hidden animation-slide-up"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Media Section */}
@@ -44,12 +44,12 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onLike
                 {/* Info Section */}
                 <div className="w-full md:w-1/2 lg:w-2/5 flex flex-col">
                     {/* Header */}
-                    <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+                    <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
                          <div className="flex items-center space-x-3">
                             <img src={post.authorAvatar} alt={post.author} className="w-9 h-9 rounded-full" />
-                            <span className="font-semibold text-sm text-slate-800">{post.author}</span>
+                            <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{post.author}</span>
                         </div>
-                        <button className="text-slate-500">
+                        <button className="text-slate-500 dark:text-slate-400">
                             <DotsHorizontalIcon className="w-5 h-5"/>
                         </button>
                     </div>
@@ -60,11 +60,11 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onLike
                         <div className="flex items-start space-x-3 mb-4">
                             <img src={post.authorAvatar} alt={post.author} className="w-9 h-9 rounded-full flex-shrink-0" />
                             <div>
-                                <p className="text-sm text-slate-700">
-                                    <span className="font-semibold text-slate-800">{post.author}</span>{' '}
+                                <p className="text-sm text-slate-700 dark:text-slate-300">
+                                    <span className="font-semibold text-slate-800 dark:text-slate-100">{post.author}</span>{' '}
                                     {post.caption}
                                 </p>
-                                <p className="text-xs text-slate-400 mt-1">{formatDate(post.timestamp)}</p>
+                                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatDate(post.timestamp)}</p>
                             </div>
                         </div>
                         
@@ -74,11 +74,11 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onLike
                                <div key={comment.id} className="flex items-start space-x-3">
                                    <img src={post.authorAvatar} alt={comment.author} className="w-9 h-9 rounded-full flex-shrink-0" />
                                    <div>
-                                       <p className="text-sm text-slate-700">
-                                           <span className="font-semibold text-slate-800">{comment.author}</span>{' '}
+                                       <p className="text-sm text-slate-700 dark:text-slate-300">
+                                           <span className="font-semibold text-slate-800 dark:text-slate-100">{comment.author}</span>{' '}
                                            {comment.text}
                                        </p>
-                                       <p className="text-xs text-slate-400 mt-1">{formatDate(comment.timestamp)}</p>
+                                       <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{formatDate(comment.timestamp)}</p>
                                    </div>
                                </div>
                            ))}
@@ -86,33 +86,33 @@ const PostDetailModal: React.FC<PostDetailModalProps> = ({ post, onClose, onLike
                     </div>
 
                     {/* Actions & Form (Fixed at bottom) */}
-                    <div className="p-3 border-t border-slate-200 bg-white mt-auto">
+                    <div className="p-3 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 mt-auto">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
-                                <button onClick={() => onLike(post.id)} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 hover:text-slate-900'}`}>
+                                <button onClick={() => onLike(post.id)} className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isLiked ? 'text-red-500' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}>
                                     <HeartIcon className="w-7 h-7" isLiked={post.isLiked}/>
                                 </button>
-                                <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+                                <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                                     <CommentIcon className="w-7 h-7" />
                                 </button>
-                                <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+                                <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                                     <PaperAirplaneIcon className="w-7 h-7 -rotate-12" />
                                 </button>
                             </div>
-                            <button className="text-slate-600 hover:text-slate-900 transition-transform duration-200 ease-out hover:scale-110">
+                            <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
                                 <BookmarkIcon className="w-7 h-7" />
                             </button>
                         </div>
-                        <p className="font-semibold text-sm text-slate-800 mt-3">{post.likes.toLocaleString('pt-BR')} curtidas</p>
+                        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 mt-3">{post.likes.toLocaleString('pt-BR')} curtidas</p>
                         <form onSubmit={handleCommentSubmit} className="mt-3 flex items-center">
                             <input
                                 type="text"
                                 value={commentText}
                                 onChange={(e) => setCommentText(e.target.value)}
                                 placeholder="Adicione um comentário..."
-                                className="flex-grow bg-transparent text-sm focus:outline-none"
+                                className="flex-grow bg-transparent text-sm focus:outline-none dark:placeholder-slate-400"
                             />
-                            <button type="submit" className="text-indigo-500 text-sm font-semibold hover:text-indigo-700 disabled:text-indigo-300 transition-colors" disabled={!commentText.trim()}>
+                            <button type="submit" className="text-indigo-500 dark:text-indigo-400 text-sm font-semibold hover:text-indigo-700 dark:hover:text-indigo-300 disabled:text-indigo-300 dark:disabled:text-indigo-600 transition-colors" disabled={!commentText.trim()}>
                                 Publicar
                             </button>
                         </form>

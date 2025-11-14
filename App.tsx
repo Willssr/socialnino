@@ -17,15 +17,31 @@ import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
 import NewPostModal from './components/NewPostModal';
 
+type Theme = 'light' | 'dark';
+
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
   const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v2', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
+  const [theme, setTheme] = useLocalStorage<Theme>('socialnino-theme', 'light');
   
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
 
   // Effect to migrate user profile data if 'stats' is missing
   useEffect(() => {
@@ -145,8 +161,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-slate-800 flex flex-col">
-      <Header userProfile={userProfile} onNavigate={setActivePage} />
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">
+      <Header userProfile={userProfile} onNavigate={setActivePage} theme={theme} toggleTheme={toggleTheme} />
       
       <main className="flex-grow pb-16 md:pb-0">
         <div className="container mx-auto px-0 sm:px-4">
@@ -185,7 +201,7 @@ const App: React.FC = () => {
 
       <BottomNav activePage={activePage} setActivePage={setActivePage} />
 
-      <footer className="hidden md:block text-center py-4 text-sm text-slate-500 border-t border-slate-200/80 mt-8">
+      <footer className="hidden md:block text-center py-4 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-800 mt-8">
         <div className="space-y-2">
             <Geolocation />
             <p>&copy; {new Date().getFullYear()} SocialNino. Todos os direitos reservados.</p>
