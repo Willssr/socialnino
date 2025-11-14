@@ -1,4 +1,5 @@
 
+
 export interface Comment {
   id: string;
   author: string;
@@ -8,10 +9,16 @@ export interface Comment {
 
 export type PostType = 'image' | 'video';
 
+export interface PostAuthor {
+    id: number;
+    username: string;
+    avatar: string;
+    isFollowing: boolean;
+}
+
 export interface Post {
   id: string;
-  author: string;
-  authorAvatar: string;
+  author: PostAuthor;
   timestamp: string;
   caption: string;
   media: {

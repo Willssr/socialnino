@@ -3,6 +3,7 @@ import { UserProfile, Post } from '../types';
 import EditProfileModal from './EditProfileModal';
 import { HeartIcon, CommentIcon, PlayIcon } from './Icons';
 import PostDetailModal from './PostDetailModal';
+import FollowButton from './FollowButton';
 
 interface ProfileProps {
   userProfile: UserProfile;
@@ -63,16 +64,10 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
                 >
                   Editar Perfil
                 </button>
-                <button
+                <FollowButton
+                  isFollowing={isFollowing}
                   onClick={handleToggleFollow}
-                  className={`w-auto px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out ${
-                    isFollowing 
-                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600' 
-                    : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:opacity-90'
-                  }`}
-                >
-                  {isFollowing ? 'Seguindo' : 'Seguir'}
-                </button>
+                />
               </div>
             </div>
 

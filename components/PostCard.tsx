@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Post } from '../types';
 import { HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon, DotsHorizontalIcon } from './Icons';
+import FollowButton from './FollowButton';
 
 interface PostCardProps {
   post: Post;
   onLike: (postId: string) => void;
   onComment: (postId: string, commentText: string) => void;
+  onToggleFollow: (personId: number) => void;
   currentUserName: string;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUserName }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onToggleFollow, currentUserName }) => {
   const [commentText, setCommentText] = useState('');
   const [isAnimatingLike, setIsAnimatingLike] = useState(false);
 
@@ -50,13 +52,27 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
       {/* Post Header */}
       <div className="p-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <img src={post.authorAvatar} alt={post.author} className="w-9 h-9 rounded-full" />
-          <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{post.author}</span>
-          <span className="text-xs text-slate-400 dark:text-slate-500">&bull; {formatDate(post.timestamp)}</span>
+          <img src={post.author.avatar} alt={post.author.username} className="w-9 h-9 rounded-full" />
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">{post.author.username}</span>
+            {post.author.username !== currentUserName && (
+                <>
+                    <span className="text-xs text-slate-400 dark:text-slate-500 -ml-1">&bull;</span>
+                    <FollowButton
+                      isFollowing={post.author.isFollowing}
+                      onClick={() => onToggleFollow(post.author.id)}
+                      variant="text"
+                    />
+                </>
+            )}
+          </div>
         </div>
-        <button className="text-slate-500 dark:text-slate-400">
-            <DotsHorizontalIcon className="w-5 h-5"/>
-        </button>
+         <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+            <span className="text-xs">{formatDate(post.timestamp)}</span>
+            <button>
+                <DotsHorizontalIcon className="w-5 h-5"/>
+            </button>
+        </div>
       </div>
 
       {/* Post Media with Double-Click Like and Animation */}
@@ -103,7 +119,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
 
         {/* Caption */}
         <p className="text-sm mt-1 text-slate-700 dark:text-slate-300">
-            <span className="font-semibold text-slate-800 dark:text-slate-100">{post.author}</span>{' '}
+            <span className="font-semibold text-slate-800 dark:text-slate-100">{post.author.username}</span>{' '}
             {post.caption}
         </p>
 

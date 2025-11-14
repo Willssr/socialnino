@@ -7,6 +7,7 @@ interface FeedProps {
     posts: Post[];
     handleLike: (postId: string) => void;
     handleComment: (postId: string, commentText: string) => void;
+    handleToggleFollow: (personId: number) => void;
     currentUserName: string;
     userProfile: UserProfile;
     onNavigate: (page: ActivePage) => void;
@@ -15,7 +16,7 @@ interface FeedProps {
     onViewStory: (author: string) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, currentUserName, userProfile, onNavigate, onAddStoryClick, stories, onViewStory }) => {
+const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, handleToggleFollow, currentUserName, userProfile, onNavigate, onAddStoryClick, stories, onViewStory }) => {
     return (
         // Ajustado o preenchimento vertical para ser mais consistente e espaçoso.
         <div className="w-full max-w-lg mx-auto py-6">
@@ -34,6 +35,7 @@ const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, currentUs
                         post={post} 
                         onLike={handleLike} 
                         onComment={handleComment}
+                        onToggleFollow={handleToggleFollow}
                         currentUserName={currentUserName}
                     />
                 ))}

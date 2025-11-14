@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
@@ -10,9 +11,9 @@ import Profile from './components/Profile';
 import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
 import { PlusCircleIcon } from './components/Icons';
-import { ActivePage, Post, Comment, UserProfile, Story } from './types';
+import { ActivePage, Post, Comment, UserProfile, Story, Person } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES } from './constants';
+import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES, INITIAL_PEOPLE } from './constants';
 import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
 import NewPostModal from './components/NewPostModal';
@@ -22,9 +23,10 @@ type Theme = 'light' | 'dark';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
-  const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v2', INITIAL_POSTS);
+  const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v3', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
+  const [people, setPeople] = useLocalStorage<Person[]>('socialnino-people-v1', INITIAL_PEOPLE);
   const [theme, setTheme] = useLocalStorage<Theme>('socialnino-theme', 'light');
   
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
@@ -54,13 +56,36 @@ const App: React.FC = () => {
     }
   }, [userProfile, setUserProfile]);
 
+  const handleToggleFollow = (personId: number) => {
+    // Update the list of people
+    setPeople(prevPeople =>
+      prevPeople.map(p =>
+        p.id === personId
+          ? { ...p, isFollowing: !p.isFollowing, followers: p.isFollowing ? p.followers - 1 : p.followers + 1 }
+          : p
+      )
+    );
+    // Update the follow status on posts by the same author
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.author.id === personId
+          ? { ...post, author: { ...post.author, isFollowing: !post.author.isFollowing } }
+          : post
+      )
+    );
+  };
+
   const handleAddPost = (caption: string, file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
         const newPost: Post = {
             id: `post-${Date.now()}`,
-            author: userProfile.name,
-            authorAvatar: userProfile.avatar,
+            author: {
+                id: 0, // 0 represents the current user
+                username: userProfile.name,
+                avatar: userProfile.avatar,
+                isFollowing: false, // You don't follow yourself
+            },
             timestamp: new Date().toISOString(),
             caption,
             media: {
@@ -136,9 +161,9 @@ const App: React.FC = () => {
       case 'download':
         return <Download />;
       case 'suggestions':
-        return <Suggestions />;
+        return <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
       case 'profile':
-        const userPosts = posts.filter(post => post.author === userProfile.name);
+        const userPosts = posts.filter(post => post.author.username === userProfile.name);
         return <Profile 
                   userProfile={userProfile} 
                   onUpdateProfile={setUserProfile} 
@@ -156,6 +181,7 @@ const App: React.FC = () => {
                   onAddStoryClick={() => setIsAddStoryModalOpen(true)}
                   stories={stories}
                   onViewStory={handleViewStory}
+                  handleToggleFollow={handleToggleFollow}
                 />;
     }
   };

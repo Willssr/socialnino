@@ -1,5 +1,50 @@
 
-import { Post, Song, Story, UserProfile } from './types';
+
+import { Post, Song, Story, UserProfile, Person } from './types';
+
+export const INITIAL_PEOPLE: Person[] = [
+  {
+    id: 1,
+    username: "nina_dev",
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d',
+    bio: "Fotógrafa e dev ✨",
+    followers: 1380,
+    isFollowing: false,
+  },
+  {
+    id: 2,
+    username: "rafael.art",
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
+    bio: "Arte digital e música",
+    followers: 520,
+    isFollowing: false,
+  },
+  {
+    id: 3,
+    username: "carla.codes",
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
+    bio: "Desenvolvedora Frontend",
+    followers: 940,
+    isFollowing: true,
+  },
+  {
+    id: 4,
+    username: "lucas_s",
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d',
+    bio: "Fotógrafo de paisagens",
+    followers: 1830,
+    isFollowing: false,
+  },
+   {
+    id: 5,
+    username: "ana.designer",
+    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026709d',
+    bio: "UI/UX Designer apaixonada por cores",
+    followers: 750,
+    isFollowing: false,
+  },
+];
+
 
 export const INITIAL_STORIES: Story[] = [
     { 
@@ -48,8 +93,12 @@ export const INITIAL_STORIES: Story[] = [
 export const INITIAL_POSTS: Post[] = [
   {
     id: 'post-1',
-    author: 'nina_dev',
-    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d',
+    author: {
+        id: 1,
+        username: 'nina_dev',
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d',
+        isFollowing: false
+    },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
     caption: 'Um lindo pôr do sol nas montanhas. A natureza é incrível!',
     media: {
@@ -65,8 +114,12 @@ export const INITIAL_POSTS: Post[] = [
   },
   {
     id: 'post-2',
-    author: 'rafael.art',
-    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
+    author: {
+        id: 2,
+        username: 'rafael.art',
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
+        isFollowing: false,
+    },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
     caption: 'Um clipe rápido das ondas do mar. Tão relaxante.',
     media: {
@@ -79,8 +132,12 @@ export const INITIAL_POSTS: Post[] = [
   },
   {
     id: 'post-3',
-    author: 'carla.codes',
-    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
+    author: {
+        id: 3,
+        username: 'carla.codes',
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
+        isFollowing: true,
+    },
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
     caption: 'Explorando as ruas da cidade.',
     media: {

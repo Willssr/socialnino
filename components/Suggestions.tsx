@@ -1,52 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Person } from '../types';
+import FollowButton from './FollowButton';
 
-const initialPeople: Person[] = [
-  {
-    id: 1,
-    username: "rafa_art",
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
-    bio: "Arte digital e música",
-    followers: 520,
-    isFollowing: false,
-  },
-  {
-    id: 2,
-    username: "carla.codes",
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
-    bio: "Desenvolvedora Frontend",
-    followers: 940,
-    isFollowing: true,
-  },
-  {
-    id: 3,
-    username: "lucas_s",
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d',
-    bio: "Fotógrafo de paisagens",
-    followers: 1830,
-    isFollowing: false,
-  },
-   {
-    id: 4,
-    username: "ana.designer",
-    avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026709d',
-    bio: "UI/UX Designer apaixonada por cores",
-    followers: 750,
-    isFollowing: false,
-  },
-];
+interface SuggestionsProps {
+    people: Person[];
+    onToggleFollow: (id: number) => void;
+}
 
-
-const Suggestions: React.FC = () => {
-    const [people, setPeople] = useState<Person[]>(initialPeople);
-
-    const handleToggleFollow = (id: number) => {
-        setPeople(prevPeople =>
-            prevPeople.map(person =>
-                person.id === id ? { ...person, isFollowing: !person.isFollowing } : person
-            )
-        );
-    };
+const Suggestions: React.FC<SuggestionsProps> = ({ people, onToggleFollow }) => {
 
     return (
         <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
@@ -63,16 +24,10 @@ const Suggestions: React.FC = () => {
                                 <p className="text-sm text-slate-500 dark:text-slate-400">{person.bio}</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => handleToggleFollow(person.id)}
-                            className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out ${
-                                person.isFollowing
-                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600'
-                                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:opacity-90'
-                            }`}
-                        >
-                            {person.isFollowing ? 'Seguindo' : 'Seguir'}
-                        </button>
+                        <FollowButton
+                            isFollowing={person.isFollowing}
+                            onClick={() => onToggleFollow(person.id)}
+                        />
                     </div>
                 ))}
             </div>
