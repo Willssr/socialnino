@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
@@ -14,6 +15,7 @@ import { useLocalStorage } from './hooks/useLocalStorage';
 import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES } from './constants';
 import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
+import NewPostModal from './components/NewPostModal';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
@@ -22,6 +24,7 @@ const App: React.FC = () => {
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
   
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
+  const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
 
   // Effect to migrate user profile data if 'stats' is missing
@@ -34,7 +37,7 @@ const App: React.FC = () => {
     }
   }, [userProfile, setUserProfile]);
 
-  const addPost = (caption: string, file: File) => {
+  const handleAddPost = (caption: string, file: File) => {
     const reader = new FileReader();
     reader.onloadend = () => {
         const newPost: Post = {
@@ -52,10 +55,10 @@ const App: React.FC = () => {
             comments: [],
         };
         setPosts(prevPosts => [newPost, ...prevPosts]);
+        setIsNewPostModalOpen(false);
     };
     reader.readAsDataURL(file);
   };
-  (window as any).addPost = addPost; // For simplified modal interaction
 
   const handleLike = (postId: string) => {
     setPosts(posts.map(post =>
@@ -145,13 +148,20 @@ const App: React.FC = () => {
       </main>
 
        <button 
-        onClick={() => alert('Abrir modal de criação de post!')}
+        onClick={() => setIsNewPostModalOpen(true)}
         className="fixed bottom-20 right-4 md:bottom-8 md:right-8 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-40"
         aria-label="Criar novo post"
         >
           <PlusCircleIcon className="w-10 h-10" />
       </button>
       
+      {isNewPostModalOpen && (
+        <NewPostModal
+            onClose={() => setIsNewPostModalOpen(false)}
+            onAddPost={handleAddPost}
+        />
+      )}
+
       {isAddStoryModalOpen && (
         <AddStoryModal 
           onClose={() => setIsAddStoryModalOpen(false)}
