@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserProfile, ActivePage } from '../types';
-import { MoonIcon, SunIcon, BellIcon } from './Icons';
+import { MoonIcon, SunIcon, BellIcon, SearchIcon } from './Icons';
 
 interface HeaderProps {
     userProfile: UserProfile;
@@ -9,9 +9,10 @@ interface HeaderProps {
     toggleTheme: () => void;
     unreadCount: number;
     onNotificationsClick: () => void;
+    onSearchClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleTheme, unreadCount, onNotificationsClick }) => {
+const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleTheme, unreadCount, onNotificationsClick, onSearchClick }) => {
   return (
     <header className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -34,9 +35,8 @@ const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleT
                     <SunIcon className="h-6 w-6" />
                 )}
             </button>
-             {/* Placeholder icons similar to Instagram */}
-            <button className="p-2 rounded-full hover:bg-white/20 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+             <button onClick={onSearchClick} className="p-2 rounded-full hover:bg-white/20 transition-colors">
+              <SearchIcon className="h-6 w-6" />
             </button>
              <button onClick={onNotificationsClick} className="relative p-2 rounded-full hover:bg-white/20 transition-colors">
               <BellIcon className="h-6 w-6" />

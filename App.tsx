@@ -16,6 +16,7 @@ import NewPostModal from './components/NewPostModal';
 import Suggestions from './components/Suggestions';
 import Play from './components/Play';
 import NotificationsPanel from './components/NotificationsPanel';
+import SearchModal from './components/SearchModal';
 
 type Theme = 'light' | 'dark';
 
@@ -33,6 +34,7 @@ const App: React.FC = () => {
   const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -216,6 +218,7 @@ const App: React.FC = () => {
         toggleTheme={toggleTheme} 
         unreadCount={unreadCount}
         onNotificationsClick={() => setIsNotificationsOpen(prev => !prev)}
+        onSearchClick={() => setIsSearchModalOpen(true)}
       />
       
       <main className="flex-grow pb-16 md:pb-0">
@@ -259,6 +262,14 @@ const App: React.FC = () => {
             notifications={notifications}
             onClose={() => setIsNotificationsOpen(false)}
             onMarkAllAsRead={handleMarkAllAsRead}
+        />
+      )}
+
+      {isSearchModalOpen && (
+        <SearchModal 
+            onClose={() => setIsSearchModalOpen(false)}
+            posts={posts}
+            people={people}
         />
       )}
 
