@@ -46,7 +46,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, currentUse
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200/80 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md border border-slate-200/80 overflow-hidden">
       {/* Post Header */}
       <div className="p-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">

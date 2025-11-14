@@ -1,7 +1,7 @@
-
 import React, { useState } from 'react';
 import { UserProfile, Post } from '../types';
 import EditProfileModal from './EditProfileModal';
+import { HeartIcon, CommentIcon, PlayIcon } from './Icons';
 
 interface ProfileProps {
   userProfile: UserProfile;
@@ -72,12 +72,30 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
         {userPosts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
             {userPosts.map(post => (
-              <div key={post.id} className="aspect-square bg-gray-200 rounded-lg overflow-hidden group">
+              <div key={post.id} className="relative aspect-square bg-slate-200 rounded-md overflow-hidden group cursor-pointer">
+                {/* Media */}
                 {post.media.type === 'image' ? (
                   <img src={post.media.src} alt={post.caption} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 ) : (
                   <video src={post.media.src} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 )}
+                
+                {/* Video Icon */}
+                {post.media.type === 'video' && (
+                    <PlayIcon className="absolute top-2 right-2 w-6 h-6 text-white drop-shadow-lg" />
+                )}
+
+                {/* Hover Overlay with Stats */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-6">
+                  <div className="flex items-center space-x-1.5 text-white font-bold text-lg">
+                    <HeartIcon className="w-6 h-6" isLiked={true} />
+                    <span>{post.likes.toLocaleString('pt-BR')}</span>
+                  </div>
+                  <div className="flex items-center space-x-1.5 text-white font-bold text-lg">
+                    <CommentIcon className="w-6 h-6" />
+                    <span>{post.comments.length.toLocaleString('pt-BR')}</span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
