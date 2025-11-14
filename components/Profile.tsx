@@ -14,6 +14,18 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
   const [isEditing, setIsEditing] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
+  // State for follow functionality
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(userProfile.stats?.followers || 0);
+
+  const handleToggleFollow = () => {
+    setIsFollowing(prev => {
+      const newIsFollowing = !prev;
+      setFollowersCount(count => newIsFollowing ? count + 1 : count - 1);
+      return newIsFollowing;
+    });
+  };
+
   const handleSaveProfile = (updatedProfile: UserProfile) => {
     onUpdateProfile(updatedProfile);
     setIsEditing(false);
@@ -21,7 +33,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
 
   const stats = [
     { label: 'publicações', value: userPosts.length },
-    { label: 'seguidores', value: userProfile.stats?.followers.toLocaleString('pt-BR') },
+    { label: 'seguidores', value: followersCount.toLocaleString('pt-BR') },
     { label: 'seguindo', value: userProfile.stats?.following.toLocaleString('pt-BR') },
   ];
   
@@ -44,12 +56,24 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
           <div className="mt-4 sm:mt-8 flex-grow w-full text-center sm:text-left">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">{userProfile.name}</h1>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="w-full sm:w-auto bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-              >
-                Editar Perfil
-              </button>
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-auto bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                >
+                  Editar Perfil
+                </button>
+                <button
+                  onClick={handleToggleFollow}
+                  className={`w-auto px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out ${
+                    isFollowing 
+                    ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600' 
+                    : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:opacity-90'
+                  }`}
+                >
+                  {isFollowing ? 'Seguindo' : 'Seguir'}
+                </button>
+              </div>
             </div>
 
             {/* Stats Section */}
@@ -88,21 +112,21 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
                 )}
 
                 {/* Hover Overlay with Stats */}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center space-x-6">
-                  <div className="flex items-center space-x-1.5 text-white font-bold text-lg">
-                    <HeartIcon className="w-6 h-6" isLiked={true} />
-                    <span>{post.likes.toLocaleString('pt-BR')}</span>
-                  </div>
-                  <div className="flex items-center space-x-1.5 text-white font-bold text-lg">
-                    <CommentIcon className="w-6 h-6" />
-                    <span>{post.comments.length.toLocaleString('pt-BR')}</span>
-                  </div>
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white space-x-4">
+                    <div className="flex items-center space-x-1">
+                        <HeartIcon className="w-5 h-5" isLiked={post.isLiked} />
+                        <span>{post.likes}</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                        <CommentIcon className="w-5 h-5" />
+                        <span>{post.comments.length}</span>
+                    </div>
                 </div>
               </button>
             ))}
           </div>
         ) : (
-          <p className="text-slate-500 dark:text-slate-400 text-center py-8">Nenhuma publicação ainda.</p>
+          <p className="text-center text-slate-500 dark:text-slate-400 py-8">Nenhuma publicação ainda.</p>
         )}
       </div>
 
@@ -115,7 +139,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
       )}
 
       {selectedPost && (
-        <PostDetailModal 
+        <PostDetailModal
           post={selectedPost}
           onClose={() => setSelectedPost(null)}
         />
