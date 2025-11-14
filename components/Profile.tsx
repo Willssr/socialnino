@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import { UserProfile, Post } from '../types';
 import EditProfileModal from './EditProfileModal';
 import { HeartIcon, CommentIcon, PlayIcon } from './Icons';
+import PostDetailModal from './PostDetailModal';
 
 interface ProfileProps {
   userProfile: UserProfile;
   onUpdateProfile: (newProfile: UserProfile) => void;
   userPosts: Post[];
+  handleLike: (postId: string) => void;
+  handleComment: (postId: string, commentText: string) => void;
+  currentUserName: string;
 }
 
-const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPosts }) => {
+const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPosts, handleLike, handleComment, currentUserName }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const handleSaveProfile = (updatedProfile: UserProfile) => {
     onUpdateProfile(updatedProfile);
@@ -22,6 +27,10 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
     { label: 'seguidores', value: userProfile.stats?.followers.toLocaleString('pt-BR') },
     { label: 'seguindo', value: userProfile.stats?.following.toLocaleString('pt-BR') },
   ];
+  
+  // Find the most up-to-date version of the selected post from the userPosts array
+  const updatedSelectedPost = selectedPost ? userPosts.find(p => p.id === selectedPost.id) || selectedPost : null;
+
 
   return (
     <div className="w-full max-w-4xl mx-auto">
@@ -32,7 +41,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Profile Header - Redesigned based on user's component structure */}
+        {/* Profile Header */}
         <div className="relative -mt-16 sm:-mt-20 flex flex-col items-center sm:flex-row sm:items-start sm:space-x-8">
           <img
             src={userProfile.avatar}
@@ -72,7 +81,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
         {userPosts.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 sm:gap-4">
             {userPosts.map(post => (
-              <div key={post.id} className="relative aspect-square bg-slate-200 rounded-md overflow-hidden group cursor-pointer">
+              <button key={post.id} onClick={() => setSelectedPost(post)} className="relative aspect-square bg-slate-200 rounded-md overflow-hidden group">
                 {/* Media */}
                 {post.media.type === 'image' ? (
                   <img src={post.media.src} alt={post.caption} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
@@ -96,7 +105,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
                     <span>{post.comments.length.toLocaleString('pt-BR')}</span>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         ) : (
@@ -109,6 +118,16 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
           currentUser={userProfile}
           onSave={handleSaveProfile}
           onClose={() => setIsEditing(false)}
+        />
+      )}
+
+      {updatedSelectedPost && (
+        <PostDetailModal 
+          post={updatedSelectedPost}
+          onClose={() => setSelectedPost(null)}
+          onLike={handleLike}
+          onComment={handleComment}
+          currentUserName={currentUserName}
         />
       )}
     </div>

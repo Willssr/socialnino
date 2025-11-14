@@ -120,7 +120,14 @@ const App: React.FC = () => {
         return <Download />;
       case 'profile':
         const userPosts = posts.filter(post => post.author === userProfile.name);
-        return <Profile userProfile={userProfile} onUpdateProfile={setUserProfile} userPosts={userPosts} />;
+        return <Profile 
+                  userProfile={userProfile} 
+                  onUpdateProfile={setUserProfile} 
+                  userPosts={userPosts}
+                  handleLike={handleLike}
+                  handleComment={handleComment}
+                  currentUserName={userProfile.name}
+                />;
       case 'feed':
       default:
         return <Feed 
