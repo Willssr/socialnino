@@ -16,6 +16,7 @@ import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES } from './constant
 import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
 import NewPostModal from './components/NewPostModal';
+import Suggestions from './components/Suggestions';
 
 type Theme = 'light' | 'dark';
 
@@ -134,6 +135,8 @@ const App: React.FC = () => {
         return <About />;
       case 'download':
         return <Download />;
+      case 'suggestions':
+        return <Suggestions />;
       case 'profile':
         const userPosts = posts.filter(post => post.author === userProfile.name);
         return <Profile 

@@ -99,6 +99,11 @@ export const UserIcon = ({ className, solid }: { className?: string, solid?: boo
     </svg>
 );
 
+export const UsersIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill={solid ? "currentColor" : "none"} stroke={!solid ? 'currentColor' : 'none'} strokeWidth={!solid ? 1.5 : 0}>
+        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0110 14.07a3.25 3.25 0 00-3.03 1.25C4.28 16.27 4 17.38 4 18.5V19a1 1 0 001 1h9.93a1 1 0 00.99-1.07zM16 12a5 5 0 01-3.93 4.93a3.25 3.25 0 00-3.03-1.25A5 5 0 0110 9.93a6.97 6.97 0 004.5-1.5c.327.046.66.07 1 .07a3 3 0 010 6z" />
+    </svg>
+);
 
 export const PlusCircleIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

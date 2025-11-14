@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, MusicNoteIcon, InformationCircleIcon, DownloadIcon, UserIcon } from './Icons';
+import { HomeIcon, UsersIcon, PlusCircleIcon, InformationCircleIcon, UserIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
@@ -12,8 +12,8 @@ interface BottomNavProps {
 const BottomNav: React.FC<BottomNavProps> = ({ activePage, setActivePage }) => {
   const navItems = [
     { id: 'feed', label: 'Feed', icon: HomeIcon },
-    { id: 'music', label: 'Músicas', icon: MusicNoteIcon },
-    { id: 'download', label: 'Baixar', icon: DownloadIcon },
+    { id: 'suggestions', label: 'Sugestões', icon: UsersIcon },
+    { id: 'download', label: 'Baixar', icon: PlusCircleIcon }, // Placeholder icon
     { id: 'about', label: 'Sobre', icon: InformationCircleIcon },
     { id: 'profile', label: 'Perfil', icon: UserIcon },
   ];

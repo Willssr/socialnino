@@ -56,4 +56,14 @@ export interface UserProfile {
   };
 }
 
-export type ActivePage = 'feed' | 'music' | 'about' | 'download' | 'profile';
+export interface Person {
+    id: number;
+    username: string;
+    avatar: string;
+    bio: string;
+    followers: number;
+    isFollowing: boolean;
+}
+
+
+export type ActivePage = 'feed' | 'music' | 'about' | 'download' | 'profile' | 'suggestions';
