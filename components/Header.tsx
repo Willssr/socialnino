@@ -1,66 +1,40 @@
+
 import React from 'react';
-import { ActivePage } from '../types';
 
-interface HeaderProps {
-  activePage: ActivePage;
-  setActivePage: (page: ActivePage) => void;
-}
-
-const Header: React.FC<HeaderProps> = ({ activePage, setActivePage }) => {
-  const navItems: { id: ActivePage; label: string }[] = [
-    { id: 'feed', label: 'Feed' },
-    { id: 'music', label: 'Músicas' },
-    { id: 'about', label: 'Sobre' },
-  ];
-
+const Header: React.FC = () => {
   return (
-    <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-      <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <header className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white shadow-md sticky top-0 z-50">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
         <div className="flex items-center justify-between h-16">
           <div className="flex-shrink-0">
-            <span className="text-3xl font-bold text-indigo-600 cursor-pointer" onClick={() => setActivePage('feed')}>
+            {/* Using a simple text logo with a unique font for style */}
+            <span style={{ fontFamily: "'Lobster', cursive" }} className="text-3xl font-bold tracking-wider cursor-pointer">
               SocialNino
             </span>
           </div>
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActivePage(item.id)}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
-                    activePage === item.id
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-indigo-600'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="md:hidden">
-            {/* Mobile menu could be implemented here with a hamburger icon */}
-            <div className="flex items-baseline space-x-2">
-               {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActivePage(item.id)}
-                  className={`px-3 py-2 rounded-md text-xs font-medium transition-colors duration-200 ${
-                    activePage === item.id
-                      ? 'bg-indigo-600 text-white'
-                      : 'text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
+          <div className="flex items-center space-x-4">
+             {/* Placeholder icons similar to Instagram */}
+            <button className="p-2 rounded-full hover:bg-white/20 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+            </button>
+             <button className="p-2 rounded-full hover:bg-white/20 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+            </button>
+             <button className="p-2 rounded-full hover:bg-white/20 transition-colors">
+                <img src="https://i.pravatar.cc/150?u=a042581f4e29026704d" alt="Profile" className="h-8 w-8 rounded-full border-2 border-white"/>
+            </button>
           </div>
         </div>
-      </nav>
+      </div>
     </header>
   );
 };
+
+// Add a link to the Lobster font in the document head for the logo
+const fontLink = document.createElement('link');
+fontLink.href = 'https://fonts.googleapis.com/css2?family=Lobster&display=swap';
+fontLink.rel = 'stylesheet';
+document.head.appendChild(fontLink);
+
 
 export default Header;

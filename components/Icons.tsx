@@ -1,11 +1,11 @@
 
 import React from 'react';
 
-export const HeartIcon = ({ className }: { className?: string }) => (
+export const HeartIcon = ({ className, isLiked }: { className?: string; isLiked?: boolean; }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     className={className}
-    fill="none"
+    fill={isLiked ? 'currentColor' : 'none'}
     viewBox="0 0 24 24"
     stroke="currentColor"
     strokeWidth={2}
@@ -41,5 +41,55 @@ export const PaperAirplaneIcon = ({ className }: { className?: string }) => (
         strokeWidth={2}
     >
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+);
+
+export const BookmarkIcon = ({ className }: { className?: string }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+    >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+    </svg>
+);
+
+export const DotsHorizontalIcon = ({ className }: { className?: string }) => (
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+    >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h.01M12 12h.01M19 12h.01" />
+    </svg>
+);
+
+export const HomeIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor" stroke={!solid ? 'currentColor' : 'none'} strokeWidth={!solid ? 1.5 : 0}>
+        <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
+    </svg>
+);
+
+export const MusicNoteIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor" stroke={!solid ? 'currentColor' : 'none'} strokeWidth={!solid ? 1.5 : 0}>
+        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
+    </svg>
+);
+
+export const InformationCircleIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor" stroke={!solid ? 'currentColor' : 'none'} strokeWidth={!solid ? 1.5 : 0}>
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+    </svg>
+);
+
+export const PlusCircleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
 );

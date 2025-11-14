@@ -11,6 +11,7 @@ export type PostType = 'image' | 'video';
 export interface Post {
   id: string;
   author: string;
+  authorAvatar: string;
   timestamp: string;
   caption: string;
   media: {
@@ -18,6 +19,7 @@ export interface Post {
     src: string;
   };
   likes: number;
+  isLiked: boolean; // To track liked state for the demo
   comments: Comment[];
 }
 
@@ -31,6 +33,12 @@ export interface Song {
 export interface GeolocationData {
   country: string;
   city: string;
+}
+
+export interface Story {
+    id: string;
+    author: string;
+    avatar: string;
 }
 
 export type ActivePage = 'feed' | 'music' | 'about';

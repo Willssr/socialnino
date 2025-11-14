@@ -1,46 +1,63 @@
 
-import { Post, Song } from './types';
+import { Post, Song, Story } from './types';
+
+export const INITIAL_STORIES: Story[] = [
+    { id: 'story-1', author: 'Você', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' },
+    { id: 'story-2', author: 'nina_dev', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d' },
+    { id: 'story-3', author: 'rafael.art', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d' },
+    { id: 'story-4', author: 'carla.codes', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d' },
+    { id: 'story-5', author: 'lucas_s', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d' },
+    { id: 'story-6', author: 'beatriz_m', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026709d' },
+    { id: 'story-7', author: 'andre.js', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026710d' },
+];
+
 
 export const INITIAL_POSTS: Post[] = [
   {
     id: 'post-1',
-    author: 'Admin',
+    author: 'nina_dev',
+    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    caption: 'A beautiful sunset over the mountains. Nature is amazing!',
+    caption: 'Um lindo pôr do sol nas montanhas. A natureza é incrível!',
     media: {
       type: 'image',
       src: 'https://picsum.photos/id/1015/800/600',
     },
     likes: 128,
+    isLiked: false,
     comments: [
-      { id: 'comment-1-1', author: 'Visitor', text: 'Stunning view!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString() },
-      { id: 'comment-1-2', author: 'Anonymous', text: 'I wish I were there.', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
+      { id: 'comment-1-1', author: 'Visitante', text: 'Vista deslumbrante!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString() },
+      { id: 'comment-1-2', author: 'Anônimo', text: 'Queria estar aí.', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
     ],
   },
   {
     id: 'post-2',
-    author: 'Admin',
+    author: 'rafael.art',
+    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    caption: 'A short clip of ocean waves. So relaxing.',
+    caption: 'Um clipe rápido das ondas do mar. Tão relaxante.',
     media: {
       type: 'video',
       src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     },
     likes: 256,
+    isLiked: true,
     comments: [],
   },
   {
     id: 'post-3',
-    author: 'Admin',
+    author: 'carla.codes',
+    authorAvatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
     timestamp: new Date(Date.now() - 1000 * 60 * 60 * 48).toISOString(),
-    caption: 'Exploring the city streets.',
+    caption: 'Explorando as ruas da cidade.',
     media: {
       type: 'image',
       src: 'https://picsum.photos/id/1074/800/600',
     },
     likes: 95,
+    isLiked: false,
     comments: [
-      { id: 'comment-3-1', author: 'Visitor', text: 'Great shot!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString() },
+      { id: 'comment-3-1', author: 'Visitante', text: 'Ótima foto!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString() },
     ],
   },
 ];

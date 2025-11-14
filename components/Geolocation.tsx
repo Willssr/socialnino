@@ -5,7 +5,6 @@ import { GeolocationData } from '../types';
 
 const Geolocation: React.FC = () => {
   const [location, setLocation] = useState<GeolocationData | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getLocation = async () => {
@@ -13,7 +12,6 @@ const Geolocation: React.FC = () => {
         const data = await fetchGeolocation();
         setLocation(data);
       } catch (err) {
-        setError('Could not determine location.');
         console.error(err);
       }
     };
@@ -21,15 +19,13 @@ const Geolocation: React.FC = () => {
     getLocation();
   }, []);
 
+  if (!location) {
+    return null;
+  }
+
   return (
-    <div className="bg-slate-100 text-center py-2 text-sm text-slate-500">
-      {location ? (
-        <p>Você está acessando de: <span className="font-semibold">{location.city}, {location.country}</span></p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : (
-        <p>Determinando sua localização...</p>
-      )}
+    <div className="text-center text-xs text-slate-400">
+        <p>Acessando de: <span className="font-semibold">{location.city}, {location.country}</span></p>
     </div>
   );
 };
