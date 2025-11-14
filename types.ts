@@ -73,4 +73,4 @@ export interface Person {
 }
 
 
-export type ActivePage = 'feed' | 'music' | 'about' | 'profile' | 'suggestions';
+export type ActivePage = 'feed' | 'music' | 'about' | 'profile' | 'suggestions' | 'play';

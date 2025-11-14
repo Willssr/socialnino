@@ -128,3 +128,9 @@ export const MoonIcon = ({ className }: { className?: string }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
     </svg>
 );
+
+export const GameControllerIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill={solid ? "currentColor" : "none"} stroke={!solid ? 'currentColor' : 'none'} strokeWidth={!solid ? 1.5 : 0}>
+        <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V5a1 1 0 00-1.447-.894l-4 2A1 1 0 0011 7v10zM4 17a1 1 0 01-1.447-.894l-2-4A1 1 0 011 11V9a1 1 0 011.447-.894l2-4A1 1 0 015 5h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1v-2zm2-5a1 1 0 011-1h1a1 1 0 110 2H7a1 1 0 01-1-1zm2 3a1 1 0 000 2h1a1 1 0 100-2H9z" />
+    </svg>
+);

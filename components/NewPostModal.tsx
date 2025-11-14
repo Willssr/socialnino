@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 interface NewPostModalProps {
   onClose: () => void;
   onAddPost: (caption: string, file: File) => void;
+  initialCaption?: string;
 }
 
-const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost }) => {
+const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initialCaption = '' }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [caption, setCaption] = useState('');
+  const [caption, setCaption] = useState(initialCaption);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

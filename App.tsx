@@ -2,6 +2,8 @@
 
 
 
+
+
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
@@ -18,6 +20,7 @@ import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
 import NewPostModal from './components/NewPostModal';
 import Suggestions from './components/Suggestions';
+import Play from './components/Play';
 
 type Theme = 'light' | 'dark';
 
@@ -31,6 +34,7 @@ const App: React.FC = () => {
   
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
+  const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
 
   useEffect(() => {
@@ -55,6 +59,16 @@ const App: React.FC = () => {
       }));
     }
   }, [userProfile, setUserProfile]);
+
+  const handleOpenNewPostModal = (initialCaption: string = '') => {
+    setNewPostInitialCaption(initialCaption);
+    setIsNewPostModalOpen(true);
+  };
+
+  const handleCloseNewPostModal = () => {
+    setIsNewPostModalOpen(false);
+    setNewPostInitialCaption(''); // Reset on close
+  };
 
   const handleToggleFollow = (personId: number) => {
     // Update the list of people
@@ -97,7 +111,7 @@ const App: React.FC = () => {
             comments: [],
         };
         setPosts(prevPosts => [newPost, ...prevPosts]);
-        setIsNewPostModalOpen(false);
+        handleCloseNewPostModal();
     };
     reader.readAsDataURL(file);
   };
@@ -152,6 +166,10 @@ const App: React.FC = () => {
     }
   };
 
+  const handleParticipateInChallenge = ({ legenda }: { legenda: string }) => {
+    handleOpenNewPostModal(legenda);
+  };
+
   const renderPage = () => {
     switch (activePage) {
       case 'music':
@@ -160,6 +178,8 @@ const App: React.FC = () => {
         return <About />;
       case 'suggestions':
         return <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
+      case 'play':
+        return <Play onParticipateInChallenge={handleParticipateInChallenge} />;
       case 'profile':
         const userPosts = posts.filter(post => post.author.username === userProfile.name);
         return <Profile 
@@ -195,7 +215,7 @@ const App: React.FC = () => {
       </main>
 
        <button 
-        onClick={() => setIsNewPostModalOpen(true)}
+        onClick={() => handleOpenNewPostModal()}
         className="fixed bottom-20 right-4 md:bottom-8 md:right-8 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-40"
         aria-label="Criar novo post"
         >
@@ -204,8 +224,9 @@ const App: React.FC = () => {
       
       {isNewPostModalOpen && (
         <NewPostModal
-            onClose={() => setIsNewPostModalOpen(false)}
+            onClose={handleCloseNewPostModal}
             onAddPost={handleAddPost}
+            initialCaption={newPostInitialCaption}
         />
       )}
 
