@@ -96,3 +96,11 @@ export type PointsEvent =
   | "FOLLOW"
   | "CHALLENGE"
   | "QUIZ";
+
+export interface Track {
+  id: number | string;
+  title: string;
+  artist: string;
+  cover: string;
+  src: string;
+}

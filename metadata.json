@@ -2,6 +2,7 @@
   "name": "SocialNino",
   "description": "A responsive web application named SocialNino where users can view, like, and comment on photo and video posts. It includes a music section, an about page, and geolocation features.",
   "requestFramePermissions": [
-    "geolocation"
+    "geolocation",
+    "microphone"
   ]
 }
