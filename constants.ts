@@ -2,13 +2,46 @@
 import { Post, Song, Story, UserProfile } from './types';
 
 export const INITIAL_STORIES: Story[] = [
-    { id: 'story-1', author: 'Você', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d' },
-    { id: 'story-2', author: 'nina_dev', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d' },
-    { id: 'story-3', author: 'rafael.art', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d' },
-    { id: 'story-4', author: 'carla.codes', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d' },
-    { id: 'story-5', author: 'lucas_s', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d' },
-    { id: 'story-6', author: 'beatriz_m', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026709d' },
-    { id: 'story-7', author: 'andre.js', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026710d' },
+    { 
+        id: 'story-2', 
+        author: 'nina_dev', 
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d', 
+        mediaSrc: 'https://picsum.photos/id/10/1080/1920',
+        mediaType: 'image',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString()
+    },
+    { 
+        id: 'story-3', 
+        author: 'rafael.art', 
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
+        mediaSrc: 'https://picsum.photos/id/20/1080/1920',
+        mediaType: 'image',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
+    },
+    { 
+        id: 'story-4', 
+        author: 'carla.codes', 
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
+        mediaSrc: 'https://picsum.photos/id/30/1080/1920',
+        mediaType: 'image',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString()
+    },
+     { 
+        id: 'story-4b', 
+        author: 'carla.codes', 
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
+        mediaSrc: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        mediaType: 'video',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 7).toISOString()
+    },
+    { 
+        id: 'story-5', 
+        author: 'lucas_s', 
+        avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d',
+        mediaSrc: 'https://picsum.photos/id/40/1080/1920',
+        mediaType: 'image',
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
+    },
 ];
 
 
@@ -70,7 +103,7 @@ export const INITIAL_SONGS: Song[] = [
 ];
 
 export const INITIAL_USER_PROFILE: UserProfile = {
-    name: 'SocialNino User',
+    name: 'Você',
     avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
     coverPhoto: 'https://picsum.photos/id/1018/1200/400',
     bio: 'Bem-vindo ao meu perfil! Explorando o mundo e compartilhando momentos.',

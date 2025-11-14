@@ -8,16 +8,21 @@ import Profile from './components/Profile';
 import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
 import { PlusCircleIcon } from './components/Icons';
-import { ActivePage, Post, Comment, UserProfile } from './types';
+import { ActivePage, Post, Comment, UserProfile, Story } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { INITIAL_POSTS, INITIAL_USER_PROFILE } from './constants';
+import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES } from './constants';
 import AddStoryModal from './components/AddStoryModal';
+import StoryViewerModal from './components/StoryViewerModal';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
   const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v2', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
+  const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
+  
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
+  const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
+
 
   const addPost = (caption: string, file: File) => {
     const reader = new FileReader();
@@ -66,10 +71,30 @@ const App: React.FC = () => {
   };
 
   const handleSaveStory = (storyFile: File) => {
-    // In a real app, you would upload the file and update the stories data.
-    // For this demo, we can just log it and close the modal.
-    console.log('New story to be posted:', storyFile.name);
-    setIsAddStoryModalOpen(false);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        const newStory: Story = {
+            id: `story-${Date.now()}`,
+            author: userProfile.name,
+            avatar: userProfile.avatar,
+            mediaSrc: reader.result as string,
+            mediaType: storyFile.type.startsWith('image/') ? 'image' : 'video',
+            timestamp: new Date().toISOString(),
+        };
+        setStories(prevStories => [...prevStories, newStory]);
+        setIsAddStoryModalOpen(false);
+    };
+    reader.readAsDataURL(storyFile);
+  };
+  
+  const handleViewStory = (author: string) => {
+    const authorStories = stories
+        .filter(s => s.author === author)
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+
+    if (authorStories.length > 0) {
+        setStoryViewerState({ isOpen: true, stories: authorStories });
+    }
   };
 
   const renderPage = () => {
@@ -93,6 +118,8 @@ const App: React.FC = () => {
                   userProfile={userProfile}
                   onNavigate={setActivePage}
                   onAddStoryClick={() => setIsAddStoryModalOpen(true)}
+                  stories={stories}
+                  onViewStory={handleViewStory}
                 />;
     }
   };
@@ -120,6 +147,13 @@ const App: React.FC = () => {
           onClose={() => setIsAddStoryModalOpen(false)}
           onSave={handleSaveStory}
         />
+      )}
+
+      {storyViewerState.isOpen && (
+          <StoryViewerModal
+            stories={storyViewerState.stories}
+            onClose={() => setStoryViewerState({ isOpen: false, stories: [] })}
+          />
       )}
 
       <BottomNav activePage={activePage} setActivePage={setActivePage} />

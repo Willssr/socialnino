@@ -39,6 +39,9 @@ export interface Story {
     id: string;
     author: string;
     avatar: string;
+    mediaSrc: string;
+    mediaType: 'image' | 'video';
+    timestamp: string;
 }
 
 export interface UserProfile {
