@@ -32,6 +32,20 @@
   .animate-heart-burst {
     animation: heart-burst 0.8s ease-out forwards;
   }
+  .animation-slide-up {
+    animation: slideUp 0.28s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 </style>
 </head>
   <body class="bg-gray-50">

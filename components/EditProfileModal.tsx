@@ -41,7 +41,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ currentUser, onSave
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animation-slide-up">
         <form onSubmit={handleSubmit}>
           <div className="p-6">
             <div className="flex justify-between items-center mb-4">

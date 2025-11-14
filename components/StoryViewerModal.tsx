@@ -93,7 +93,7 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose })
 
   return (
     <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center" onClick={onClose}>
-      <div className="relative w-full max-w-md h-full max-h-[95vh] bg-black rounded-lg overflow-hidden shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="relative w-full max-w-md h-full max-h-[95vh] bg-black rounded-lg overflow-hidden shadow-2xl animation-slide-up" onClick={(e) => e.stopPropagation()}>
         {/* Progress Bars */}
         <div className="absolute top-2 left-2 right-2 flex space-x-1 z-20">
           {stories.map((_, index) => (
