@@ -1,9 +1,3 @@
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
@@ -13,14 +7,15 @@ import Profile from './components/Profile';
 import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
 import { PlusCircleIcon } from './components/Icons';
-import { ActivePage, Post, Comment, UserProfile, Story, Person } from './types';
+import { ActivePage, Post, Comment, UserProfile, Story, Person, Notification } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
-import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES, INITIAL_PEOPLE } from './constants';
+import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES, INITIAL_PEOPLE, INITIAL_NOTIFICATIONS } from './constants';
 import AddStoryModal from './components/AddStoryModal';
 import StoryViewerModal from './components/StoryViewerModal';
 import NewPostModal from './components/NewPostModal';
 import Suggestions from './components/Suggestions';
 import Play from './components/Play';
+import NotificationsPanel from './components/NotificationsPanel';
 
 type Theme = 'light' | 'dark';
 
@@ -30,12 +25,16 @@ const App: React.FC = () => {
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
   const [people, setPeople] = useLocalStorage<Person[]>('socialnino-people-v1', INITIAL_PEOPLE);
+  const [notifications, setNotifications] = useLocalStorage<Notification[]>('socialnino-notifications-v1', INITIAL_NOTIFICATIONS);
   const [theme, setTheme] = useLocalStorage<Theme>('socialnino-theme', 'light');
   
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
   const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -170,6 +169,10 @@ const App: React.FC = () => {
     handleOpenNewPostModal(legenda);
   };
 
+  const handleMarkAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+  };
+
   const renderPage = () => {
     switch (activePage) {
       case 'music':
@@ -179,7 +182,7 @@ const App: React.FC = () => {
       case 'suggestions':
         return <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
       case 'play':
-        return <Play onParticipateInChallenge={handleParticipateInChallenge} />;
+        return <Play onParticipateInChallenge={handleParticipateInChallenge} currentUser={userProfile.name} />;
       case 'profile':
         const userPosts = posts.filter(post => post.author.username === userProfile.name);
         return <Profile 
@@ -206,7 +209,14 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">
-      <Header userProfile={userProfile} onNavigate={setActivePage} theme={theme} toggleTheme={toggleTheme} />
+      <Header 
+        userProfile={userProfile} 
+        onNavigate={setActivePage} 
+        theme={theme} 
+        toggleTheme={toggleTheme} 
+        unreadCount={unreadCount}
+        onNotificationsClick={() => setIsNotificationsOpen(prev => !prev)}
+      />
       
       <main className="flex-grow pb-16 md:pb-0">
         <div className="container mx-auto px-0 sm:px-4">
@@ -242,6 +252,14 @@ const App: React.FC = () => {
             stories={storyViewerState.stories}
             onClose={() => setStoryViewerState({ isOpen: false, stories: [] })}
           />
+      )}
+      
+      {isNotificationsOpen && (
+        <NotificationsPanel
+            notifications={notifications}
+            onClose={() => setIsNotificationsOpen(false)}
+            onMarkAllAsRead={handleMarkAllAsRead}
+        />
       )}
 
       <BottomNav activePage={activePage} setActivePage={setActivePage} />

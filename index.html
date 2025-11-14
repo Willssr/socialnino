@@ -247,6 +247,119 @@
     opacity: 0.5;
     cursor: default;
   }
+  /* Ranking Styles */
+  .ranking-card {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border: 1px solid #e5e7eb;
+  }
+  .dark .ranking-card {
+    background-color: #1e293b; /* slate-800 */
+    border-color: #334155; /* slate-700 */
+  }
+  .ranking-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.25rem;
+    color: #1e293b;
+  }
+  .dark .ranking-title {
+    color: #f1f5f9;
+  }
+  .ranking-sub {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+  .dark .ranking-sub {
+    color: #94a3b8;
+  }
+  .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8fafc;
+    transition: background-color 0.2s;
+  }
+  .dark .ranking-item {
+    background-color: #334155;
+  }
+  .ranking-item-current {
+    background-color: #e0e7ff; /* indigo-100 */
+    box-shadow: 0 0 0 2px #6366f1; /* indigo-500 */
+  }
+  .dark .ranking-item-current {
+    background-color: #3730a3; /* indigo-800 */
+    box-shadow: 0 0 0 2px #818cf8; /* indigo-400 */
+  }
+  .ranking-pos {
+    font-weight: 700;
+    font-size: 1rem;
+    width: 3rem;
+    flex-shrink: 0;
+    color: #4f46e5;
+  }
+  .dark .ranking-pos {
+    color: #a5b4fc;
+  }
+  .ranking-name {
+    font-weight: 600;
+    flex-grow: 1;
+    color: #1e293b;
+  }
+  .dark .ranking-name {
+    color: #f1f5f9;
+  }
+  .ranking-score {
+    font-weight: 700;
+    color: #1e293b;
+  }
+  .dark .ranking-score {
+    color: #f1f5f9;
+  }
+  .ranking-empty {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+    padding: 2rem 0;
+  }
+  .dark .ranking-empty {
+    color: #94a3b8;
+  }
+  /* Notification Styles */
+  .notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background-color: #ef4444; /* red-500 */
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid white;
+  }
+  .dark .notif-badge {
+    border-color: #1e293b; /* slate-800 */
+  }
 </style>
 </head>
   <body class="bg-gray-50 dark:bg-slate-900">

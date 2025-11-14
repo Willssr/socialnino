@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { updateRanking, RankingEntry } from '../services/rankingService';
+import Ranking from './Ranking';
 
 // MOCK TEMPORÁRIO
 const mockUsers = [
@@ -46,13 +48,21 @@ function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
-export default function QuizFotos() {
+const TOTAL_ROUNDS = 5;
+
+interface QuizFotosProps {
+    currentUser: string;
+}
+
+export default function QuizFotos({ currentUser }: QuizFotosProps) {
   const [pontuacao, setPontuacao] = useState(0);
   const [rodada, setRodada] = useState(1);
   const [respostaCerta, setRespostaCerta] = useState<string | null>(null);
   const [fotoAtual, setFotoAtual] = useState<MockUser | null>(null);
   const [opcoes, setOpcoes] = useState<string[]>([]);
   const [estadoResposta, setEstadoResposta] = useState<'acertou' | 'errou' | null>(null);
+  const [gameState, setGameState] = useState<'playing' | 'finished'>('playing');
+  const [ranking, setRanking] = useState<RankingEntry[]>([]);
 
   const gerarPergunta = () => {
     const shuffledUsers = shuffle(mockUsers);
@@ -70,6 +80,17 @@ export default function QuizFotos() {
     gerarPergunta();
   }, []);
 
+  const handleNextRound = async () => {
+      if (rodada < TOTAL_ROUNDS) {
+          setRodada((r) => r + 1);
+          gerarPergunta();
+      } else {
+          const finalRanking = await updateRanking(currentUser, pontuacao);
+          setRanking(finalRanking);
+          setGameState('finished');
+      }
+  };
+  
   const responder = (opcao: string) => {
     if (estadoResposta) return;
 
@@ -80,11 +101,31 @@ export default function QuizFotos() {
       setEstadoResposta("errou");
     }
 
-    setTimeout(() => {
-      setRodada((r) => r + 1);
-      gerarPergunta();
-    }, 1200);
+    setTimeout(handleNextRound, 1200);
   };
+  
+  const resetGame = () => {
+      setPontuacao(0);
+      setRodada(1);
+      setGameState('playing');
+      gerarPergunta();
+  };
+
+  if (gameState === 'finished') {
+      return (
+          <div className="quiz-card">
+              <h2 className="quiz-title">Fim de Jogo!</h2>
+              <p className="quiz-sub">Sua pontuação final foi:</p>
+              <p className="text-5xl font-bold my-4 dark:text-white">{pontuacao}</p>
+              
+              <Ranking ranking={ranking} currentUser={currentUser} />
+
+              <button onClick={resetGame} className="quiz-btn mt-4">
+                  Jogar Novamente
+              </button>
+          </div>
+      )
+  }
 
   if (!fotoAtual) return null;
 
@@ -94,7 +135,7 @@ export default function QuizFotos() {
       <p className="quiz-sub">Adivinhe de quem é a foto!</p>
 
       <div className="quiz-info">
-        <span>Rodada: {rodada}</span>
+        <span>Rodada: {rodada}/{TOTAL_ROUNDS}</span>
         <span>Pontos: {pontuacao}</span>
       </div>
 

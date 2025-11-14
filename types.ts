@@ -72,5 +72,19 @@ export interface Person {
     isFollowing: boolean;
 }
 
+export type NotificationType = 'like' | 'comment' | 'follow';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  user: {
+    username: string;
+    avatar: string;
+  };
+  postPreview?: string; // for likes and comments
+  timestamp: string;
+  read: boolean;
+}
+
 
 export type ActivePage = 'feed' | 'music' | 'about' | 'profile' | 'suggestions' | 'play';

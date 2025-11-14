@@ -134,3 +134,9 @@ export const GameControllerIcon = ({ className, solid }: { className?: string, s
         <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V5a1 1 0 00-1.447-.894l-4 2A1 1 0 0011 7v10zM4 17a1 1 0 01-1.447-.894l-2-4A1 1 0 011 11V9a1 1 0 011.447-.894l2-4A1 1 0 015 5h1a1 1 0 011 1v10a1 1 0 01-1 1H5a1 1 0 01-1-1v-2zm2-5a1 1 0 011-1h1a1 1 0 110 2H7a1 1 0 01-1-1zm2 3a1 1 0 000 2h1a1 1 0 100-2H9z" />
     </svg>
 );
+
+export const BellIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+);
