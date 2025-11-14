@@ -18,6 +18,7 @@ import Play from './components/Play';
 import NotificationsPanel from './components/NotificationsPanel';
 import SearchModal from './components/SearchModal';
 import { useTheme } from './theme/ThemeProvider';
+import { useNinoPoints } from './context/NinoPointsContext';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
@@ -28,6 +29,7 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useLocalStorage<Notification[]>('socialnino-notifications-v1', INITIAL_NOTIFICATIONS);
   
   const { theme, toggleTheme } = useTheme();
+  const { addPoints } = useNinoPoints();
 
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
@@ -59,14 +61,21 @@ const App: React.FC = () => {
   };
 
   const handleToggleFollow = (personId: number) => {
+    let isFollowingAction = false;
     // Update the list of people
     setPeople(prevPeople =>
-      prevPeople.map(p =>
-        p.id === personId
-          ? { ...p, isFollowing: !p.isFollowing, followers: p.isFollowing ? p.followers - 1 : p.followers + 1 }
-          : p
-      )
+      prevPeople.map(p => {
+        if (p.id === personId) {
+            isFollowingAction = !p.isFollowing;
+            return { ...p, isFollowing: !p.isFollowing, followers: p.isFollowing ? p.followers - 1 : p.followers + 1 }
+        }
+        return p;
+      })
     );
+    if(isFollowingAction) {
+        addPoints('FOLLOW');
+    }
+
     // Update the follow status on posts by the same author
     setPosts(prevPosts =>
       prevPosts.map(post =>
@@ -99,20 +108,25 @@ const App: React.FC = () => {
             comments: [],
         };
         setPosts(prevPosts => [newPost, ...prevPosts]);
+        addPoints('POST');
         handleCloseNewPostModal();
     };
     reader.readAsDataURL(file);
   };
 
   const handleLike = (postId: string) => {
-    setPosts(posts.map(post =>
-        post.id === postId 
-        ? { ...post, 
-            likes: post.isLiked ? post.likes - 1 : post.likes + 1,
-            isLiked: !post.isLiked
-          } 
-        : post
-    ));
+    setPosts(posts.map(post => {
+        if (post.id === postId) {
+            if (!post.isLiked) {
+                addPoints('LIKE');
+            }
+            return { ...post, 
+                likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+                isLiked: !post.isLiked
+            };
+        }
+        return post;
+    }));
   };
 
   const handleComment = (postId: string, commentText: string) => {
@@ -125,6 +139,7 @@ const App: React.FC = () => {
     setPosts(posts.map(post =>
         post.id === postId ? { ...post, comments: [...post.comments, newComment] } : post
     ));
+    addPoints('COMMENT');
   };
 
   const handleSaveStory = (storyFile: File) => {
@@ -141,7 +156,6 @@ const App: React.FC = () => {
         setStories(prevStories => [...prevStories, newStory]);
         setIsAddStoryModalOpen(false);
     };
-    // Fix: Use the `storyFile` parameter passed to the function instead of an undefined `file` variable.
     reader.readAsDataURL(storyFile);
   };
   
@@ -156,6 +170,7 @@ const App: React.FC = () => {
   };
 
   const handleParticipateInChallenge = ({ legenda }: { legenda: string }) => {
+    addPoints('CHALLENGE');
     handleOpenNewPostModal(legenda);
   };
 

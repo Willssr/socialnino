@@ -437,7 +437,23 @@
   .dark .search-result-item:hover {
       background-color: #334155;
   }
-
+  /* Nino Points Styles */
+  @keyframes points-update {
+    0% { transform: scale(1); color: white; }
+    50% { transform: scale(1.25); color: #facc15; /* yellow-400 */ }
+    100% { transform: scale(1); color: white; }
+  }
+  .animate-points-update {
+    animation: points-update 0.5s ease-out;
+  }
+  .points-pill {
+    padding: 4px 12px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+  }
 </style>
 </head>
   <body class="bg-gray-50 dark:bg-slate-900">

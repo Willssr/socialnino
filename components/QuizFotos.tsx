@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { updateRanking, RankingEntry } from '../services/rankingService';
 import Ranking from './Ranking';
+import { useNinoPoints } from '../context/NinoPointsContext';
 
 // MOCK TEMPORÁRIO
 const mockUsers = [
@@ -63,6 +64,7 @@ export default function QuizFotos({ currentUser }: QuizFotosProps) {
   const [estadoResposta, setEstadoResposta] = useState<'acertou' | 'errou' | null>(null);
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing');
   const [ranking, setRanking] = useState<RankingEntry[]>([]);
+  const { addPoints } = useNinoPoints();
 
   const gerarPergunta = () => {
     const shuffledUsers = shuffle(mockUsers);
@@ -97,6 +99,7 @@ export default function QuizFotos({ currentUser }: QuizFotosProps) {
     if (opcao === respostaCerta) {
       setPontuacao((p) => p + 10);
       setEstadoResposta("acertou");
+      addPoints('QUIZ');
     } else {
       setEstadoResposta("errou");
     }

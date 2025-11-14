@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { UserProfile, ActivePage } from '../types';
-import { MoonIcon, SunIcon, BellIcon, SearchIcon } from './Icons';
+import { MoonIcon, SunIcon, BellIcon, SearchIcon, CoinIcon } from './Icons';
+import { useNinoPoints } from '../context/NinoPointsContext';
 
 interface HeaderProps {
     userProfile: UserProfile;
@@ -13,6 +14,19 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleTheme, unreadCount, onNotificationsClick, onSearchClick }) => {
+  const [isAnimatingPoints, setIsAnimatingPoints] = useState(false);
+  const { points: ninoPoints } = useNinoPoints();
+  
+  // Effect to trigger points animation
+  useEffect(() => {
+    // Avoid animation on initial load
+    if (ninoPoints > 0) {
+      setIsAnimatingPoints(true);
+      const timer = setTimeout(() => setIsAnimatingPoints(false), 500); // Animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [ninoPoints]);
+
   return (
     <header className="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 text-white shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -44,6 +58,11 @@ const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleT
                 <span className="notif-badge">{unreadCount}</span>
               )}
             </button>
+             {/* Nino Points Display */}
+            <div className={`points-pill flex items-center gap-1 ${isAnimatingPoints ? 'animate-points-update' : ''}`}>
+                <CoinIcon className="w-5 h-5 text-yellow-300"/>
+                <span>{ninoPoints}</span>
+            </div>
              <button onClick={() => onNavigate('profile')} className="p-1 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-600 focus:ring-white">
                 <img src={userProfile.avatar} alt="Profile" className="h-8 w-8 rounded-full border-2 border-white object-cover"/>
             </button>

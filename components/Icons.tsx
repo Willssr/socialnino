@@ -152,3 +152,10 @@ export const XIcon = ({ className }: { className?: string }) => (
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
     </svg>
 );
+
+export const CoinIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 20 20" fill="currentColor">
+        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.414-1.415L11 9.586V6z" clipRule="evenodd" />
+        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM6.2 5.3a1 1 0 011.5-.4l.1.1 2.4 2.4.9-.9a1 1 0 011.4 1.4l-3 3.1a1 1 0 01-1.5.1l-.1-.1-3-3a1 1 0 01.1-1.6z" />
+    </svg>
+);

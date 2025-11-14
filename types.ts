@@ -88,3 +88,11 @@ export interface Notification {
 
 
 export type ActivePage = 'feed' | 'music' | 'about' | 'profile' | 'suggestions' | 'play';
+
+export type PointsEvent =
+  | "LIKE"
+  | "COMMENT"
+  | "POST"
+  | "FOLLOW"
+  | "CHALLENGE"
+  | "QUIZ";
