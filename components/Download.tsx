@@ -43,9 +43,9 @@ const Download: React.FC = () => {
 
           {/* Direct Download Button */}
           <a
-            href="#" // TODO: Adicione o link direto para o arquivo .APK
+            href="data:text/plain;charset=utf-8,Este é um arquivo de placeholder para SocialNino.apk"
             className="bg-green-600 text-white rounded-lg px-6 py-3 flex items-center justify-center space-x-3 w-60 hover:bg-green-700 transition-colors mt-4 sm:mt-0"
-            download
+            download="SocialNino.apk"
           >
             <DownloadIcon className="w-8 h-8" solid={true} />
             <div>
