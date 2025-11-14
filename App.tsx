@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
@@ -12,11 +11,13 @@ import { PlusCircleIcon } from './components/Icons';
 import { ActivePage, Post, Comment, UserProfile } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { INITIAL_POSTS, INITIAL_USER_PROFILE } from './constants';
+import AddStoryModal from './components/AddStoryModal';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<ActivePage>('feed');
   const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v2', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
+  const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
 
   const addPost = (caption: string, file: File) => {
     const reader = new FileReader();
@@ -64,6 +65,13 @@ const App: React.FC = () => {
     ));
   };
 
+  const handleSaveStory = (storyFile: File) => {
+    // In a real app, you would upload the file and update the stories data.
+    // For this demo, we can just log it and close the modal.
+    console.log('New story to be posted:', storyFile.name);
+    setIsAddStoryModalOpen(false);
+  };
+
   const renderPage = () => {
     switch (activePage) {
       case 'music':
@@ -77,7 +85,15 @@ const App: React.FC = () => {
         return <Profile userProfile={userProfile} onUpdateProfile={setUserProfile} userPosts={userPosts} />;
       case 'feed':
       default:
-        return <Feed posts={posts} handleLike={handleLike} handleComment={handleComment} currentUserName={userProfile.name} />;
+        return <Feed 
+                  posts={posts} 
+                  handleLike={handleLike} 
+                  handleComment={handleComment} 
+                  currentUserName={userProfile.name}
+                  userProfile={userProfile}
+                  onNavigate={setActivePage}
+                  onAddStoryClick={() => setIsAddStoryModalOpen(true)}
+                />;
     }
   };
 
@@ -98,6 +114,13 @@ const App: React.FC = () => {
         >
           <PlusCircleIcon className="w-10 h-10" />
       </button>
+      
+      {isAddStoryModalOpen && (
+        <AddStoryModal 
+          onClose={() => setIsAddStoryModalOpen(false)}
+          onSave={handleSaveStory}
+        />
+      )}
 
       <BottomNav activePage={activePage} setActivePage={setActivePage} />
 

@@ -1,21 +1,30 @@
-
 import React from 'react';
 import { INITIAL_STORIES } from '../constants';
 import { PlusCircleIcon } from './Icons';
+import { UserProfile, ActivePage } from '../types';
 
-const StoriesBar: React.FC = () => {
+interface StoriesBarProps {
+  userProfile: UserProfile;
+  onNavigate: (page: ActivePage) => void;
+  onAddStoryClick: () => void;
+}
+
+
+const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onNavigate, onAddStoryClick }) => {
   return (
     <div className="w-full bg-white border-b border-slate-200/80 py-3 px-2 sm:rounded-xl sm:border">
       <div className="flex items-center space-x-4 overflow-x-auto pb-2 -mb-2">
         {/* Your Story */}
         <div className="flex-shrink-0 text-center w-16">
           <div className="relative">
-            <img 
-              src={INITIAL_STORIES[0].avatar} 
-              alt="Seu story" 
-              className="w-16 h-16 rounded-full object-cover"
-            />
-            <button className="absolute -bottom-1 -right-1 bg-white rounded-full">
+            <button onClick={() => onNavigate('profile')} className="block rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <img 
+                src={userProfile.avatar} 
+                alt="Seu story" 
+                className="w-16 h-16 rounded-full object-cover"
+                />
+            </button>
+            <button onClick={onAddStoryClick} className="absolute -bottom-1 -right-1 bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500">
               <PlusCircleIcon className="w-6 h-6 text-blue-500"/>
             </button>
           </div>
