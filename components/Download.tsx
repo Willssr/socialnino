@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { DownloadIcon } from './Icons';
 
 const Download: React.FC = () => {
   return (
@@ -12,10 +12,10 @@ const Download: React.FC = () => {
           Leve a experiência completa do SocialNino com você! Baixe nosso aplicativo para ter acesso a recursos exclusivos e uma interface otimizada para o seu celular.
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-4">
           {/* App Store Button */}
           <a
-            href="#" // TODO: Replace with your actual App Store link
+            href="#" // TODO: Substitua pelo seu link real da App Store
             className="bg-black text-white rounded-lg px-6 py-3 flex items-center justify-center space-x-3 w-60 hover:bg-gray-800 transition-colors"
           >
             <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 384 512">
@@ -29,7 +29,7 @@ const Download: React.FC = () => {
 
           {/* Google Play Button */}
           <a
-            href="#" // TODO: Replace with your actual Google Play link
+            href="#" // TODO: Substitua pelo seu link real do Google Play
             className="bg-black text-white rounded-lg px-6 py-3 flex items-center justify-center space-x-3 w-60 hover:bg-gray-800 transition-colors"
           >
             <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 512 512">
@@ -38,6 +38,19 @@ const Download: React.FC = () => {
             <div>
               <p className="text-xs">GET IT ON</p>
               <p className="text-xl font-semibold">Google Play</p>
+            </div>
+          </a>
+
+          {/* Direct Download Button */}
+          <a
+            href="#" // TODO: Adicione o link direto para o arquivo .APK
+            className="bg-green-600 text-white rounded-lg px-6 py-3 flex items-center justify-center space-x-3 w-60 hover:bg-green-700 transition-colors mt-4 sm:mt-0"
+            download
+          >
+            <DownloadIcon className="w-8 h-8" solid={true} />
+            <div>
+              <p className="text-xs">Para Android</p>
+              <p className="text-xl font-semibold">Baixar .APK</p>
             </div>
           </a>
         </div>
