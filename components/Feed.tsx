@@ -15,9 +15,11 @@ interface FeedProps {
 
 const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, currentUserName, userProfile, onNavigate, onAddStoryClick }) => {
     return (
-        <div className="w-full max-w-lg mx-auto py-4 sm:py-6 lg:py-8">
+        // Ajustado o preenchimento vertical para ser mais consistente e espaçoso.
+        <div className="w-full max-w-lg mx-auto py-6">
             <StoriesBar userProfile={userProfile} onNavigate={onNavigate} onAddStoryClick={onAddStoryClick} />
-            <div className="space-y-4 mt-4">
+            {/* Aumentado o espaçamento entre a barra de stories e os posts, e entre os próprios posts para um layout mais limpo. */}
+            <div className="space-y-6 mt-6">
                 {posts.map(post => (
                     <PostCard 
                         key={post.id} 
