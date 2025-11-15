@@ -43,6 +43,9 @@ import {
   off,
 } from "firebase/database";
 
+// 🔍 Modal de perfil público
+import PublicProfileModal from "./components/PublicProfileModal";
+
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
@@ -89,14 +92,15 @@ const App: React.FC = () => {
   }>({ isOpen: false, stories: [] });
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
+  // 🔍 estado para perfil público
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [publicProfileOpen, setPublicProfileOpen] = useState(false);
+
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL (normalizando dados)
   useEffect(() => {
-    const postsQuery = query(
-      dbRef(db, "posts"),
-      orderByChild("timestamp")
-    );
+    const postsQuery = query(dbRef(db, "posts"), orderByChild("timestamp"));
 
     const callback = (snapshot: any) => {
       const data = snapshot.val();
@@ -370,6 +374,20 @@ const App: React.FC = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
+  // 🔍 ABRIR PERFIL PÚBLICO
+  const handleOpenPublicProfile = (personName: string) => {
+    const person = people.find((p) => p.name === personName);
+    if (!person) return;
+
+    setSelectedPerson(person);
+    setPublicProfileOpen(true);
+  };
+
+  const handleClosePublicProfile = () => {
+    setPublicProfileOpen(false);
+    setSelectedPerson(null);
+  };
+
   const renderPage = () => {
     let pageComponent;
     switch (activePage) {
@@ -415,6 +433,7 @@ const App: React.FC = () => {
             onViewStory={handleViewStory}
             handleToggleFollow={handleToggleFollow}
             handleBookmark={handleBookmark}
+            onOpenProfile={handleOpenPublicProfile}
           />
         );
         break;
@@ -485,6 +504,19 @@ const App: React.FC = () => {
             notifications={notifications}
             onClose={() => setIsNotificationsOpen(false)}
             onMarkAllAsRead={handleMarkAllAsRead}
+          />
+        )}
+
+        {/* Modal de perfil público */}
+        {selectedPerson && (
+          <PublicProfileModal
+            person={selectedPerson}
+            posts={posts.filter(
+              (p) => p.author.username === selectedPerson.name
+            )}
+            isOpen={publicProfileOpen}
+            onClose={handleClosePublicProfile}
+            onToggleFollow={handleToggleFollow}
           />
         )}
 
