@@ -2,12 +2,18 @@ import React from "react";
 import { Post, Person } from "../types";
 import PostCard from "./PostCard";
 
+// FIX: Add props required by PostCard
 interface PublicProfileModalProps {
   person: Person;
   posts: Post[];
   isOpen: boolean;
   onClose: () => void;
   onToggleFollow: (personId: number) => void;
+  handleLike: (postId: string) => void;
+  handleComment: (postId: string, text: string) => void;
+  handleBookmark: (postId: string) => void;
+  currentUserName: string;
+  onOpenProfile: (username: string) => void;
 }
 
 const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
@@ -16,6 +22,12 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
   isOpen,
   onClose,
   onToggleFollow,
+  // FIX: Destructure new props
+  handleLike,
+  handleComment,
+  handleBookmark,
+  currentUserName,
+  onOpenProfile,
 }) => {
   if (!isOpen) return null;
 
@@ -27,13 +39,15 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-800">
           <div className="flex items-center space-x-3">
             <img
+              // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
               src={person.avatar}
-              alt={person.name}
+              alt={person.username}
               className="w-12 h-12 rounded-full"
             />
             <div>
               <p className="font-semibold text-black dark:text-white">
-                {person.name}
+                {/* FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead. */}
+                {person.username}
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {person.followers.toLocaleString("pt-BR")} seguidores
@@ -61,12 +75,16 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
             </p>
           ) : (
             posts.map((post) => (
+              // FIX: Pass correct props to PostCard to resolve type errors.
               <PostCard
                 key={post.id}
                 post={post}
-                onLike={() => {}}
-                onComment={() => {}}
-                onBookmark={() => {}}
+                handleLike={handleLike}
+                handleComment={handleComment}
+                currentUserName={currentUserName}
+                handleToggleFollow={onToggleFollow}
+                handleBookmark={handleBookmark}
+                onOpenProfile={onOpenProfile}
               />
             ))
           )}

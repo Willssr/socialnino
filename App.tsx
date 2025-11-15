@@ -376,7 +376,8 @@ const App: React.FC = () => {
 
   // 🔍 ABRIR PERFIL PÚBLICO
   const handleOpenPublicProfile = (personName: string) => {
-    const person = people.find((p) => p.name === personName);
+    // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
+    const person = people.find((p) => p.username === personName);
     if (!person) return;
 
     setSelectedPerson(person);
@@ -512,11 +513,18 @@ const App: React.FC = () => {
           <PublicProfileModal
             person={selectedPerson}
             posts={posts.filter(
-              (p) => p.author.username === selectedPerson.name
+              // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
+              (p) => p.author.username === selectedPerson.username
             )}
             isOpen={publicProfileOpen}
             onClose={handleClosePublicProfile}
             onToggleFollow={handleToggleFollow}
+            // FIX: Pass required props to PostCard through PublicProfileModal
+            handleLike={handleLike}
+            handleComment={handleComment}
+            handleBookmark={handleBookmark}
+            currentUserName={userProfile.name}
+            onOpenProfile={handleOpenPublicProfile}
           />
         )}
 
