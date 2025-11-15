@@ -49,7 +49,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
                     />
                 </div>
             </div>
-            <p className="text-xs mt-1 truncate text-textLight">{story.author}</p>
+            <p className="text-sm font-semibold mt-1 truncate text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{story.author}</p>
           </div>
         ))}
       </div>
