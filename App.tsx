@@ -91,7 +91,7 @@ const App: React.FC = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL
+  // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL (normalizando dados)
   useEffect(() => {
     const postsQuery = query(
       dbRef(db, "posts"),
@@ -104,12 +104,37 @@ const App: React.FC = () => {
         setPosts([]);
         return;
       }
-      const list: Post[] = Object.values(data);
+
+      const list: Post[] = Object.values(data).map((raw: any) => {
+        const comments = Array.isArray(raw.comments) ? raw.comments : [];
+
+        return {
+          id: raw.id ?? "",
+          author: {
+            id: raw.author?.id ?? 0,
+            username: raw.author?.username ?? "desconhecido",
+            avatar: raw.author?.avatar ?? "",
+            isFollowing: raw.author?.isFollowing ?? false,
+          },
+          timestamp: raw.timestamp ?? new Date().toISOString(),
+          caption: raw.caption ?? "",
+          media: {
+            type: raw.media?.type ?? "image",
+            src: raw.media?.src ?? "",
+          },
+          likes: typeof raw.likes === "number" ? raw.likes : 0,
+          isLiked: !!raw.isLiked,
+          isBookmarked: !!raw.isBookmarked,
+          comments,
+        } as Post;
+      });
+
       // mais recentes primeiro
       list.sort(
         (a, b) =>
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
+
       setPosts(list);
     };
 
@@ -120,7 +145,7 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // 🟪 BUSCAR STORIES GLOBAIS EM TEMPO REAL
+  // 🟪 BUSCAR STORIES GLOBAIS EM TEMPO REAL (normalizando também)
   useEffect(() => {
     const storiesQuery = query(
       dbRef(db, "stories"),
@@ -133,8 +158,16 @@ const App: React.FC = () => {
         setStories([]);
         return;
       }
-      const list: Story[] = Object.values(data);
-      // mais antigas primeiro (fluxo de stories)
+
+      const list: Story[] = Object.values(data).map((raw: any) => ({
+        id: raw.id ?? "",
+        author: raw.author ?? "desconhecido",
+        avatar: raw.avatar ?? "",
+        mediaSrc: raw.mediaSrc ?? "",
+        mediaType: raw.mediaType ?? "image",
+        timestamp: raw.timestamp ?? new Date().toISOString(),
+      }));
+
       list.sort(
         (a, b) =>
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
@@ -278,7 +311,9 @@ const App: React.FC = () => {
       timestamp: new Date().toISOString(),
     };
 
-    const newComments = [...post.comments, newComment];
+    const newComments = Array.isArray(post.comments)
+      ? [...post.comments, newComment]
+      : [newComment];
 
     await update(dbRef(db, `posts/${postId}`), {
       comments: newComments,
