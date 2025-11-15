@@ -1,45 +1,28 @@
-// Fix: Import React to use types like React.Dispatch and React.SetStateAction.
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-// A custom hook to manage state in localStorage
-// This makes data persist across page reloads
-export function useLocalStorage<T,>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
+export function useLocalStorage<T>(key: string, initialValue: T) {
+  const [value, setValue] = useState<T>(() => {
+    if (typeof window === "undefined") {
+      return initialValue;
+    }
+
     try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      const stored = window.localStorage.getItem(key);
+      if (stored === null) return initialValue;
+      return JSON.parse(stored) as T;
     } catch (error) {
-      console.error(error);
+      console.error("Erro ao ler localStorage:", error);
       return initialValue;
     }
   });
 
-  const setValue: React.Dispatch<React.SetStateAction<T>> = (value) => {
-    try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      setStoredValue(valueToStore);
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    // This effect ensures that if the local storage is cleared manually,
-    // the app state resets to the initial value.
-    const handleStorageChange = () => {
-        const item = window.localStorage.getItem(key);
-        if (item === null) {
-            setStoredValue(initialValue);
-        }
-    };
-    
-    window.addEventListener('storage', handleStorageChange);
+    try {
+      window.localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error("Erro ao salvar no localStorage:", error);
+    }
+  }, [key, value]);
 
-    return () => {
-        window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [key, initialValue]);
-
-  return [storedValue, setValue];
+  return [value, setValue] as const;
 }

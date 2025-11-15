@@ -107,6 +107,7 @@ export const INITIAL_POSTS: Post[] = [
     },
     likes: 128,
     isLiked: false,
+    isBookmarked: false,
     comments: [
       { id: 'comment-1-1', author: 'Visitante', text: 'Vista deslumbrante!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 1).toISOString() },
       { id: 'comment-1-2', author: 'Anônimo', text: 'Queria estar aí.', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString() },
@@ -128,6 +129,7 @@ export const INITIAL_POSTS: Post[] = [
     },
     likes: 256,
     isLiked: true,
+    isBookmarked: true,
     comments: [],
   },
   {
@@ -146,6 +148,7 @@ export const INITIAL_POSTS: Post[] = [
     },
     likes: 95,
     isLiked: false,
+    isBookmarked: false,
     comments: [
       { id: 'comment-3-1', author: 'Visitante', text: 'Ótima foto!', timestamp: new Date(Date.now() - 1000 * 60 * 60 * 25).toISOString() },
     ],

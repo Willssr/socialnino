@@ -114,7 +114,11 @@ const Music: React.FC = () => {
 
     } catch (err) {
       console.error(err);
-      setError("Erro ao enviar música. Verifique a configuração do Firebase e tente novamente.");
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Erro ao enviar música. Tente novamente.");
+      }
     } finally {
       setIsUploading(false);
       e.target.value = "";
@@ -167,7 +171,11 @@ const Music: React.FC = () => {
 
         } catch (err) {
           console.error(err);
-          setError("Erro ao enviar gravação. Verifique a configuração do Firebase.");
+          if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError("Erro ao enviar gravação. Tente novamente.");
+          }
         } finally {
           setIsUploading(false);
         }

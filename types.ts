@@ -27,6 +27,7 @@ export interface Post {
   };
   likes: number;
   isLiked: boolean; // To track liked state for the demo
+  isBookmarked: boolean;
   comments: Comment[];
 }
 

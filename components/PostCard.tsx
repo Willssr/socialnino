@@ -8,10 +8,11 @@ interface PostCardProps {
   onLike: (postId: string) => void;
   onComment: (postId: string, commentText: string) => void;
   onToggleFollow: (personId: number) => void;
+  onBookmark: (postId: string) => void;
   currentUserName: string;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onToggleFollow, currentUserName }) => {
+const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onToggleFollow, onBookmark, currentUserName }) => {
   const [commentText, setCommentText] = useState('');
   const [isAnimatingLike, setIsAnimatingLike] = useState(false);
 
@@ -116,8 +117,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onToggleFo
                       <PaperAirplaneIcon className="w-7 h-7 -rotate-12" />
                   </button>
               </div>
-              <button className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-transform duration-200 ease-out hover:scale-110">
-                  <BookmarkIcon className="w-7 h-7" />
+              <button 
+                onClick={() => onBookmark(post.id)}
+                className={`group transition-transform duration-200 ease-out hover:scale-110 ${post.isBookmarked ? 'text-yellow-500 dark:text-yellow-400' : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'}`}
+              >
+                  <BookmarkIcon className="w-7 h-7" solid={post.isBookmarked} />
               </button>
           </div>
 

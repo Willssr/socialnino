@@ -105,6 +105,7 @@ const App: React.FC = () => {
             },
             likes: 0,
             isLiked: false,
+            isBookmarked: false,
             comments: [],
         };
         setPosts(prevPosts => [newPost, ...prevPosts]);
@@ -124,6 +125,15 @@ const App: React.FC = () => {
                 likes: post.isLiked ? post.likes - 1 : post.likes + 1,
                 isLiked: !post.isLiked
             };
+        }
+        return post;
+    }));
+  };
+
+  const handleBookmark = (postId: string) => {
+    setPosts(posts.map(post => {
+        if (post.id === postId) {
+            return { ...post, isBookmarked: !post.isBookmarked };
         }
         return post;
     }));
@@ -208,6 +218,7 @@ const App: React.FC = () => {
                   stories={stories}
                   onViewStory={handleViewStory}
                   handleToggleFollow={handleToggleFollow}
+                  handleBookmark={handleBookmark}
                 />;
     }
   };
