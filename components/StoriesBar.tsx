@@ -10,8 +10,14 @@ interface StoriesBarProps {
 }
 
 const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, stories, onViewStory }) => {
+  // 1. Verifica se o usuário logado tem stories
+  const myStories = stories.filter(story => story.author === userProfile.name);
+  const hasMyStory = myStories.length > 0;
+
+  // 2. Filtra os stories de outros usuários
   const otherAuthorsStories = stories.filter(story => story.author !== userProfile.name);
   
+  // 3. Agrupa os stories de outros usuários para exibir apenas um por autor
   const uniqueAuthors = Array.from(new Set(otherAuthorsStories.map(s => s.author)))
     .map(author => {
       return otherAuthorsStories.find(s => s.author === author)!;
@@ -20,16 +26,35 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
   return (
     <div className="w-full py-3 px-2 border-b border-borderNeon/50">
       <div className="flex items-center space-x-4 overflow-x-auto pb-2 -mb-2">
-        {/* Your Story */}
+        {/* Card do Usuário Logado (Sempre o primeiro) */}
         <div className="flex-shrink-0 text-center w-20">
           <div className="relative">
-            <button onClick={onAddStoryClick} className="block rounded-full">
+            {/* O botão principal muda de função: ver story existente ou adicionar um novo */}
+            <button 
+              onClick={hasMyStory ? () => onViewStory(userProfile.name) : onAddStoryClick} 
+              className="block rounded-full"
+            >
+              {hasMyStory ? (
+                // Se tem story, mostra o anel neon
+                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse">
+                  <div className="bg-backgroundDark p-0.5 rounded-full">
+                    <img 
+                      src={userProfile.avatar} 
+                      alt="Seu story" 
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  </div>
+                </div>
+              ) : (
+                // Se não tem, mostra a borda tracejada para adicionar
                 <img 
-                src={userProfile.avatar} 
-                alt="Seu story" 
-                className="w-16 h-16 rounded-full object-cover border-2 border-dashed border-textDark"
+                  src={userProfile.avatar} 
+                  alt="Adicionar ao seu story" 
+                  className="w-16 h-16 rounded-full object-cover border-2 border-dashed border-textDark"
                 />
+              )}
             </button>
+            {/* Ícone de adicionar sempre presente no story do usuário */}
             <button onClick={onAddStoryClick} className="absolute -bottom-1 -right-1 bg-backgroundLight rounded-full">
               <PlusSquareIcon className="w-6 h-6 text-secondary"/>
             </button>
@@ -37,7 +62,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
           <p className="text-xs mt-1 truncate text-textDark">Seu story</p>
         </div>
         
-        {/* Other Stories */}
+        {/* Stories dos Outros Usuários */}
         {uniqueAuthors.map(story => (
           <div key={story.author} className="flex-shrink-0 text-center w-20 cursor-pointer" onClick={() => onViewStory(story.author)}>
             <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse">
