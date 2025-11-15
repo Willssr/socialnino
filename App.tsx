@@ -466,7 +466,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center">
-      <div className="w-full md:max-w-xl bg-white dark:bg-black">
+      <div className="w-full md:max-w-xl bg-backgroundDark">
         <Header
           unreadCount={unreadCount}
           onNotificationsClick={() =>
@@ -474,7 +474,7 @@ const App: React.FC = () => {
           }
         />
 
-        <main className="flex-grow pb-16">{renderPage()}</main>
+        <main className="flex-grow pt-16 pb-16">{renderPage()}</main>
 
         {isNewPostModalOpen && (
           <NewPostModal
