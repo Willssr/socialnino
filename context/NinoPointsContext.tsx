@@ -14,9 +14,14 @@ const NinoPointsContext = createContext<NinoPointsContextType | undefined>(
   undefined
 );
 
-export const NinoPointsProvider: React.FC<{ children: React.ReactNode }> = ({
+// FIX: Refactored to use an explicit props type instead of React.FC for consistency and to avoid potential typing issues.
+type NinoPointsProviderProps = {
+  children: React.ReactNode;
+};
+
+export const NinoPointsProvider = ({
   children,
-}) => {
+}: NinoPointsProviderProps) => {
   const [points, setPoints] = useState(0);
 
   useEffect(() => {

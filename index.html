@@ -4,19 +4,45 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SocialNino</title>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
-  }
-}
-</script>
-</head>
+
+    <!-- IMPORT MAPS (obrigatório no AI Studio) -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "firebase/": "https://aistudiocdn.com/firebase@^12.6.0/"
+      }
+    }
+    </script>
+
+    <!-- ⚡ TailwindCSS via CDN (necessário no AI Studio) -->
+    <script>
+      tailwind = {
+        config: {
+          darkMode: "class",
+        }
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Estilos extras opcionais -->
+    <style>
+      body {
+        background-color: #fafafa;
+      }
+      body.dark {
+        background-color: #000;
+      }
+    </style>
+  </head>
+
   <body class="bg-white dark:bg-black">
+    <!-- React Root -->
     <div id="root"></div>
+
+    <!-- App Entry -->
     <script type="module" src="/index.tsx"></script>
   </body>
 </html>

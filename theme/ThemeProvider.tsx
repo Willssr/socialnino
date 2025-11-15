@@ -9,9 +9,14 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+// FIX: Refactored to use an explicit props type instead of React.FC to resolve a potential typing issue.
+type ThemeProviderProps = {
+  children: React.ReactNode;
+};
+
+export const ThemeProvider = ({
   children,
-}) => {
+}: ThemeProviderProps) => {
   const [theme, setTheme] = useState<Theme>("light");
 
   // Load theme from localStorage or system preference on initial load

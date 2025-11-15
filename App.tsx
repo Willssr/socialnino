@@ -246,8 +246,8 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col md:items-center">
-      <div className="w-full md:max-w-xl">
+    <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center">
+      <div className="w-full md:max-w-xl bg-white dark:bg-black">
         <Header 
           unreadCount={unreadCount}
           onNotificationsClick={() => setIsNotificationsOpen(prev => !prev)}
@@ -287,7 +287,12 @@ const App: React.FC = () => {
           />
         )}
 
-        <BottomNav activePage={activePage} onNavigate={handleNavigate} onNewPostClick={() => handleOpenNewPostModal()} />
+        <BottomNav 
+          activePage={activePage} 
+          onNavigate={handleNavigate} 
+          onNewPostClick={() => handleOpenNewPostModal()}
+          userAvatar={userProfile.avatar}
+        />
       </div>
     </div>
   );

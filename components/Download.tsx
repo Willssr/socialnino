@@ -5,7 +5,7 @@ const Download: React.FC = () => {
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl">
       <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg text-center">
-        <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500">
+        <h1 className="text-4xl font-bold mb-4 text-black dark:text-white">
           Baixe o App SocialNino
         </h1>
         <p className="text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto mt-4 mb-8">

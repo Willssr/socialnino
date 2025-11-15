@@ -19,7 +19,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({ isFollowing, onClick, varia
                 className={`text-sm font-bold transition-colors ${
                     isFollowing
                     ? 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                    : 'text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300'
+                    : 'text-sky-500 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300'
                 }`}
             >
                 {isFollowing ? 'Seguindo' : 'Seguir'}
@@ -33,8 +33,8 @@ const FollowButton: React.FC<FollowButtonProps> = ({ isFollowing, onClick, varia
             onClick={handleButtonClick}
             className={`w-auto px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ease-in-out ${
                 isFollowing 
-                ? 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600' 
-                : 'bg-gradient-to-r from-pink-500 to-orange-500 text-white hover:opacity-90'
+                ? 'bg-gray-200 dark:bg-gray-700 text-black dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600' 
+                : 'bg-sky-500 text-white hover:bg-sky-600'
             }`}
         >
             {isFollowing ? 'Seguindo' : 'Seguir'}

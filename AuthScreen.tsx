@@ -29,31 +29,27 @@ export default function AuthScreen() {
       style={{
         minHeight: "100vh",
         display: "flex",
+        flexDirection: 'column',
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(135deg, #ff4f8b, #ff914d)",
+        background: "#fafafa",
+        padding: "20px"
       }}
     >
       <div
         style={{
           width: "100%",
-          maxWidth: 360,
+          maxWidth: 350,
           background: "#fff",
-          borderRadius: 18,
-          padding: 20,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+          border: '1px solid #dbdbdb',
+          borderRadius: 3,
+          padding: "10px 40px",
+          marginBottom: 10,
         }}
       >
-        <h2
-          style={{
-            textAlign: "center",
-            marginBottom: 8,
-            fontSize: 20,
-            fontWeight: 700,
-          }}
-        >
-          {mode === "login" ? "Entrar no SocialNino" : "Criar conta no SocialNino"}
-        </h2>
+        <h1 style={{ fontFamily: "'Grand Hotel', cursive", fontSize: '50px', textAlign: 'center', margin: '36px 0 12px 0' }}>
+            SocialNino
+        </h1>
 
         <form
           onSubmit={handleSubmit}
@@ -61,63 +57,76 @@ export default function AuthScreen() {
         >
           <input
             type="email"
-            placeholder="Seu e-mail"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             style={{
-              borderRadius: 999,
-              border: "1px solid #ddd",
-              padding: "8px 12px",
-              fontSize: 14,
+              borderRadius: 3,
+              border: "1px solid #dbdbdb",
+              padding: "9px 8px 7px",
+              fontSize: 12,
+              background: '#fafafa',
             }}
           />
 
           <input
             type="password"
-            placeholder="Senha (mínimo 6 caracteres)"
+            placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             minLength={6}
             required
-            style={{
-              borderRadius: 999,
-              border: "1px solid #ddd",
-              padding: "8px 12px",
-              fontSize: 14,
+             style={{
+              borderRadius: 3,
+              border: "1px solid #dbdbdb",
+              padding: "9px 8px 7px",
+              fontSize: 12,
+              background: '#fafafa',
             }}
           />
 
           {error && (
-            <p style={{ color: "#e53935", fontSize: 12 }}>{error}</p>
+            <p style={{ color: "#ed4956", fontSize: 13, textAlign: 'center', margin: '10px 0' }}>{error}</p>
           )}
 
           <button
             type="submit"
+            disabled={!email || password.length < 6}
             style={{
-              marginTop: 6,
-              borderRadius: 999,
+              marginTop: 12,
+              borderRadius: 8,
               border: "none",
-              padding: "8px 12px",
-              background: "linear-gradient(45deg, #ff4f8b, #ff914d)",
+              padding: "7px 12px",
+              background: "#0095f6",
               color: "#fff",
               fontWeight: 600,
               cursor: "pointer",
               fontSize: 14,
+              opacity: (!email || password.length < 6) ? 0.7 : 1,
             }}
           >
             {mode === "login" ? "Entrar" : "Cadastrar"}
           </button>
         </form>
-
+      </div>
+      
+      <div style={{
+          width: "100%",
+          maxWidth: 350,
+          background: "#fff",
+          border: "1px solid #dbdbdb",
+          borderRadius: 3,
+          padding: 20,
+      }}>
         <p
           style={{
-            marginTop: 10,
-            fontSize: 13,
+            margin: 0,
+            fontSize: 14,
             textAlign: "center",
           }}
         >
-          {mode === "login" ? "Não tem conta?" : "Já tem conta?"}{" "}
+          {mode === "login" ? "Não tem uma conta?" : "Já tem uma conta?"}{" "}
           <button
             type="button"
             onClick={() =>
@@ -126,12 +135,13 @@ export default function AuthScreen() {
             style={{
               border: "none",
               background: "none",
-              color: "#ff4f8b",
+              color: "#0095f6",
               fontWeight: 600,
               cursor: "pointer",
+              padding: 0
             }}
           >
-            {mode === "login" ? "Criar conta" : "Entrar"}
+            {mode === "login" ? "Cadastre-se" : "Entrar"}
           </button>
         </p>
       </div>

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { BellIcon } from './Icons';
-import LogoutButton from './LogoutButton';
+import { HeartIcon, PaperAirplaneIcon } from './Icons';
 
 interface HeaderProps {
     unreadCount: number;
@@ -9,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) => {
   return (
-    <header className="bg-white dark:bg-black text-black dark:text-white shadow-sm sticky top-0 z-50 border-b border-gray-300 dark:border-gray-800 h-14">
+    <header className="bg-white dark:bg-black text-black dark:text-white sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-14">
       <div className="container mx-auto px-4 flex items-center justify-between h-full">
           <div className="flex-shrink-0">
             <span 
@@ -19,14 +18,16 @@ const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) =>
               SocialNino
             </span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-5">
              <button onClick={onNotificationsClick} className="relative p-1">
-              <BellIcon className="h-6 w-6" />
+              <HeartIcon className="h-7 w-7" />
               {unreadCount > 0 && (
-                 <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-black"></span>
+                 <span className="absolute top-1 right-0.5 block h-2 w-2 rounded-full bg-red-500 ring-1 ring-white dark:ring-black"></span>
               )}
             </button>
-            <LogoutButton />
+            <button className="p-1">
+                <PaperAirplaneIcon className="h-7 w-7 -rotate-12" />
+            </button>
           </div>
       </div>
     </header>

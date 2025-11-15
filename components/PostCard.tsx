@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Post } from '../types';
 import { HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon, DotsHorizontalIcon } from './Icons';
 
@@ -12,6 +12,41 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark }) => {
   const [commentText, setCommentText] = useState('');
   const [isAnimatingLike, setIsAnimatingLike] = useState(false);
+  const [isIntersecting, setIsIntersecting] = useState(false);
+  const mediaRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    // We only need to observe videos
+    if (post.media.type !== 'video') return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsIntersecting(true);
+          // Once visible, we don't need to observe it anymore
+          if (mediaRef.current) {
+            observer.unobserve(mediaRef.current);
+          }
+        }
+      },
+      {
+        // Start loading when the video is 200px away from the viewport
+        rootMargin: '200px 0px',
+      }
+    );
+
+    if (mediaRef.current) {
+      observer.observe(mediaRef.current);
+    }
+
+    // Cleanup function
+    return () => {
+      if (mediaRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        observer.unobserve(mediaRef.current);
+      }
+    };
+  }, [post.media.type]);
 
   const handleCommentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,11 +94,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark
         </div>
 
         {/* Post Media */}
-        <div className="relative" onDoubleClick={handleLikeAction}>
+        <div className="relative" onDoubleClick={handleLikeAction} ref={mediaRef}>
           {post.media.type === 'image' ? (
             <img src={post.media.src} alt={post.caption} className="w-full object-cover" />
           ) : (
-            <video controls src={post.media.src} className="w-full bg-black">
+            <video controls preload="metadata" src={isIntersecting ? post.media.src : undefined} className="w-full bg-black">
               Your browser does not support the video tag.
             </video>
           )}
