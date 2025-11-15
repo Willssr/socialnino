@@ -31,7 +31,7 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-orbitron font-bold text-gradient-neon">{userProfile.name}</h1>
+            <h1 className="text-2xl font-orbitron font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.name}</h1>
             <div className="flex items-center space-x-2">
                 <button className="text-textDark hover:text-textLight">
                     <DotsHorizontalIcon className="w-6 h-6"/>
@@ -53,8 +53,8 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
             <div className="flex-grow flex justify-around items-center">
                 {stats.map(stat => (
                     <div key={stat.label} className="text-center">
-                    <span className="font-bold text-xl">{stat.value}</span>
-                    <span className="block text-sm text-textDark">{stat.label}</span>
+                    <span className="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{stat.value}</span>
+                    <span className="block text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{stat.label}</span>
                     </div>
                 ))}
             </div>
@@ -62,8 +62,8 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
 
         {/* Bio */}
         <div>
-            <p className="font-bold text-sm">{userProfile.name}</p>
-            <p className="text-sm text-textDark">{userProfile.bio}</p>
+            <p className="font-bold text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.name}</p>
+            <p className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.bio}</p>
         </div>
 
         {/* Action Buttons */}

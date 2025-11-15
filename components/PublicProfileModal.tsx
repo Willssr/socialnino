@@ -45,12 +45,12 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
               className="w-12 h-12 rounded-full"
             />
             <div>
-              <p className="font-semibold text-black dark:text-white">
+              <p className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">
                 {/* FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead. */}
                 {person.username}
               </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {person.followers.toLocaleString("pt-BR")} seguidores
+              <p className="text-xs text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">
+                <span className="font-semibold">{person.followers.toLocaleString("pt-BR")}</span> seguidores
               </p>
             </div>
           </div>
