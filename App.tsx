@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import Feed from './components/Feed';
-import Music from './components/Music';
-import Profile from './components/Profile';
-import BottomNav from './components/BottomNav';
+import React, { useState, useEffect } from "react";
+import Header from "./components/Header";
+import Feed from "./components/Feed";
+import Music from "./components/Music";
+import Profile from "./components/Profile";
+import BottomNav from "./components/BottomNav";
 import {
   ActivePage,
   Post,
@@ -12,66 +12,69 @@ import {
   Story,
   Person,
   Notification,
-} from './types';
-import { useLocalStorage } from './hooks/useLocalStorage';
+} from "./types";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 import {
   INITIAL_USER_PROFILE,
   INITIAL_PEOPLE,
   INITIAL_NOTIFICATIONS,
-} from './constants';
-import AddStoryModal from './components/AddStoryModal';
-import StoryViewerModal from './components/StoryViewerModal';
-import NewPostModal from './components/NewPostModal';
-import Suggestions from './components/Suggestions';
-import Play from './components/Play';
-import NotificationsPanel from './components/NotificationsPanel';
-import SearchModal from './components/SearchModal';
-import { useNinoPoints } from './context/NinoPointsContext';
-import { useAuth } from './AuthContext';
-import AuthScreen from './AuthScreen';
+} from "./constants";
+import AddStoryModal from "./components/AddStoryModal";
+import StoryViewerModal from "./components/StoryViewerModal";
+import NewPostModal from "./components/NewPostModal";
+import Suggestions from "./components/Suggestions";
+import Play from "./components/Play";
+import NotificationsPanel from "./components/NotificationsPanel";
+import SearchModal from "./components/SearchModal";
+import { useNinoPoints } from "./context/NinoPointsContext";
+import { useAuth } from "./AuthContext";
+import AuthScreen from "./AuthScreen";
 
-// 🔥 Firebase
-import { db } from './services/firebase';
+// 🔥 Realtime Database
+import { db } from "./services/firebase";
 import {
-  collection,
-  addDoc,
-  onSnapshot,
+  ref as dbRef,
+  push,
+  set,
+  update,
+  onValue,
   query,
-  orderBy,
-  doc,
-  updateDoc,
-} from 'firebase/firestore';
+  orderByChild,
+  off,
+} from "firebase/database";
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
-  const [activePage, setActivePage] = useState<ActivePage>('feed');
-  const [pageDirection, setPageDirection] = useState<'left' | 'right' | null>(null);
+  const [activePage, setActivePage] = useState<ActivePage>("feed");
+  const [pageDirection, setPageDirection] = useState<"left" | "right" | null>(
+    null
+  );
   const [pageOrder] = useState<ActivePage[]>([
-    'feed',
-    'search',
-    'play',
-    'music',
-    'profile',
+    "feed",
+    "search",
+    "play",
+    "music",
+    "profile",
   ]);
 
-  // 🔥 POSTS GLOBAIS
+  // 🔥 POSTS GLOBAIS (Realtime DB)
   const [posts, setPosts] = useState<Post[]>([]);
 
-  // 🔥 STORIES GLOBAIS
+  // 🔥 STORIES GLOBAIS (Realtime DB)
   const [stories, setStories] = useState<Story[]>([]);
 
-  // RESTO LOCAL
+  // RESTO continua local
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>(
-    'socialnino-user-profile',
+    "socialnino-user-profile",
     INITIAL_USER_PROFILE
   );
   const [people, setPeople] = useLocalStorage<Person[]>(
-    'socialnino-people-v1',
+    "socialnino-people-v1",
     INITIAL_PEOPLE
   );
   const [notifications, setNotifications] = useLocalStorage<Notification[]>(
-    'socialnino-notifications-v1',
+    "socialnino-notifications-v1",
     INITIAL_NOTIFICATIONS
   );
 
@@ -79,7 +82,7 @@ const App: React.FC = () => {
 
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
-  const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
+  const [newPostInitialCaption, setNewPostInitialCaption] = useState("");
   const [storyViewerState, setStoryViewerState] = useState<{
     isOpen: boolean;
     stories: Story[];
@@ -88,54 +91,82 @@ const App: React.FC = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // 🟦 POSTS EM TEMPO REAL (GLOBAL)
+  // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL
   useEffect(() => {
-    const q = query(collection(db, 'posts'), orderBy('timestamp', 'desc'));
+    const postsQuery = query(
+      dbRef(db, "posts"),
+      orderByChild("timestamp")
+    );
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const list: Post[] = snapshot.docs.map((docSnap) => {
-        const data = docSnap.data() as Omit<Post, 'id'>;
-        return { id: docSnap.id, ...data };
-      });
+    const callback = (snapshot: any) => {
+      const data = snapshot.val();
+      if (!data) {
+        setPosts([]);
+        return;
+      }
+      const list: Post[] = Object.values(data);
+      // mais recentes primeiro
+      list.sort(
+        (a, b) =>
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
       setPosts(list);
-    });
+    };
 
-    return () => unsub();
+    onValue(postsQuery, callback);
+
+    return () => {
+      off(postsQuery, "value", callback);
+    };
   }, []);
 
-  // 🟪 STORIES EM TEMPO REAL (GLOBAL)
+  // 🟪 BUSCAR STORIES GLOBAIS EM TEMPO REAL
   useEffect(() => {
-    const q = query(collection(db, 'stories'), orderBy('timestamp', 'desc'));
+    const storiesQuery = query(
+      dbRef(db, "stories"),
+      orderByChild("timestamp")
+    );
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      const list: Story[] = snapshot.docs.map((docSnap) => {
-        const data = docSnap.data() as Omit<Story, 'id'>;
-        return { id: docSnap.id, ...data };
-      });
+    const callback = (snapshot: any) => {
+      const data = snapshot.val();
+      if (!data) {
+        setStories([]);
+        return;
+      }
+      const list: Story[] = Object.values(data);
+      // mais antigas primeiro (fluxo de stories)
+      list.sort(
+        (a, b) =>
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+      );
       setStories(list);
-    });
+    };
 
-    return () => unsub();
+    onValue(storiesQuery, callback);
+
+    return () => {
+      off(storiesQuery, "value", callback);
+    };
   }, []);
 
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);
     const ni = pageOrder.indexOf(newPage);
-    setPageDirection(ni > ci ? 'left' : ni < ci ? 'right' : null);
+    setPageDirection(ni > ci ? "left" : ni < ci ? "right" : null);
     setActivePage(newPage);
   };
 
-  const handleOpenNewPostModal = (initialCaption: string = '') => {
+  const handleOpenNewPostModal = (initialCaption: string = "") => {
     setNewPostInitialCaption(initialCaption);
     setIsNewPostModalOpen(true);
   };
 
   const handleCloseNewPostModal = () => {
     setIsNewPostModalOpen(false);
-    setNewPostInitialCaption('');
+    setNewPostInitialCaption("");
   };
 
-  // 🔁 SEGUIR AINDA LOCAL (se depois quiser, fazemos global)
+  // 🔁 SEGUIR ainda local (só mexe no estado local)
   const handleToggleFollow = (personId: number) => {
     let isFollowingAction = false;
     setPeople((prevPeople) =>
@@ -152,10 +183,10 @@ const App: React.FC = () => {
       })
     );
     if (isFollowingAction) {
-      addPoints('FOLLOW');
+      addPoints("FOLLOW");
     }
 
-    // só visual nos posts (não global ainda)
+    // efeito visual nos posts
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.author.id === personId
@@ -171,12 +202,16 @@ const App: React.FC = () => {
     );
   };
 
-  // 🔥 ADD POST GLOBAL
+  // 🔥 CRIAR POST GLOBAL (Realtime DB)
   const handleAddPost = (caption: string, file: File) => {
     const reader = new FileReader();
 
     reader.onloadend = async () => {
-      const newPost: Omit<Post, 'id'> = {
+      const newPostRef = push(dbRef(db, "posts"));
+      const postId = newPostRef.key as string;
+
+      const newPost: Post = {
+        id: postId,
         author: {
           id: 0,
           username: userProfile.name,
@@ -186,7 +221,7 @@ const App: React.FC = () => {
         timestamp: new Date().toISOString(),
         caption,
         media: {
-          type: file.type.startsWith('image/') ? 'image' : 'video',
+          type: file.type.startsWith("image/") ? "image" : "video",
           src: reader.result as string,
         },
         likes: 0,
@@ -195,17 +230,17 @@ const App: React.FC = () => {
         comments: [],
       };
 
-      await addDoc(collection(db, 'posts'), newPost);
+      await set(newPostRef, newPost);
 
-      addPoints('POST');
+      addPoints("POST");
       handleCloseNewPostModal();
-      handleNavigate('feed');
+      handleNavigate("feed");
     };
 
     reader.readAsDataURL(file);
   };
 
-  // ❤️ LIKE GLOBAL
+  // ❤️ LIKE GLOBAL (Realtime DB)
   const handleLike = async (postId: string) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
@@ -213,12 +248,12 @@ const App: React.FC = () => {
     const newLiked = !post.isLiked;
     const newLikes = newLiked ? post.likes + 1 : post.likes - 1;
 
-    await updateDoc(doc(db, 'posts', postId), {
+    await update(dbRef(db, `posts/${postId}`), {
       isLiked: newLiked,
       likes: newLikes,
     });
 
-    if (newLiked) addPoints('LIKE');
+    if (newLiked) addPoints("LIKE");
   };
 
   // 🔖 BOOKMARK GLOBAL
@@ -226,7 +261,7 @@ const App: React.FC = () => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
-    await updateDoc(doc(db, 'posts', postId), {
+    await update(dbRef(db, `posts/${postId}`), {
       isBookmarked: !post.isBookmarked,
     });
   };
@@ -243,11 +278,13 @@ const App: React.FC = () => {
       timestamp: new Date().toISOString(),
     };
 
-    await updateDoc(doc(db, 'posts', postId), {
-      comments: [...post.comments, newComment],
+    const newComments = [...post.comments, newComment];
+
+    await update(dbRef(db, `posts/${postId}`), {
+      comments: newComments,
     });
 
-    addPoints('COMMENT');
+    addPoints("COMMENT");
   };
 
   // 🟪 SALVAR STORY GLOBAL
@@ -255,15 +292,19 @@ const App: React.FC = () => {
     const reader = new FileReader();
 
     reader.onloadend = async () => {
-      const newStory: Omit<Story, 'id'> = {
+      const newStoryRef = push(dbRef(db, "stories"));
+      const storyId = newStoryRef.key as string;
+
+      const newStory: Story = {
+        id: storyId,
         author: userProfile.name,
         avatar: userProfile.avatar,
         mediaSrc: reader.result as string,
-        mediaType: storyFile.type.startsWith('image/') ? 'image' : 'video',
+        mediaType: storyFile.type.startsWith("image/") ? "image" : "video",
         timestamp: new Date().toISOString(),
       };
 
-      await addDoc(collection(db, 'stories'), newStory);
+      await set(newStoryRef, newStory);
 
       setIsAddStoryModalOpen(false);
     };
@@ -271,7 +312,7 @@ const App: React.FC = () => {
     reader.readAsDataURL(storyFile);
   };
 
-  // 🟪 VER STORIES (AGORA VINDO DO FIRESTORE)
+  // VER STORIES GLOBAIS
   const handleViewStory = (author: string) => {
     const userStories = stories
       .filter((s) => s.author === author)
@@ -286,7 +327,7 @@ const App: React.FC = () => {
   };
 
   const handleParticipateInChallenge = ({ legenda }: { legenda: string }) => {
-    addPoints('CHALLENGE');
+    addPoints("CHALLENGE");
     handleOpenNewPostModal(legenda);
   };
 
@@ -297,15 +338,15 @@ const App: React.FC = () => {
   const renderPage = () => {
     let pageComponent;
     switch (activePage) {
-      case 'music':
+      case "music":
         pageComponent = <Music />;
         break;
-      case 'search':
+      case "search":
         pageComponent = (
           <Suggestions people={people} onToggleFollow={handleToggleFollow} />
         );
         break;
-      case 'play':
+      case "play":
         pageComponent = (
           <Play
             onParticipateInChallenge={handleParticipateInChallenge}
@@ -313,7 +354,7 @@ const App: React.FC = () => {
           />
         );
         break;
-      case 'profile':
+      case "profile":
         const userPosts = posts.filter(
           (post) => post.author.username === userProfile.name
         );
@@ -325,7 +366,7 @@ const App: React.FC = () => {
           />
         );
         break;
-      case 'feed':
+      case "feed":
       default:
         pageComponent = (
           <Feed
@@ -344,11 +385,11 @@ const App: React.FC = () => {
         break;
     }
     const animationClass =
-      pageDirection === 'left'
-        ? 'animate-slide-in-left'
-        : pageDirection === 'right'
-        ? 'animate-slide-in-right'
-        : '';
+      pageDirection === "left"
+        ? "animate-slide-in-left"
+        : pageDirection === "right"
+        ? "animate-slide-in-right"
+        : "";
     return (
       <div key={activePage} className={animationClass}>
         {pageComponent}

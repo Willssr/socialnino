@@ -1,11 +1,7 @@
 // services/firebase.ts
-
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-
-// ❗ Firestore COMPLETO (para feed global)
-import { getFirestore } from "firebase/firestore";
-
+import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -16,6 +12,10 @@ const firebaseConfig = {
   messagingSenderId: "165583816034",
   appId: "1:165583816034:web:130770b6efe954699c583b",
   measurementId: "G-M7R6TH3PRC",
+
+  // 🔥 MUITO IMPORTANTE para Realtime Database:
+  // copie a URL exata do console do Firebase → Realtime Database
+  databaseURL: "https://socialninovisk-default-rtdb.firebaseio.com",
 };
 
 let app: FirebaseApp;
@@ -26,7 +26,11 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 
-// 🔥 Agora funciona o modo global
+// Auth (login, registro, etc.)
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+
+// Realtime Database (global posts, stories, etc.)
+export const db = getDatabase(app);
+
+// Storage (imagens, vídeos, músicas)
 export const storage = getStorage(app);
