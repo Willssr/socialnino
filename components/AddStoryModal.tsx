@@ -42,7 +42,7 @@ const AddStoryModal: React.FC<AddStoryModalProps> = ({ onClose, onSave }) => {
             </div>
           ) : (
             <div className="mb-4 p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-md text-center">
-              <label htmlFor="story-file-upload" className="cursor-pointer text-indigo-600 dark:text-indigo-400 font-semibold">
+              <label htmlFor="story-file-upload" className="cursor-pointer text-instaBlue dark:text-sky-400 font-semibold">
                 Selecione uma imagem ou vídeo
               </label>
               <input id="story-file-upload" type="file" accept="image/*,video/*" onChange={handleFileChange} className="hidden" />
@@ -63,7 +63,7 @@ const AddStoryModal: React.FC<AddStoryModalProps> = ({ onClose, onSave }) => {
             type="button"
             onClick={handleSubmit}
             disabled={!selectedFile}
-            className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-instaBlue border border-transparent rounded-md text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Postar Story
           </button>

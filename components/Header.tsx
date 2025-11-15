@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) => {
   return (
-    <header className="bg-white dark:bg-black text-black dark:text-white sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 h-14">
+    <header className="bg-white dark:bg-black text-black dark:text-white sticky top-0 z-50 border-b border-instaBorder dark:border-gray-800 h-14">
       <div className="container mx-auto px-4 flex items-center justify-between h-full">
           <div className="flex-shrink-0">
             <span 

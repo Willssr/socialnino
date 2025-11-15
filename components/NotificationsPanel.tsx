@@ -87,7 +87,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, 
             >
                 <div className="flex items-center justify-between p-3 border-b dark:border-slate-700">
                     <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Notificações</h3>
-                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-sky-600 dark:text-sky-400 hover:underline">
+                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-instaBlue dark:text-sky-400 hover:underline">
                         Marcar todas como lidas
                     </button>
                 </div>

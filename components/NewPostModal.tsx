@@ -49,7 +49,7 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
               </div>
             ) : (
               <div className="p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-md text-center">
-                <label htmlFor="post-file-upload" className="cursor-pointer text-indigo-600 dark:text-indigo-400 font-semibold">
+                <label htmlFor="post-file-upload" className="cursor-pointer text-instaBlue dark:text-sky-400 font-semibold">
                   Selecione uma imagem ou vídeo
                 </label>
                 <input id="post-file-upload" type="file" accept="image/*,video/*" onChange={handleFileChange} className="hidden" />
@@ -66,7 +66,7 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               placeholder="Escreva uma legenda..."
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-instaBlue focus:border-instaBlue bg-white dark:bg-slate-700 dark:text-white"
             />
           </div>
         </div>
@@ -83,7 +83,7 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
             type="button"
             onClick={handleSubmit}
             disabled={!selectedFile}
-            className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-indigo-700 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-instaBlue border border-transparent rounded-md text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Publicar
           </button>

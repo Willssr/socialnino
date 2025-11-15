@@ -1,5 +1,3 @@
-
-
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
 
@@ -79,7 +77,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ currentUser, onSave
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-instaBlue focus:border-instaBlue bg-white dark:bg-slate-700 dark:text-white"
               />
             </div>
 
@@ -92,7 +90,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ currentUser, onSave
                 rows={3}
                 value={formData.bio}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white"
+                className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-instaBlue focus:border-instaBlue bg-white dark:bg-slate-700 dark:text-white"
               />
             </div>
           </div>
@@ -107,7 +105,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ currentUser, onSave
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 border border-transparent rounded-md text-sm font-semibold text-white hover:bg-indigo-700"
+              className="px-4 py-2 bg-instaBlue border border-transparent rounded-md text-sm font-semibold text-white hover:opacity-90"
             >
               Salvar Alterações
             </button>

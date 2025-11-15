@@ -40,7 +40,7 @@ const Play: React.FC<PlayProps> = ({ onParticipateInChallenge, currentUser }) =>
           <QuizFotos currentUser={currentUser} />
           <button
             onClick={() => setActiveGame('menu')}
-            className="mt-4 w-full text-center text-blue-500 font-semibold"
+            className="mt-4 w-full text-center text-instaBlue font-semibold"
           >
             &larr; Voltar ao menu Play
           </button>
@@ -54,7 +54,7 @@ const Play: React.FC<PlayProps> = ({ onParticipateInChallenge, currentUser }) =>
                 <DesafioDoDia onParticipar={handleParticipate} />
                 <button 
                     onClick={() => setActiveGame("menu")} 
-                    className="mt-4 w-full text-center text-blue-500 font-semibold"
+                    className="mt-4 w-full text-center text-instaBlue font-semibold"
                 >
                     &larr; Voltar ao menu Play
                 </button>

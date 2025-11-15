@@ -1,6 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Post } from '../types';
-import { HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon, DotsHorizontalIcon } from './Icons';
+import React, { useState, useRef, useEffect } from "react";
+import { Post } from "../types";
+import {
+  HeartIcon,
+  CommentIcon,
+  PaperAirplaneIcon,
+  BookmarkIcon,
+  DotsHorizontalIcon,
+} from "./Icons";
 
 interface PostCardProps {
   post: Post;
@@ -9,29 +15,32 @@ interface PostCardProps {
   onBookmark: (postId: string) => void;
 }
 
-const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark }) => {
-  const [commentText, setCommentText] = useState('');
+const PostCard: React.FC<PostCardProps> = ({
+  post,
+  onLike,
+  onComment,
+  onBookmark,
+}) => {
+  const [commentText, setCommentText] = useState("");
   const [isAnimatingLike, setIsAnimatingLike] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const mediaRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // We only need to observe videos
-    if (post.media.type !== 'video') return;
+    // Lazy-load só para vídeo
+    if (post.media.type !== "video") return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsIntersecting(true);
-          // Once visible, we don't need to observe it anymore
           if (mediaRef.current) {
             observer.unobserve(mediaRef.current);
           }
         }
       },
       {
-        // Start loading when the video is 200px away from the viewport
-        rootMargin: '200px 0px',
+        rootMargin: "200px 0px",
       }
     );
 
@@ -39,10 +48,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark
       observer.observe(mediaRef.current);
     }
 
-    // Cleanup function
     return () => {
       if (mediaRef.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(mediaRef.current);
       }
     };
@@ -52,7 +59,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark
     e.preventDefault();
     if (commentText.trim()) {
       onComment(post.id, commentText);
-      setCommentText('');
+      setCommentText("");
     }
   };
 
@@ -61,7 +68,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark
       setIsAnimatingLike(true);
       setTimeout(() => {
         setIsAnimatingLike(false);
-      }, 800); // Animation duration
+      }, 800);
     }
     onLike(post.id);
   };
@@ -78,81 +85,125 @@ const PostCard: React.FC<PostCardProps> = ({ post, onLike, onComment, onBookmark
     if (diffMinutes < 60) return `${diffMinutes}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     return `${diffDays}d ago`;
-  }
+  };
 
   return (
-    <div className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800">
-        {/* Post Header */}
-        <div className="p-3 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <img src={post.author.avatar} alt={post.author.username} className="w-8 h-8 rounded-full" />
-            <span className="font-semibold text-sm text-black dark:text-white">{post.author.username}</span>
+    <div className="bg-white dark:bg-black border-b border-instaBorder dark:border-gray-800">
+      {/* Cabeçalho */}
+      <div className="p-3 flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <img
+            src={post.author.avatar}
+            alt={post.author.username}
+            className="w-8 h-8 rounded-full object-cover"
+          />
+          <span className="font-semibold text-sm text-black dark:text-white">
+            {post.author.username}
+          </span>
+        </div>
+        <button className="text-black dark:text-white">
+          <DotsHorizontalIcon className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Mídia */}
+      <div
+        className="relative bg-black"
+        onDoubleClick={handleLikeAction}
+        ref={mediaRef}
+      >
+        {post.media.type === "image" ? (
+          <img
+            src={post.media.src}
+            alt={post.caption}
+            className="w-full max-h-[480px] object-cover"
+          />
+        ) : (
+          <video
+            controls
+            preload="metadata"
+            src={isIntersecting ? post.media.src : undefined}
+            className="w-full max-h-[480px] object-contain bg-black"
+          >
+            Your browser does not support the video tag.
+          </video>
+        )}
+
+        {isAnimatingLike && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <HeartIcon
+              className="w-24 h-24 text-white drop-shadow-lg animate-heart-burst"
+              solid={true}
+            />
           </div>
-          <button className="text-black dark:text-white">
-              <DotsHorizontalIcon className="w-5 h-5"/>
+        )}
+      </div>
+
+      {/* Ações e info */}
+      <div className="p-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleLikeAction}
+              className={
+                post.isLiked ? "text-instaRed" : "text-black dark:text-white"
+              }
+            >
+              <HeartIcon className="w-7 h-7" solid={post.isLiked} />
+            </button>
+            <button className="text-black dark:text-white">
+              <CommentIcon className="w-7 h-7" />
+            </button>
+            <button className="text-black dark:text-white">
+              <PaperAirplaneIcon className="w-7 h-7 -rotate-12" />
+            </button>
+          </div>
+          <button
+            onClick={() => onBookmark(post.id)}
+            className="text-black dark:text-white"
+          >
+            <BookmarkIcon className="w-7 h-7" solid={post.isBookmarked} />
           </button>
         </div>
 
-        {/* Post Media */}
-        <div className="relative" onDoubleClick={handleLikeAction} ref={mediaRef}>
-          {post.media.type === 'image' ? (
-            <img src={post.media.src} alt={post.caption} className="w-full object-cover" />
-          ) : (
-            <video controls preload="metadata" src={isIntersecting ? post.media.src : undefined} className="w-full bg-black">
-              Your browser does not support the video tag.
-            </video>
-          )}
-          {isAnimatingLike && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <HeartIcon 
-                className="w-24 h-24 text-white drop-shadow-lg animate-heart-burst" 
-                solid={true}
-              />
-            </div>
-          )}
-        </div>
+        <p className="font-semibold text-sm text-black dark:text-white mt-3">
+          {post.likes.toLocaleString("pt-BR")} curtidas
+        </p>
 
-        {/* Post Actions & Info */}
-        <div className="p-3">
-          <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                  <button onClick={handleLikeAction} className={`${post.isLiked ? 'text-red-500' : 'text-black dark:text-white'}`}>
-                      <HeartIcon className="w-7 h-7" solid={post.isLiked}/>
-                  </button>
-                  <button className="text-black dark:text-white">
-                      <CommentIcon className="w-7 h-7" />
-                  </button>
-                  <button className="text-black dark:text-white">
-                      <PaperAirplaneIcon className="w-7 h-7 -rotate-12" />
-                  </button>
-              </div>
-              <button 
-                onClick={() => onBookmark(post.id)}
-                className="text-black dark:text-white"
-              >
-                  <BookmarkIcon className="w-7 h-7" solid={post.isBookmarked} />
-              </button>
+        <p className="text-sm mt-1 text-black dark:text-white">
+          <span className="font-semibold">{post.author.username}</span>{" "}
+          {post.caption}
+        </p>
+
+        {/* Comments Section */}
+        {post.comments.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {post.comments.map(comment => (
+              <p key={comment.id} className="text-sm text-black dark:text-white">
+                <span className="font-semibold">{comment.author}</span>{' '}
+                {comment.text}
+              </p>
+            ))}
           </div>
+        )}
 
-          <p className="font-semibold text-sm text-black dark:text-white mt-3">{post.likes.toLocaleString('pt-BR')} curtidas</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 uppercase">
+          {formatDate(post.timestamp)}
+        </p>
 
-          <p className="text-sm mt-1 text-black dark:text-white">
-              <span className="font-semibold">{post.author.username}</span>{' '}
-              {post.caption}
-          </p>
-
-           <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 uppercase">{formatDate(post.timestamp)}</p>
-          
-           <form onSubmit={handleCommentSubmit} className="mt-2 border-t border-gray-200 dark:border-gray-800 pt-2">
-              <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Adicione um comentário..."
-                  className="w-full bg-transparent text-sm focus:outline-none placeholder-gray-500 dark:placeholder-gray-400"
-              />
-           </form>
-        </div>
+        <form
+          onSubmit={handleCommentSubmit}
+          className="mt-2 border-t border-instaBorder dark:border-gray-800 pt-2"
+        >
+          <input
+            type="text"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            placeholder="Adicione um comentário..."
+            className="w-full bg-transparent text-sm focus:outline-none placeholder-gray-500 dark:placeholder-gray-400 text-black dark:text-white"
+          />
+        </form>
+      </div>
     </div>
   );
 };

@@ -17,17 +17,31 @@
     }
     </script>
 
-    <!-- ⚡ TailwindCSS via CDN (necessário no AI Studio) -->
+    <!-- ⚡ TailwindCSS via CDN + cores customizadas -->
     <script>
       tailwind = {
         config: {
           darkMode: "class",
-        }
+          theme: {
+            extend: {
+              colors: {
+                instaBg: "#fafafa",       // fundo geral tipo Instagram
+                instaText: "#262626",     // texto principal
+                instaRed: '#ED4956',      // Cor de curtida do Instagram
+                instaBlue: '#0095f6',     // Cor de ação principal do Instagram
+                instaBorder: '#dbdbdb',   // Cor da borda do Instagram
+                instaOrange: "#f77737",
+                instaYellow: "#fcd353",
+                instaPurple: "#833ab4",
+              },
+            },
+          },
+        },
       };
     </script>
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Estilos extras opcionais -->
+    <!-- Estilos extras (inclui animação do coração) -->
     <style>
       body {
         background-color: #fafafa;
@@ -35,10 +49,33 @@
       body.dark {
         background-color: #000;
       }
+
+      @keyframes heart-burst {
+        0% {
+          transform: scale(0.3);
+          opacity: 0;
+        }
+        40% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        60% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+      }
+
+      .animate-heart-burst {
+        animation: heart-burst 0.8s ease-out forwards;
+      }
     </style>
   </head>
 
-  <body class="bg-white dark:bg-black">
+  <body class="bg-instaBg text-instaText dark:bg-black">
     <!-- React Root -->
     <div id="root"></div>
 

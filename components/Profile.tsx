@@ -4,6 +4,7 @@ import EditProfileModal from './EditProfileModal';
 import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon } from './Icons';
 import PostDetailModal from './PostDetailModal';
 import FollowButton from './FollowButton';
+import LogoutButton from './LogoutButton';
 
 interface ProfileProps {
   userProfile: UserProfile;
@@ -32,9 +33,12 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
         {/* Header */}
         <div className="flex items-center justify-between">
             <h1 className="text-xl font-bold">{userProfile.name}</h1>
-            <button>
-                <DotsHorizontalIcon className="w-6 h-6"/>
-            </button>
+            <div className="flex items-center space-x-2">
+                <button>
+                    <DotsHorizontalIcon className="w-6 h-6"/>
+                </button>
+                <LogoutButton />
+            </div>
         </div>
 
         {/* Profile Info */}
