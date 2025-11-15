@@ -19,8 +19,11 @@ import NotificationsPanel from './components/NotificationsPanel';
 import SearchModal from './components/SearchModal';
 import { useTheme } from './theme/ThemeProvider';
 import { useNinoPoints } from './context/NinoPointsContext';
+import { useAuth } from './AuthContext';
+import AuthScreen from './AuthScreen';
 
 const App: React.FC = () => {
+  const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState<ActivePage>('feed');
   const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v3', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
@@ -222,6 +225,18 @@ const App: React.FC = () => {
                 />;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <p className="text-slate-500 dark:text-slate-400">Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">

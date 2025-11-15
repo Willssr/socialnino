@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, ActivePage } from '../types';
 import { MoonIcon, SunIcon, BellIcon, SearchIcon, CoinIcon } from './Icons';
 import { useNinoPoints } from '../context/NinoPointsContext';
+import LogoutButton from './LogoutButton';
 
 interface HeaderProps {
     userProfile: UserProfile;
@@ -66,6 +67,7 @@ const Header: React.FC<HeaderProps> = ({ userProfile, onNavigate, theme, toggleT
              <button onClick={() => onNavigate('profile')} className="p-1 rounded-full hover:bg-white/20 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-purple-600 focus:ring-white">
                 <img src={userProfile.avatar} alt="Profile" className="h-8 w-8 rounded-full border-2 border-white object-cover"/>
             </button>
+            <LogoutButton />
           </div>
         </div>
       </div>
