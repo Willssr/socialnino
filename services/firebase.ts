@@ -1,7 +1,11 @@
+// services/firebase.ts
+
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-// Fix: Use 'firebase/firestore/lite' to resolve import errors.
-import { getFirestore } from "firebase/firestore/lite";
+
+// ❗ Firestore COMPLETO (para feed global)
+import { getFirestore } from "firebase/firestore";
+
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -15,12 +19,14 @@ const firebaseConfig = {
 };
 
 let app: FirebaseApp;
+
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
 } else {
   app = getApps()[0];
 }
 
+// 🔥 Agora funciona o modo global
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
