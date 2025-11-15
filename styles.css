@@ -1,0 +1,101 @@
+/* styles.css */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Roboto:wght@400;500;700&display=swap');
+
+body {
+    background-color: #0A0A0D;
+    color: #F5F5F5;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Propriedade customizada para a animação da borda */
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+/* Animação de rotação para o gradiente da borda */
+@keyframes rgb-spin {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}
+
+/* Classe para aplicar a borda RGB animada */
+.rgb-border {
+  position: relative;
+  border: 2px solid transparent; /* Fallback e espaço para o gradiente */
+  background-clip: padding-box; /* Essencial para o fundo não vazar para a borda */
+  background-color: #14141F; /* Cor de fundo do card */
+  z-index: 1;
+}
+
+.rgb-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px; /* Controla a espessura da borda, deve ser o negativo da borda do pai */
+  z-index: -1;
+  border-radius: inherit; /* Garante que a borda arredondada seja a mesma do elemento pai */
+  background: conic-gradient(
+    from var(--angle),
+    #7B2FF7, /* primary */
+    #FF2CDF, /* accent */
+    #00E5FF, /* secondary */
+    #7B2FF7 /* primary */
+  );
+  animation: rgb-spin 4s linear infinite;
+}
+
+
+/* Classe para o gradiente de texto neon */
+.text-gradient-neon {
+  background: linear-gradient(90deg, #7B2FF7, #00E5FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+  padding-bottom: 4px; /* Adiciona um pequeno preenchimento para evitar cortes no gradiente */
+}
+
+/* Sombra de texto para um leve brilho neon */
+.text-glow {
+    text-shadow: 0 0 2px rgba(245, 245, 245, 0.5), 0 0 8px rgba(0, 229, 255, 0.3);
+}
+
+/* Estilos para os componentes de música e jogos */
+.music-header, .music-section-header {
+    border-bottom: 1px solid rgba(123, 47, 247, 0.3);
+    padding-bottom: 0.75rem;
+}
+.music-now-card, .music-row, .daily-challenge-card, .quiz-card, .ranking-card {
+    background-color: #14141F;
+    border: 1px solid rgba(123, 47, 247, 0.55);
+    border-radius: 0.75rem;
+    box-shadow: 0 0 15px rgba(123, 47, 247, 0.15);
+}
+.music-add-btn, .daily-btn, .quiz-btn {
+    background-color: #7B2FF7;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+    box-shadow: 0 0 8px #7B2FF7, 0 0 12px #7B2FF7;
+    transition: all 0.2s ease-in-out;
+}
+.music-add-btn:hover, .daily-btn:hover, .quiz-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px #7B2FF7, 0 0 20px #7B2FF7;
+}
+
+/* Estilos específicos do quiz */
+.quiz-feedback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    font-weight: bold;
+    border-radius: 0.5rem;
+}
+.quiz-ok { background-color: rgba(0, 255, 13, 0.7); color: white; }
+.quiz-no { background-color: rgba(255, 36, 36, 0.7); color: white; }

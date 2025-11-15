@@ -6,6 +6,7 @@ import App from "./App";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { NinoPointsProvider } from "./context/NinoPointsContext";
 import { AuthProvider } from "./AuthContext";
+import "./styles.css"; // Importa os estilos globais
 
 const rootElement = document.getElementById("root");
 

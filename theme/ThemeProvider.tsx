@@ -4,12 +4,12 @@ type Theme = "light" | "dark";
 
 type ThemeContextType = {
   theme: Theme;
-  toggleTheme: () => void;
+  // A função toggleTheme pode ser removida se não for mais necessária
+  // toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// FIX: Refactored to use an explicit props type instead of React.FC to resolve a potential typing issue.
 type ThemeProviderProps = {
   children: React.ReactNode;
 };
@@ -17,35 +17,28 @@ type ThemeProviderProps = {
 export const ThemeProvider = ({
   children,
 }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<Theme>("light");
+  // Define o tema como 'dark' por padrão e o trava
+  const [theme] = useState<Theme>("dark");
 
-  // Load theme from localStorage or system preference on initial load
+  // Aplica a classe 'dark' ao body e a mantém
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("socialnino-theme") as Theme | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setTheme(prefersDark ? "dark" : "light");
+    const body = document.body;
+    body.classList.add('dark');
+    // Salva 'dark' no localStorage para consistência
+    window.localStorage.setItem("socialnino-theme", "dark");
+    
+    // Opcional: remover a classe 'dark' não é mais necessário,
+    // mas deixamos aqui caso a lógica de toggle seja reintroduzida.
+    return () => {
+        body.classList.remove('dark');
     }
   }, []);
 
-  // Apply 'dark' class to the <body> element and save theme to localStorage
-  useEffect(() => {
-    const body = document.body;
-    if (theme === 'dark') {
-      body.classList.add('dark');
-    } else {
-      body.classList.remove('dark');
-    }
-    window.localStorage.setItem("socialnino-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () =>
-    setTheme((currentTheme) => (currentTheme === "light" ? "dark" : "light"));
+  // A função de toggle pode ser omitida do provedor se não for usada.
+  // const toggleTheme = () => {};
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme }}>
       {children}
     </ThemeContext.Provider>
   );

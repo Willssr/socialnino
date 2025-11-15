@@ -30,27 +30,27 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 animation-fade">
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto animation-fade-zoom">
+    <div className="fixed inset-0 bg-backgroundDark/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+      <div className="bg-cardDark border border-borderNeon rounded-lg shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">Criar nova publicação</h2>
-            <button type="button" onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 text-3xl leading-none">&times;</button>
+            <h2 className="text-xl font-orbitron font-bold text-gradient-neon">Nova Publicação</h2>
+            <button type="button" onClick={onClose} className="text-textDark hover:text-textLight text-3xl leading-none">&times;</button>
           </div>
           
           <div className="mb-4">
             {preview ? (
               <div>
                 {selectedFile?.type.startsWith('video/') ? (
-                    <video src={preview} controls className="w-full max-h-[50vh] object-contain rounded-md bg-slate-100 dark:bg-slate-700" />
+                    <video src={preview} controls className="w-full max-h-[50vh] object-contain rounded-md bg-backgroundLight" />
                 ) : (
-                    <img src={preview} alt="Pré-visualização" className="w-full max-h-[50vh] object-contain rounded-md bg-slate-100 dark:bg-slate-700" />
+                    <img src={preview} alt="Pré-visualização" className="w-full max-h-[50vh] object-contain rounded-md bg-backgroundLight" />
                 )}
               </div>
             ) : (
-              <div className="p-8 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-md text-center">
-                <label htmlFor="post-file-upload" className="cursor-pointer text-instaBlue dark:text-sky-400 font-semibold">
-                  Selecione uma imagem ou vídeo
+              <div className="p-8 border-2 border-dashed border-borderNeon rounded-md text-center bg-backgroundLight">
+                <label htmlFor="post-file-upload" className="cursor-pointer text-secondary font-semibold hover:text-white drop-shadow-[0_0_8px_#00E5FF]">
+                  Selecionar Mídia
                 </label>
                 <input id="post-file-upload" type="file" accept="image/*,video/*" onChange={handleFileChange} className="hidden" />
               </div>
@@ -58,24 +58,24 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
           </div>
 
           <div className="mb-4">
-            <label htmlFor="caption" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Legenda</label>
+            <label htmlFor="caption" className="block text-sm font-bold text-secondary mb-1">Legenda</label>
             <textarea
               id="caption"
               name="caption"
               rows={3}
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Escreva uma legenda..."
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-md shadow-sm focus:outline-none focus:ring-instaBlue focus:border-instaBlue bg-white dark:bg-slate-700 dark:text-white"
+              placeholder="Adicione uma legenda futurista..."
+              className="w-full px-3 py-2 border-2 border-borderNeon rounded-md bg-backgroundLight text-textLight placeholder-textDark focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
             />
           </div>
         </div>
         
-        <div className="bg-slate-50 dark:bg-slate-900/50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+        <div className="bg-backgroundLight/50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg border-t border-borderNeon">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-white dark:bg-slate-600 border border-slate-300 dark:border-slate-500 rounded-md text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-500"
+            className="px-4 py-2 border border-borderNeon rounded-md text-sm font-semibold text-textDark hover:bg-cardDark hover:text-textLight"
           >
             Cancelar
           </button>
@@ -83,7 +83,7 @@ const NewPostModal: React.FC<NewPostModalProps> = ({ onClose, onAddPost, initial
             type="button"
             onClick={handleSubmit}
             disabled={!selectedFile}
-            className="px-4 py-2 bg-instaBlue border border-transparent rounded-md text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2 bg-primary border border-transparent rounded-md text-sm font-semibold text-white shadow-glow-primary hover:animate-neon-pulse disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
           >
             Publicar
           </button>

@@ -5,36 +5,11 @@ import { useNinoPoints } from '../context/NinoPointsContext';
 
 // MOCK TEMPORÁRIO
 const mockUsers = [
-  {
-    id: 1,
-    username: "joao",
-    avatar: "https://picsum.photos/200?random=11",
-    photo: "https://picsum.photos/600/600?random=111",
-  },
-  {
-    id: 2,
-    username: "maria",
-    avatar: "https://picsum.photos/200?random=22",
-    photo: "https://picsum.photos/600/600?random=222",
-  },
-  {
-    id: 3,
-    username: "luana",
-    avatar: "https://picsum.photos/200?random=33",
-    photo: "https://picsum.photos/600/600?random=333",
-  },
-  {
-    id: 4,
-    username: "pedro",
-    avatar: "https://picsum.photos/200?random=44",
-    photo: "https://picsum.photos/600/600?random=444",
-  },
-  {
-    id: 5,
-    username: "nina",
-    avatar: "https://picsum.photos/200?random=55",
-    photo: "https://picsum.photos/600/600?random=555",
-  },
+  { id: 1, username: "zer0_cool", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026705d", photo: "https://picsum.photos/seed/tech1/600/600" },
+  { id: 2, username: "gl1tch", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026706d", photo: "https://picsum.photos/seed/tech2/600/600" },
+  { id: 3, username: "n3xus", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026707d", photo: "https://picsum.photos/seed/tech3/600/600" },
+  { id: 4, username: "cyb3r", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026708d", photo: "https://picsum.photos/seed/tech4/600/600" },
+  { id: 5, username: "v0id", avatar: "https://i.pravatar.cc/150?u=a042581f4e29026709d", photo: "https://picsum.photos/seed/tech5/600/600" },
 ];
 
 interface MockUser {
@@ -116,14 +91,14 @@ export default function QuizFotos({ currentUser }: QuizFotosProps) {
 
   if (gameState === 'finished') {
       return (
-          <div className="quiz-card">
-              <h2 className="quiz-title">Fim de Jogo!</h2>
-              <p className="quiz-sub">Sua pontuação final foi:</p>
-              <p className="text-5xl font-bold my-4 dark:text-white">{pontuacao}</p>
+          <div className="rgb-border rounded-xl p-6 text-center">
+              <h2 className="text-2xl font-orbitron font-bold text-gradient-neon">Fim de Jogo!</h2>
+              <p className="text-textDark mt-2">Sua pontuação final foi:</p>
+              <p className="text-6xl font-bold my-4 text-secondary drop-shadow-[0_0_8px_#00E5FF]">{pontuacao}</p>
               
               <Ranking ranking={ranking} currentUser={currentUser} />
 
-              <button onClick={resetGame} className="quiz-btn mt-4">
+              <button onClick={resetGame} className="w-full mt-6 py-3 rounded-lg font-bold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse">
                   Jogar Novamente
               </button>
           </div>
@@ -133,32 +108,31 @@ export default function QuizFotos({ currentUser }: QuizFotosProps) {
   if (!fotoAtual) return null;
 
   return (
-    <div className="quiz-card">
-      <h2 className="quiz-title">Quiz de Fotos 📸</h2>
-      <p className="quiz-sub">Adivinhe de quem é a foto!</p>
+    <div className="rgb-border rounded-xl p-6">
+      <h2 className="text-2xl font-orbitron font-bold text-gradient-neon text-center">Quiz de Fotos 📸</h2>
 
-      <div className="quiz-info">
-        <span>Rodada: {rodada}/{TOTAL_ROUNDS}</span>
-        <span>Pontos: {pontuacao}</span>
+      <div className="flex justify-between items-center my-4 text-sm">
+        <span className="font-bold text-textDark">Rodada: <span className="text-textLight">{rodada}/{TOTAL_ROUNDS}</span></span>
+        <span className="font-bold text-textDark">Pontos: <span className="text-textLight">{pontuacao}</span></span>
       </div>
 
-      <div className="quiz-foto-area">
-        <img src={fotoAtual.photo} className="quiz-foto" alt="Foto do quiz" />
+      <div className="relative aspect-square rounded-lg overflow-hidden border-2 border-borderNeon">
+        <img src={fotoAtual.photo} className="w-full h-full object-cover" alt="Foto do quiz" />
 
         {estadoResposta === "acertou" && (
-          <div className="quiz-feedback quiz-ok">✔ Acertou!</div>
+          <div className="absolute inset-0 flex items-center justify-center font-bold text-5xl bg-secondary/70 text-backgroundDark animate-ping once">✔</div>
         )}
         {estadoResposta === "errou" && (
-          <div className="quiz-feedback quiz-no">✖ Errou!</div>
+          <div className="absolute inset-0 flex items-center justify-center font-bold text-5xl bg-accent/70 text-white animate-ping once">✖</div>
         )}
       </div>
 
-      <div className="quiz-opcoes">
+      <div className="grid grid-cols-1 gap-3 mt-4">
         {opcoes.map((o) => (
           <button
             key={o}
             onClick={() => responder(o)}
-            className="quiz-btn"
+            className="w-full py-3 rounded-lg font-bold bg-cardDark border border-borderNeon text-textLight hover:bg-primary/30 hover:border-primary disabled:opacity-50 transition-colors"
             disabled={!!estadoResposta}
           >
             @{o}

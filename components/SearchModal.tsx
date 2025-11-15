@@ -17,12 +17,10 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, posts, people }) => 
         return { filteredPeople: [], filteredHashtags: [] };
     }
 
-    // Filter People
     const filteredPeople = people.filter(p => 
         p.username.toLowerCase().includes(trimmedQuery)
     );
 
-    // Filter Hashtags
     const allHashtags = new Set<string>();
     posts.forEach(post => {
         const matches = post.caption.match(/#\w+/g);
@@ -37,7 +35,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, posts, people }) => 
     return { filteredPeople, filteredHashtags };
   }, [query, posts, people]);
   
-  // Close modal on Escape key press
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (e.key === 'Escape') {
@@ -49,39 +46,39 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, posts, people }) => 
   }, [onClose]);
 
   return (
-    <div className="search-modal-container animation-fade" onClick={onClose}>
-      <div className="search-modal-content animation-fade-zoom" onClick={(e) => e.stopPropagation()}>
-        <div className="search-input-wrapper">
-          <SearchIcon className="w-5 h-5 text-slate-400 dark:text-slate-500"/>
+    <div className="fixed inset-0 bg-backgroundDark/80 backdrop-blur-sm z-50 p-4" onClick={onClose}>
+      <div className="w-full max-w-lg mx-auto bg-cardDark border border-borderNeon rounded-xl shadow-lg flex flex-col max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center space-x-3 p-3 border-b border-borderNeon">
+          <SearchIcon className="w-5 h-5 text-textDark"/>
           <input
             autoFocus
             type="text"
             placeholder="Buscar por usuários ou #hashtags..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="search-input"
+            className="w-full bg-transparent focus:outline-none text-textLight placeholder-textDark"
           />
-           <button onClick={onClose} className="text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200">
+           <button onClick={onClose} className="text-textDark hover:text-textLight">
             <XIcon className="w-6 h-6" />
           </button>
         </div>
         
-        <div className="search-results">
+        <div className="overflow-y-auto p-3">
             {query && filteredPeople.length === 0 && filteredHashtags.length === 0 && (
-                 <p className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                    Nenhum resultado encontrado.
+                 <p className="p-8 text-center text-sm text-textDark">
+                    Nenhum resultado encontrado para "{query}".
                 </p>
             )}
 
             {filteredPeople.length > 0 && (
                 <>
-                    <h3 className="search-result-category">Usuários</h3>
+                    <h3 className="text-xs font-bold uppercase text-secondary tracking-widest px-2 mb-2">Usuários</h3>
                     {filteredPeople.map(person => (
-                        <div key={person.id} className="search-result-item">
+                        <div key={person.id} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 cursor-pointer">
                             <img src={person.avatar} alt={person.username} className="w-10 h-10 rounded-full object-cover" />
                             <div>
-                                <p className="font-semibold text-slate-800 dark:text-slate-100">{person.username}</p>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">{person.bio}</p>
+                                <p className="font-semibold text-sm">{person.username}</p>
+                                <p className="text-xs text-textDark">{person.bio}</p>
                             </div>
                         </div>
                     ))}
@@ -90,11 +87,11 @@ const SearchModal: React.FC<SearchModalProps> = ({ onClose, posts, people }) => 
 
             {filteredHashtags.length > 0 && (
                  <>
-                    <h3 className="search-result-category mt-2">Hashtags</h3>
+                    <h3 className="text-xs font-bold uppercase text-accent tracking-widest px-2 mt-4 mb-2">Hashtags</h3>
                     {filteredHashtags.map(tag => (
-                        <div key={tag} className="search-result-item">
-                            <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-500 dark:text-slate-400">#</div>
-                            <p className="font-semibold text-slate-800 dark:text-slate-100">{tag}</p>
+                        <div key={tag} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary/20 cursor-pointer">
+                            <div className="w-10 h-10 rounded-full bg-backgroundLight border border-borderNeon flex items-center justify-center font-bold text-accent">#</div>
+                            <p className="font-semibold text-sm">{tag}</p>
                         </div>
                     ))}
                 </>

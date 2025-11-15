@@ -3,7 +3,6 @@ import { UserProfile, Post } from '../types';
 import EditProfileModal from './EditProfileModal';
 import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon } from './Icons';
 import PostDetailModal from './PostDetailModal';
-import FollowButton from './FollowButton';
 import LogoutButton from './LogoutButton';
 
 interface ProfileProps {
@@ -28,13 +27,13 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
   ];
   
   return (
-    <div className="w-full max-w-4xl mx-auto text-black dark:text-white">
+    <div className="w-full max-w-4xl mx-auto text-textLight">
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold">{userProfile.name}</h1>
+            <h1 className="text-2xl font-orbitron font-bold text-gradient-neon">{userProfile.name}</h1>
             <div className="flex items-center space-x-2">
-                <button>
+                <button className="text-textDark hover:text-textLight">
                     <DotsHorizontalIcon className="w-6 h-6"/>
                 </button>
                 <LogoutButton />
@@ -42,17 +41,20 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
         </div>
 
         {/* Profile Info */}
-        <div className="flex items-center my-4">
-            <img
-                src={userProfile.avatar}
-                alt="Avatar"
-                className="w-20 h-20 rounded-full object-cover"
-            />
+        <div className="flex items-center my-6">
+            <div className="relative w-24 h-24">
+                <img
+                    src={userProfile.avatar}
+                    alt="Avatar"
+                    className="w-24 h-24 rounded-full object-cover"
+                />
+                <div className="absolute inset-0 rounded-full border-2 border-primary animate-neon-pulse opacity-50"></div>
+            </div>
             <div className="flex-grow flex justify-around items-center">
                 {stats.map(stat => (
                     <div key={stat.label} className="text-center">
-                    <span className="font-bold text-lg">{stat.value}</span>
-                    <span className="block text-sm text-gray-500 dark:text-gray-400">{stat.label}</span>
+                    <span className="font-bold text-xl">{stat.value}</span>
+                    <span className="block text-sm text-textDark">{stat.label}</span>
                     </div>
                 ))}
             </div>
@@ -60,20 +62,20 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
 
         {/* Bio */}
         <div>
-            <p className="font-semibold text-sm">{userProfile.name}</p>
-            <p className="text-sm">{userProfile.bio}</p>
+            <p className="font-bold text-sm">{userProfile.name}</p>
+            <p className="text-sm text-textDark">{userProfile.bio}</p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2 my-4">
             <button
                 onClick={() => setIsEditing(true)}
-                className="flex-1 bg-gray-200 dark:bg-gray-800 px-4 py-1.5 rounded-lg text-sm font-semibold"
+                className="flex-1 bg-cardDark border border-borderNeon px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors"
             >
                 Editar Perfil
             </button>
              <button
-                className="flex-1 bg-gray-200 dark:bg-gray-800 px-4 py-1.5 rounded-lg text-sm font-semibold"
+                className="flex-1 bg-cardDark border border-borderNeon px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors"
             >
                 Compartilhar Perfil
             </button>
@@ -81,19 +83,19 @@ const Profile: React.FC<ProfileProps> = ({ userProfile, onUpdateProfile, userPos
       </div>
       
       {/* User Posts Grid */}
-      <div className="mt-4 border-t border-gray-200 dark:border-gray-800">
+      <div className="mt-4 border-t border-borderNeon/50">
         <div className="grid grid-cols-3 gap-0.5">
             {userPosts.map(post => (
-              <button key={post.id} onClick={() => setSelectedPost(post)} className="relative aspect-square bg-gray-200 dark:bg-gray-800 group">
+              <button key={post.id} onClick={() => setSelectedPost(post)} className="relative aspect-square bg-cardDark group">
                 {post.media.type === 'image' ? (
                   <img src={post.media.src} alt={post.caption} className="w-full h-full object-cover" />
                 ) : (
                   <video src={post.media.src} className="w-full h-full object-cover" />
                 )}
                 {post.media.type === 'video' && (
-                    <PlayIcon className="absolute top-2 right-2 w-5 h-5 text-white drop-shadow-md" solid />
+                    <PlayIcon className="absolute top-2 right-2 w-5 h-5 text-white drop-shadow-[0_0_5px_rgba(0,0,0,0.7)]" solid />
                 )}
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white space-x-4">
+                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white space-x-4">
                     <div className="flex items-center space-x-1">
                         <HeartIcon className="w-5 h-5" solid />
                         <span>{post.likes}</span>

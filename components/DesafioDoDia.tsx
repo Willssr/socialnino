@@ -2,36 +2,35 @@ import React, { useMemo, useState } from "react";
 
 const DESAFIOS = [
   {
-    title: "Algo azul",
-    description: "Poste uma foto com algo azul que você viu hoje.",
-    hashtag: "#DesafioDoDiaAzul",
+    title: "Neon Urbano",
+    description: "Poste uma foto de luzes neon que você encontrou na cidade.",
+    hashtag: "#DesafioNeonUrbano",
   },
   {
-    title: "Vista do dia",
-    description: "Mostre a vista de onde você está agora.",
-    hashtag: "#DesafioDoDiaVista",
+    title: "Reflexo do Futuro",
+    description: "Capture um reflexo interessante em uma superfície metálica ou de vidro.",
+    hashtag: "#DesafioReflexoFuturo",
   },
   {
-    title: "Momento feliz",
-    description: "Compartilhe um momento que te deixou feliz recentemente.",
-    hashtag: "#DesafioDoDiaFeliz",
+    title: "Sombra Cyber",
+    description: "Brinque com luz e sombra para criar uma foto com estética cyberpunk.",
+    hashtag: "#DesafioSombraCyber",
   },
   {
-    title: "Seu lugar favorito",
-    description: "Poste uma foto ou vídeo do seu lugar favorito na sua cidade.",
-    hashtag: "#DesafioDoDiaLugarFav",
+    title: "Seu Setup Gamer",
+    description: "Mostre seu setup de jogos, trabalho ou estudo com iluminação RGB.",
+    hashtag: "#DesafioSetupGamer",
   },
   {
-    title: "Mood musical",
-    description: "Mostre algo que combine com a música que você mais ouviu hoje.",
-    hashtag: "#DesafioDoDiaMusic",
+    title: "Trilha Sonora Noturna",
+    description: "Uma foto que represente a música que você está ouvindo agora.",
+    hashtag: "#DesafioTrilhaNoturna",
   },
 ];
 
 function getDesafioDoDia() {
   const today = new Date();
   const key = `${today.getFullYear()}-${today.getMonth()}-${today.getDate()}`;
-  // gera um índice "fixo" pro dia
   let hash = 0;
   for (let i = 0; i < key.length; i++) {
     hash = (hash + key.charCodeAt(i)) % 10000;
@@ -53,7 +52,6 @@ interface DesafioDoDiaProps {
 
 export default function DesafioDoDia({ onParticipar }: DesafioDoDiaProps) {
   const desafio = useMemo(() => getDesafioDoDia(), []);
-  // In a real app, this would be stored per-user, per-day
   const [participantes, setParticipantes] = useState(Math.floor(Math.random() * 100)); 
   const [jaParticipou, setJaParticipou] = useState(false);
 
@@ -67,35 +65,29 @@ export default function DesafioDoDia({ onParticipar }: DesafioDoDiaProps) {
   };
 
   return (
-    <section className="daily-challenge-card">
-      <div className="daily-challenge-header">
-        <span className="daily-chip">Desafio do dia 🌟</span>
-        <span className="daily-date">
-          {new Date().toLocaleDateString("pt-BR", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })}
+    <section className="rgb-border rounded-xl p-6">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-bold bg-primary/30 text-secondary px-3 py-1 rounded-full">Desafio do dia 🌟</span>
+        <span className="text-xs text-textDark">
+          {new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long" })}
         </span>
       </div>
 
-      <h3 className="daily-title">{desafio.title}</h3>
-      <p className="daily-description">{desafio.description}</p>
+      <h3 className="text-2xl font-orbitron font-bold text-gradient-neon mb-2">{desafio.title}</h3>
+      <p className="text-textDark mb-4">{desafio.description}</p>
 
-      <div className="daily-hashtag">{desafio.hashtag}</div>
+      <div className="text-secondary font-mono bg-cardDark/50 px-3 py-1 rounded mb-6 inline-block">{desafio.hashtag}</div>
 
-      <div className="daily-footer">
+      <div className="text-center">
         <button
-          className={`daily-btn ${jaParticipou ? "daily-btn-ok" : ""}`}
+          className={`w-full py-3 rounded-lg font-bold text-lg transition-all duration-300 ${jaParticipou ? "bg-secondary text-backgroundDark" : "bg-primary text-white shadow-glow-primary hover:animate-neon-pulse"}`}
           onClick={handleParticipar}
         >
-          {jaParticipou ? "Você já está participando 🎉" : "Participar do desafio"}
+          {jaParticipou ? "PARTICIPANDO 🎉" : "PARTICIPAR DO DESAFIO"}
         </button>
 
-        <span className="daily-participants">
-          {participantes === 0 && "Seja o primeiro a participar!"}
-          {participantes === 1 && "1 pessoa já participou hoje"}
-          {participantes > 1 && `${participantes} pessoas já participaram hoje`}
+        <span className="block text-xs text-textDark mt-3">
+          {participantes > 1 ? `${participantes} pessoas já participaram hoje` : "Seja um dos primeiros a participar!"}
         </span>
       </div>
     </section>

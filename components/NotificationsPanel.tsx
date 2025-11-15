@@ -18,20 +18,20 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
 
         switch(type) {
             case 'like':
-                bgColor = "bg-red-500";
+                bgColor = "bg-accent";
                 icon = <HeartIcon className={iconClass} solid={true} />;
                 break;
             case 'comment':
-                bgColor = "bg-blue-500";
+                bgColor = "bg-secondary";
                 icon = <CommentIcon className={iconClass} />;
                 break;
             case 'follow':
-                bgColor = "bg-purple-500";
+                bgColor = "bg-primary";
                 icon = <UserIcon className={iconClass} solid={true}/>;
                 break;
         }
         return (
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${bgColor}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${bgColor} shadow-lg`}>
                 {icon}
             </div>
         )
@@ -40,11 +40,11 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
     const renderText = () => {
         switch(type) {
             case 'like':
-                return <><strong>@{user.username}</strong> curtiu sua foto.</>;
+                return <><strong className="text-textLight">@{user.username}</strong> curtiu sua foto.</>;
             case 'comment':
-                return <><strong>@{user.username}</strong> comentou na sua foto.</>;
+                return <><strong className="text-textLight">@{user.username}</strong> comentou na sua foto.</>;
             case 'follow':
-                return <><strong>@{user.username}</strong> começou a seguir você.</>;
+                return <><strong className="text-textLight">@{user.username}</strong> começou a seguir você.</>;
         }
     }
 
@@ -62,13 +62,13 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
     }
 
     return (
-        <div className={`flex items-start gap-3 p-3 transition-colors duration-200 ${!read ? 'bg-sky-50 dark:bg-slate-700/50' : ''} hover:bg-slate-100 dark:hover:bg-slate-700`}>
+        <div className={`flex items-start gap-3 p-3 transition-colors duration-200 ${!read ? 'bg-primary/10' : ''} hover:bg-primary/20`}>
             {renderIcon()}
             <div className="flex-grow">
-                <p className="text-sm text-slate-700 dark:text-slate-300">
+                <p className="text-sm text-textDark">
                     {renderText()}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{formatDate(timestamp)}</p>
+                <p className="text-xs text-textDark/70 mt-0.5">{formatDate(timestamp)}</p>
             </div>
             {postPreview && (
                 <img src={postPreview} alt="Post preview" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
@@ -82,20 +82,20 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, 
     return (
         <div className="fixed inset-0 z-40" onClick={onClose}>
             <div 
-                className="absolute top-16 right-4 sm:right-6 lg:right-8 w-full max-w-sm bg-white dark:bg-slate-800 rounded-lg shadow-2xl border dark:border-slate-700 overflow-hidden animation-fade-zoom"
+                className="absolute top-20 right-4 sm:right-6 lg:right-8 w-full max-w-sm bg-cardDark rounded-lg shadow-2xl border border-borderNeon overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-3 border-b dark:border-slate-700">
-                    <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Notificações</h3>
-                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-instaBlue dark:text-sky-400 hover:underline">
-                        Marcar todas como lidas
+                <div className="flex items-center justify-between p-3 border-b border-borderNeon">
+                    <h3 className="font-bold text-lg text-textLight">Notificações</h3>
+                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-secondary hover:underline">
+                        Marcar como lidas
                     </button>
                 </div>
                 <div className="max-h-[70vh] overflow-y-auto">
                     {notifications.length > 0 ? (
                         notifications.map(n => <NotificationItem key={n.id} notification={n} />)
                     ) : (
-                        <p className="p-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                        <p className="p-8 text-center text-sm text-textDark">
                             Você não tem nenhuma notificação.
                         </p>
                     )}

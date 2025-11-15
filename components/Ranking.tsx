@@ -18,27 +18,35 @@ const Ranking: React.FC<RankingProps> = ({ ranking, currentUser, title = "Rankin
         return `Semana ${week} de ${now.getFullYear()}`;
     }
 
+    const getPositionClass = (index: number) => {
+        if (index === 0) return 'text-yellow-400';
+        if (index === 1) return 'text-slate-300';
+        if (index === 2) return 'text-amber-600';
+        return 'text-textDark';
+    }
+
     return (
-        <div className="ranking-card">
-            <h2 className="ranking-title">{title}</h2>
-            <p className="ranking-sub">{subtitle || getWeekLabel()}</p>
+        <div className="rgb-border rounded-xl p-5">
+            <h2 className="text-xl font-orbitron font-bold text-gradient-neon text-center">{title}</h2>
+            <p className="text-xs text-textDark text-center mb-4">{subtitle || getWeekLabel()}</p>
             {ranking.length > 0 ? (
-                <ol className="ranking-list">
+                <ol className="space-y-2">
                     {ranking.map((user, index) => (
-                        <li key={user.username} className={`ranking-item ${user.username === currentUser ? 'ranking-item-current' : ''}`}>
-                            <span className="ranking-pos">
-                                {index === 0 && '🥇'}
-                                {index === 1 && '🥈'}
-                                {index === 2 && '🥉'}
-                                {index > 2 && `#${index + 1}`}
-                            </span>
-                            <span className="ranking-name">@{user.username}</span>
-                            <span className="ranking-score">{user.score} pts</span>
+                        <li key={user.username} className={`flex items-center justify-between p-2 rounded-md ${user.username === currentUser ? 'bg-primary/30' : ''}`}>
+                            <div className="flex items-center space-x-3">
+                                <span className={`w-6 text-center font-bold text-lg ${getPositionClass(index)}`}>
+                                    {index < 3 ? ['🥇', '🥈', '🥉'][index] : `#${index + 1}`}
+                                </span>
+                                <span className="font-semibold text-sm">@{user.username}</span>
+                            </div>
+                            <span className="font-bold text-sm text-secondary">{user.score} pts</span>
                         </li>
                     ))}
                 </ol>
             ) : (
-                <p className="ranking-empty">Ainda não há pontuações. Jogue uma partida para aparecer aqui!</p>
+                <p className="text-center text-sm text-textDark py-8">
+                    Ainda não há pontuações. Jogue uma partida para aparecer aqui!
+                </p>
             )}
         </div>
     );
