@@ -10,34 +10,28 @@ interface FeedProps {
     handleToggleFollow: (personId: number) => void;
     currentUserName: string;
     userProfile: UserProfile;
-    onNavigate: (page: ActivePage) => void;
     onAddStoryClick: () => void;
     stories: Story[];
     onViewStory: (author: string) => void;
     handleBookmark: (postId: string) => void;
 }
 
-const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, handleToggleFollow, currentUserName, userProfile, onNavigate, onAddStoryClick, stories, onViewStory, handleBookmark }) => {
+const Feed: React.FC<FeedProps> = ({ posts, handleLike, handleComment, handleToggleFollow, currentUserName, userProfile, onAddStoryClick, stories, onViewStory, handleBookmark }) => {
     return (
-        // Ajustado o preenchimento vertical para ser mais consistente e espaçoso.
-        <div className="w-full max-w-lg mx-auto py-6">
+        <div className="w-full max-w-xl mx-auto">
             <StoriesBar 
-                userProfile={userProfile} 
-                onNavigate={onNavigate} 
+                userProfile={userProfile}
                 onAddStoryClick={onAddStoryClick}
                 stories={stories}
                 onViewStory={onViewStory}
             />
-            {/* Aumentado o espaçamento entre a barra de stories e os posts, e entre os próprios posts para um layout mais limpo. */}
-            <div className="space-y-6 mt-6">
+            <div className="space-y-2">
                 {posts.map(post => (
                     <PostCard 
                         key={post.id} 
                         post={post} 
                         onLike={handleLike} 
                         onComment={handleComment}
-                        onToggleFollow={handleToggleFollow}
-                        currentUserName={currentUserName}
                         onBookmark={handleBookmark}
                     />
                 ))}

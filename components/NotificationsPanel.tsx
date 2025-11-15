@@ -19,7 +19,8 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
         switch(type) {
             case 'like':
                 bgColor = "bg-pink-500";
-                icon = <HeartIcon className={iconClass} isLiked={true} />;
+                // Fix: Use the 'solid' prop instead of the incorrect 'isLiked' prop.
+                icon = <HeartIcon className={iconClass} solid={true} />;
                 break;
             case 'comment':
                 bgColor = "bg-blue-500";

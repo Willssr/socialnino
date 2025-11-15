@@ -25,13 +25,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Apply 'dark' class to the <html> element and save theme to localStorage
+  // Apply 'dark' class to the <body> element and save theme to localStorage
   useEffect(() => {
-    const root = document.documentElement;
+    const body = document.body;
     if (theme === 'dark') {
-      root.classList.add('dark');
+      body.classList.add('dark');
     } else {
-      root.classList.remove('dark');
+      body.classList.remove('dark');
     }
     window.localStorage.setItem("socialnino-theme", theme);
   }, [theme]);

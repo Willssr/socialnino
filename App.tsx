@@ -2,11 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Feed from './components/Feed';
 import Music from './components/Music';
-import About from './components/About';
 import Profile from './components/Profile';
-import Geolocation from './components/Geolocation';
 import BottomNav from './components/BottomNav';
-import { PlusCircleIcon } from './components/Icons';
 import { ActivePage, Post, Comment, UserProfile, Story, Person, Notification } from './types';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { INITIAL_POSTS, INITIAL_USER_PROFILE, INITIAL_STORIES, INITIAL_PEOPLE, INITIAL_NOTIFICATIONS } from './constants';
@@ -25,13 +22,15 @@ import AuthScreen from './AuthScreen';
 const App: React.FC = () => {
   const { user, loading } = useAuth();
   const [activePage, setActivePage] = useState<ActivePage>('feed');
+  const [pageDirection, setPageDirection] = useState<'left' | 'right' | null>(null);
+  const [pageOrder] = useState<ActivePage[]>(['feed', 'search', 'play', 'music', 'profile']);
+
   const [posts, setPosts] = useLocalStorage<Post[]>('socialnino-posts-v3', INITIAL_POSTS);
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('socialnino-user-profile', INITIAL_USER_PROFILE);
   const [stories, setStories] = useLocalStorage<Story[]>('socialnino-stories-v1', INITIAL_STORIES);
   const [people, setPeople] = useLocalStorage<Person[]>('socialnino-people-v1', INITIAL_PEOPLE);
   const [notifications, setNotifications] = useLocalStorage<Notification[]>('socialnino-notifications-v1', INITIAL_NOTIFICATIONS);
   
-  const { theme, toggleTheme } = useTheme();
   const { addPoints } = useNinoPoints();
 
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
@@ -39,19 +38,23 @@ const App: React.FC = () => {
   const [newPostInitialCaption, setNewPostInitialCaption] = useState('');
   const [storyViewerState, setStoryViewerState] = useState<{isOpen: boolean, stories: Story[]}>({isOpen: false, stories: []});
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  
+  const handleNavigate = (newPage: ActivePage) => {
+    const currentIndex = pageOrder.indexOf(activePage);
+    const newIndex = pageOrder.indexOf(newPage);
 
-  // Effect to migrate user profile data if 'stats' is missing
-  useEffect(() => {
-    if (userProfile && !userProfile.stats) {
-      setUserProfile(prevProfile => ({
-        ...prevProfile,
-        stats: INITIAL_USER_PROFILE.stats,
-      }));
+    if (newIndex > currentIndex) {
+      setPageDirection('left');
+    } else if (newIndex < currentIndex) {
+      setPageDirection('right');
+    } else {
+      setPageDirection(null);
     }
-  }, [userProfile, setUserProfile]);
+
+    setActivePage(newPage);
+  };
 
   const handleOpenNewPostModal = (initialCaption: string = '') => {
     setNewPostInitialCaption(initialCaption);
@@ -60,12 +63,11 @@ const App: React.FC = () => {
 
   const handleCloseNewPostModal = () => {
     setIsNewPostModalOpen(false);
-    setNewPostInitialCaption(''); // Reset on close
+    setNewPostInitialCaption(''); 
   };
 
   const handleToggleFollow = (personId: number) => {
     let isFollowingAction = false;
-    // Update the list of people
     setPeople(prevPeople =>
       prevPeople.map(p => {
         if (p.id === personId) {
@@ -79,7 +81,6 @@ const App: React.FC = () => {
         addPoints('FOLLOW');
     }
 
-    // Update the follow status on posts by the same author
     setPosts(prevPosts =>
       prevPosts.map(post =>
         post.author.id === personId
@@ -95,10 +96,10 @@ const App: React.FC = () => {
         const newPost: Post = {
             id: `post-${Date.now()}`,
             author: {
-                id: 0, // 0 represents the current user
+                id: 0, 
                 username: userProfile.name,
                 avatar: userProfile.avatar,
-                isFollowing: false, // You don't follow yourself
+                isFollowing: false,
             },
             timestamp: new Date().toISOString(),
             caption,
@@ -114,6 +115,7 @@ const App: React.FC = () => {
         setPosts(prevPosts => [newPost, ...prevPosts]);
         addPoints('POST');
         handleCloseNewPostModal();
+        handleNavigate('feed'); 
     };
     reader.readAsDataURL(file);
   };
@@ -192,44 +194,49 @@ const App: React.FC = () => {
   };
 
   const renderPage = () => {
+    let pageComponent;
     switch (activePage) {
       case 'music':
-        return <Music />;
-      case 'about':
-        return <About />;
-      case 'suggestions':
-        return <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
+        pageComponent = <Music />;
+        break;
+      case 'search':
+        pageComponent = <Suggestions people={people} onToggleFollow={handleToggleFollow} />;
+        break;
       case 'play':
-        return <Play onParticipateInChallenge={handleParticipateInChallenge} currentUser={userProfile.name} />;
+        pageComponent = <Play onParticipateInChallenge={handleParticipateInChallenge} currentUser={userProfile.name} />;
+        break;
       case 'profile':
         const userPosts = posts.filter(post => post.author.username === userProfile.name);
-        return <Profile 
+        pageComponent = <Profile 
                   userProfile={userProfile} 
                   onUpdateProfile={setUserProfile} 
                   userPosts={userPosts}
                 />;
+        break;
       case 'feed':
       default:
-        return <Feed 
+        pageComponent = <Feed 
                   posts={posts} 
                   handleLike={handleLike} 
                   handleComment={handleComment} 
                   currentUserName={userProfile.name}
                   userProfile={userProfile}
-                  onNavigate={setActivePage}
                   onAddStoryClick={() => setIsAddStoryModalOpen(true)}
                   stories={stories}
                   onViewStory={handleViewStory}
                   handleToggleFollow={handleToggleFollow}
                   handleBookmark={handleBookmark}
                 />;
+        break;
     }
+    const animationClass = pageDirection === 'left' ? 'animate-slide-in-left' : pageDirection === 'right' ? 'animate-slide-in-right' : '';
+    return <div key={activePage} className={animationClass}>{pageComponent}</div>;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
-        <p className="text-slate-500 dark:text-slate-400">Carregando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+        <p className="text-gray-500">Carregando...</p>
       </div>
     );
   }
@@ -239,77 +246,49 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 flex flex-col">
-      <Header 
-        userProfile={userProfile} 
-        onNavigate={setActivePage} 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
-        unreadCount={unreadCount}
-        onNotificationsClick={() => setIsNotificationsOpen(prev => !prev)}
-        onSearchClick={() => setIsSearchModalOpen(true)}
-      />
-      
-      <main className="flex-grow pb-16 md:pb-0">
-        <div className="container mx-auto px-0 sm:px-4">
-            {renderPage()}
-        </div>
-      </main>
-
-       <button 
-        onClick={() => handleOpenNewPostModal()}
-        className="fixed bottom-20 right-4 md:bottom-8 md:right-8 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 text-white p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-40"
-        aria-label="Criar novo post"
-        >
-          <PlusCircleIcon className="w-10 h-10" />
-      </button>
-      
-      {isNewPostModalOpen && (
-        <NewPostModal
-            onClose={handleCloseNewPostModal}
-            onAddPost={handleAddPost}
-            initialCaption={newPostInitialCaption}
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white flex flex-col md:items-center">
+      <div className="w-full md:max-w-xl">
+        <Header 
+          unreadCount={unreadCount}
+          onNotificationsClick={() => setIsNotificationsOpen(prev => !prev)}
         />
-      )}
-
-      {isAddStoryModalOpen && (
-        <AddStoryModal 
-          onClose={() => setIsAddStoryModalOpen(false)}
-          onSave={handleSaveStory}
-        />
-      )}
-
-      {storyViewerState.isOpen && (
-          <StoryViewerModal
-            stories={storyViewerState.stories}
-            onClose={() => setStoryViewerState({ isOpen: false, stories: [] })}
+        
+        <main className="flex-grow pb-16">
+          {renderPage()}
+        </main>
+        
+        {isNewPostModalOpen && (
+          <NewPostModal
+              onClose={handleCloseNewPostModal}
+              onAddPost={handleAddPost}
+              initialCaption={newPostInitialCaption}
           />
-      )}
-      
-      {isNotificationsOpen && (
-        <NotificationsPanel
-            notifications={notifications}
-            onClose={() => setIsNotificationsOpen(false)}
-            onMarkAllAsRead={handleMarkAllAsRead}
-        />
-      )}
+        )}
 
-      {isSearchModalOpen && (
-        <SearchModal 
-            onClose={() => setIsSearchModalOpen(false)}
-            posts={posts}
-            people={people}
-        />
-      )}
+        {isAddStoryModalOpen && (
+          <AddStoryModal 
+            onClose={() => setIsAddStoryModalOpen(false)}
+            onSave={handleSaveStory}
+          />
+        )}
 
-      <BottomNav activePage={activePage} setActivePage={setActivePage} />
+        {storyViewerState.isOpen && (
+            <StoryViewerModal
+              stories={storyViewerState.stories}
+              onClose={() => setStoryViewerState({ isOpen: false, stories: [] })}
+            />
+        )}
+        
+        {isNotificationsOpen && (
+          <NotificationsPanel
+              notifications={notifications}
+              onClose={() => setIsNotificationsOpen(false)}
+              onMarkAllAsRead={handleMarkAllAsRead}
+          />
+        )}
 
-      <footer className="hidden md:block text-center py-4 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/80 dark:border-slate-800 mt-8">
-        <div className="space-y-2">
-            <Geolocation />
-            <p>&copy; {new Date().getFullYear()} SocialNino. Todos os direitos reservados.</p>
-        </div>
-      </footer>
+        <BottomNav activePage={activePage} onNavigate={handleNavigate} onNewPostClick={() => handleOpenNewPostModal()} />
+      </div>
     </div>
   );
 };

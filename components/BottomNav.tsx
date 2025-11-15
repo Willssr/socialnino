@@ -1,41 +1,59 @@
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, UsersIcon, InformationCircleIcon, UserIcon, MusicNoteIcon, GameControllerIcon } from './Icons';
+import { HomeIcon, UserIcon, MusicNoteIcon, GameControllerIcon, SearchIcon, PlusSquareIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
-  setActivePage: (page: ActivePage) => void;
+  onNavigate: (page: ActivePage) => void;
+  onNewPostClick: () => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ activePage, setActivePage }) => {
+const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, onNewPostClick }) => {
   const navItems = [
-    { id: 'feed', label: 'Feed', icon: HomeIcon },
-    { id: 'suggestions', label: 'Sugestões', icon: UsersIcon },
-    { id: 'play', label: 'Play', icon: GameControllerIcon },
-    { id: 'music', label: 'Músicas', icon: MusicNoteIcon },
-    { id: 'profile', label: 'Perfil', icon: UserIcon },
+    { id: 'feed', icon: HomeIcon },
+    { id: 'search', icon: SearchIcon },
+    { id: 'play', icon: GameControllerIcon },
+    { id: 'music', icon: MusicNoteIcon },
+    { id: 'profile', icon: UserIcon },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-700 h-16 flex md:hidden justify-around items-center z-50">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = activePage === item.id;
-        return (
-          <button
-            key={item.id}
-            onClick={() => setActivePage(item.id as ActivePage)}
-            className={`flex flex-col items-center justify-center w-full h-full transition-colors duration-200 ${
-              isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400'
-            }`}
-          >
-            <Icon className="w-7 h-7" solid={isActive} />
-            <span className={`text-xs mt-1 font-semibold ${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-500 dark:text-slate-400'}`}>{item.label}</span>
-          </button>
-        );
-      })}
+    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-black border-t border-gray-200 dark:border-gray-800 h-14 flex md:hidden justify-around items-center z-50">
+      {navItems.slice(0, 2).map(item => (
+        <NavButton
+          key={item.id}
+          Icon={item.icon}
+          isActive={activePage === item.id}
+          onClick={() => onNavigate(item.id as ActivePage)}
+        />
+      ))}
+
+      <button onClick={onNewPostClick} className="text-black dark:text-white">
+        <PlusSquareIcon className="w-7 h-7" />
+      </button>
+      
+      {navItems.slice(2).map(item => (
+        <NavButton
+          key={item.id}
+          Icon={item.icon}
+          isActive={activePage === item.id}
+          onClick={() => onNavigate(item.id as ActivePage)}
+        />
+      ))}
     </nav>
   );
 };
+
+interface NavButtonProps {
+    Icon: React.ElementType;
+    isActive: boolean;
+    onClick: () => void;
+}
+
+const NavButton: React.FC<NavButtonProps> = ({ Icon, isActive, onClick }) => (
+    <button onClick={onClick} className="text-black dark:text-white w-full h-full flex items-center justify-center">
+        <Icon className="w-7 h-7" solid={isActive} />
+    </button>
+);
 
 export default BottomNav;
