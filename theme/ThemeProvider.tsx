@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, PropsWithChildren } from "react";
 
 type Theme = "light" | "dark";
 
@@ -10,9 +10,8 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-type ThemeProviderProps = {
-  children: React.ReactNode;
-};
+// FIX: Changed props to use PropsWithChildren to fix type error.
+type ThemeProviderProps = PropsWithChildren<{}>;
 
 export const ThemeProvider = ({
   children,

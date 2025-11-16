@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, PropsWithChildren } from "react";
 import {
   addPoints as serviceAddPoints,
   getCurrentPoints,
@@ -15,9 +15,7 @@ const NinoPointsContext = createContext<NinoPointsContextType | undefined>(
 );
 
 // FIX: Refactored to use an explicit props type instead of React.FC for consistency and to avoid potential typing issues.
-type NinoPointsProviderProps = {
-  children: React.ReactNode;
-};
+type NinoPointsProviderProps = PropsWithChildren<{}>;
 
 export const NinoPointsProvider = ({
   children,

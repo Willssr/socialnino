@@ -3,7 +3,7 @@ import React, {
   useContext,
   useEffect,
   useState,
-  ReactNode,
+  PropsWithChildren,
 } from "react";
 import {
   onAuthStateChanged,
@@ -25,7 +25,8 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+// FIX: Changed props to use PropsWithChildren to fix type error.
+export function AuthProvider({ children }: PropsWithChildren) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 

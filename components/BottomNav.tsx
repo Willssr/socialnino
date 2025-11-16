@@ -35,7 +35,7 @@ const NavButton: React.FC<NavButtonProps> = ({ Icon, isActive, onClick, special,
 
 const ProfileNavButton: React.FC<ProfileNavButtonProps> = ({ avatar, isActive, onClick }) => (
     <button onClick={onClick} className="w-full h-full flex items-center justify-center p-3.5">
-        <div className={`rounded-full p-0.5 transition-all duration-300 ${isActive ? 'bg-primary shadow-glow-primary' : 'bg-transparent'}`}>
+        <div className={`rounded-full p-0.5 transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-primary to-secondary shadow-glow-primary' : 'bg-transparent'}`}>
             <img 
                 src={avatar} 
                 alt="Profile" 
