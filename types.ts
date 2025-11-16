@@ -6,6 +6,8 @@
 
 
 
+
+
 export interface Comment {
   id: string;
   author: string;
@@ -23,7 +25,7 @@ export interface PostAuthor {
 }
 
 export interface Post {
-  id: string;
+  id:string;
   author: PostAuthor;
   timestamp: string;
   caption: string;
@@ -130,4 +132,14 @@ export interface ChatMessage {
   type: 'text' | 'sticker';
   timestamp: string;
   reactions?: { [username: string]: string };
+}
+
+export interface ToastNotificationData {
+  id: string;
+  type: 'like' | 'comment' | 'post';
+  user?: {
+    username: string;
+    avatar: string;
+  };
+  content: string;
 }

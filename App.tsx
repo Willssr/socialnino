@@ -50,6 +50,8 @@ import {
 import PublicProfileModal from "./components/PublicProfileModal";
 import FriendsScreen from "./components/FriendsScreen";
 import GlobalChatScreen from "./components/Chat/GlobalChatScreen";
+import { useToast } from "./context/ToastContext";
+import { usePrevious } from "./hooks/usePrevious";
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -92,6 +94,8 @@ const App: React.FC = () => {
   );
 
   const { addPoints } = useNinoPoints();
+  const { addToast } = useToast();
+  const prevPosts = usePrevious(posts);
 
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
@@ -218,6 +222,56 @@ const App: React.FC = () => {
         off(chatQuery, 'value', callback);
     };
   }, []);
+
+  // 🔔 EFFECT PARA NOTIFICAÇÕES TOAST
+  useEffect(() => {
+    if (!prevPosts || !userProfile.name || posts.length === 0) return;
+
+    // 1. Check for new posts from others
+    if (posts.length > prevPosts.length) {
+      const newPost = posts.find(p => !prevPosts.some(op => op.id === p.id));
+      if (newPost && newPost.author.username !== userProfile.name) {
+        addToast({
+          type: 'post',
+          user: newPost.author,
+          content: 'adicionou uma nova publicação.'
+        });
+      }
+    }
+
+    // 2. Check for new likes and comments on my posts
+    posts.forEach(post => {
+      if (post.author.username === userProfile.name) {
+        const oldPost = prevPosts.find(p => p.id === post.id);
+        if (oldPost) {
+          // New Like
+          if (post.likes > oldPost.likes) {
+            const likerCandidates = people.filter(p => p.username !== userProfile.name);
+            const randomLiker = likerCandidates[Math.floor(Math.random() * likerCandidates.length)] || { username: 'Alguém', avatar: 'https://i.pravatar.cc/150' };
+            addToast({
+              type: 'like',
+              user: { username: randomLiker.username, avatar: randomLiker.avatar },
+              content: 'curtiu sua publicação.'
+            });
+          }
+
+          // New Comment
+          if (post.comments.length > oldPost.comments.length) {
+            const newComment = post.comments[post.comments.length - 1];
+            if (newComment.author !== userProfile.name) {
+              const commenter = people.find(p => p.username === newComment.author) || { username: newComment.author, avatar: 'https://i.pravatar.cc/150?u=' + newComment.author };
+              addToast({
+                type: 'comment',
+                user: { username: commenter.username, avatar: commenter.avatar },
+                content: `comentou: "${newComment.text.substring(0, 25)}..."`
+              });
+            }
+          }
+        }
+      }
+    });
+  }, [posts, prevPosts, userProfile.name, addToast, people]);
+
 
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);

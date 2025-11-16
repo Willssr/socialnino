@@ -6,6 +6,7 @@ import App from "./App";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { NinoPointsProvider } from "./context/NinoPointsContext";
 import { AuthProvider } from "./AuthContext";
+import { ToastProvider } from "./context/ToastContext";
 import "./styles.css"; // Importa os estilos globais
 
 const rootElement = document.getElementById("root");
@@ -22,7 +23,9 @@ root.render(
     <AuthProvider>
       <ThemeProvider>
         <NinoPointsProvider>
-          <App />
+          <ToastProvider>
+            <App />
+          </ToastProvider>
         </NinoPointsProvider>
       </ThemeProvider>
     </AuthProvider>
