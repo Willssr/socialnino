@@ -9,6 +9,9 @@ interface StoriesBarProps {
   onViewStory: (author: string) => void;
 }
 
+// Mock de usuários online para demonstração
+const onlineAuthors = ['nina_dev', 'carla.codes'];
+
 const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, stories, onViewStory }) => {
   // 1. Verifica se o usuário logado tem stories
   const myStories = stories.filter(story => story.author === userProfile.name);
@@ -63,20 +66,28 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
         </div>
         
         {/* Stories dos Outros Usuários */}
-        {uniqueAuthors.map(story => (
-          <div key={story.author} className="flex-shrink-0 text-center w-20 cursor-pointer" onClick={() => onViewStory(story.author)}>
-            <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse">
-                <div className="bg-backgroundDark p-0.5 rounded-full">
-                    <img 
-                      src={story.avatar} 
-                      alt={story.author} 
-                      className="w-full h-full rounded-full object-cover"
-                    />
+        {uniqueAuthors.map(story => {
+          const isOnline = onlineAuthors.includes(story.author);
+          return (
+            <div key={story.author} className="flex-shrink-0 text-center w-20 cursor-pointer" onClick={() => onViewStory(story.author)}>
+              <div className="relative inline-block">
+                <div className={`w-16 h-16 rounded-full p-0.5 ${isOnline ? 'bg-[#00FF7F] shadow-[0_0_8px_rgba(0,255,127,0.7)]' : 'bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse'}`}>
+                    <div className="bg-backgroundDark p-0.5 rounded-full h-full">
+                        <img 
+                          src={story.avatar} 
+                          alt={story.author} 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                    </div>
                 </div>
+                {isOnline && (
+                  <span className="absolute bottom-0 right-0 block w-3 h-3 rounded-full bg-[#00FF7F] ring-2 ring-backgroundDark"></span>
+                )}
+              </div>
+              <p className="text-sm font-semibold mt-1 truncate text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{story.author}</p>
             </div>
-            <p className="text-sm font-semibold mt-1 truncate text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{story.author}</p>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   );
