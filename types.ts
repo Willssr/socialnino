@@ -3,6 +3,7 @@
 
 
 
+
 export interface Comment {
   id: string;
   author: string;
@@ -91,7 +92,7 @@ export interface Notification {
 }
 
 
-export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'download' | 'friends';
+export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'download' | 'friends' | 'chat';
 
 export type PointsEvent =
   | "LIKE"
@@ -107,4 +108,15 @@ export interface Track {
   artist: string;
   cover: string;
   src: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  author: {
+    name: string;
+    avatar: string;
+  };
+  content: string; // can be text or a sticker URL
+  type: 'text' | 'sticker';
+  timestamp: string;
 }

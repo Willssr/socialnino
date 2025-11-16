@@ -12,6 +12,7 @@ import {
   Story,
   Person,
   Notification,
+  ChatMessage,
 } from "./types";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import {
@@ -47,6 +48,7 @@ import {
 // 🔍 Modal de perfil público
 import PublicProfileModal from "./components/PublicProfileModal";
 import FriendsScreen from "./components/FriendsScreen";
+import GlobalChatScreen from "./components/Chat/GlobalChatScreen";
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -59,6 +61,7 @@ const App: React.FC = () => {
     "feed",
     "search",
     "friends",
+    "chat",
     "download",
     "music",
     "profile",
@@ -69,6 +72,9 @@ const App: React.FC = () => {
 
   // 🔥 STORIES GLOBAIS (Realtime DB)
   const [stories, setStories] = useState<Story[]>([]);
+  
+  // 💬 CHAT GLOBAL (Realtime DB)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
   // RESTO continua local
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>(
@@ -186,6 +192,28 @@ const App: React.FC = () => {
 
     return () => {
       off(storiesQuery, "value", callback);
+    };
+  }, []);
+  
+    // 💬 BUSCAR MENSAGENS DO CHAT GLOBAL EM TEMPO REAL
+  useEffect(() => {
+    const chatQuery = query(dbRef(db, "global-chat"), orderByChild("timestamp"));
+    
+    const callback = (snapshot: any) => {
+        const data = snapshot.val();
+        if (!data) {
+            setChatMessages([]);
+            return;
+        }
+
+        const list: ChatMessage[] = Object.values(data);
+        setChatMessages(list);
+    };
+
+    onValue(chatQuery, callback);
+    
+    return () => {
+        off(chatQuery, 'value', callback);
     };
   }, []);
 
@@ -329,6 +357,25 @@ const App: React.FC = () => {
 
     addPoints("COMMENT");
   };
+  
+  // 💬 ENVIAR MENSAGEM GLOBAL
+  const handleSendMessage = async (content: string, type: 'text' | 'sticker') => {
+      const newMessageRef = push(dbRef(db, 'global-chat'));
+      const messageId = newMessageRef.key as string;
+
+      const newMessage: ChatMessage = {
+          id: messageId,
+          author: {
+              name: userProfile.name,
+              avatar: userProfile.avatar
+          },
+          content,
+          type,
+          timestamp: new Date().toISOString()
+      };
+      
+      await set(newMessageRef, newMessage);
+  };
 
   // 🟪 SALVAR STORY GLOBAL
   const handleSaveStory = (storyFile: File) => {
@@ -402,6 +449,15 @@ const App: React.FC = () => {
       case "friends":
         pageComponent = (
           <FriendsScreen people={people} onToggleFollow={handleToggleFollow} />
+        );
+        break;
+      case "chat":
+        pageComponent = (
+          <GlobalChatScreen 
+            messages={chatMessages}
+            currentUser={userProfile}
+            onSendMessage={handleSendMessage}
+          />
         );
         break;
       case "download":
