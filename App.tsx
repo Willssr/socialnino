@@ -41,6 +41,7 @@ import {
   query,
   orderByChild,
   off,
+  increment,
 } from "firebase/database";
 
 // 🔍 Modal de perfil público
@@ -285,11 +286,12 @@ const App: React.FC = () => {
     if (!post) return;
 
     const newLiked = !post.isLiked;
-    const newLikes = newLiked ? post.likes + 1 : post.likes - 1;
+    const likesIncrement = newLiked ? 1 : -1;
 
+    // FIX: Use Firebase's atomic increment to prevent race conditions and ensure accurate like counts.
     await update(dbRef(db, `posts/${postId}`), {
       isLiked: newLiked,
-      likes: newLikes,
+      likes: increment(likesIncrement),
     });
 
     if (newLiked) addPoints("LIKE");

@@ -182,7 +182,7 @@ const PostCard: React.FC<Props> = ({
         {/* LIKES E LEGENDA */}
         <div className="px-4 pb-2">
           <p className="font-bold text-sm">
-            {post.likes.toLocaleString("pt-BR")} curtidas
+            {post.likes.toLocaleString("pt-BR")} {post.likes === 1 ? 'curtida' : 'curtidas'}
           </p>
 
           <p className="mt-1 text-sm">
