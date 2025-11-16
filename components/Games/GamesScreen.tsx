@@ -151,6 +151,36 @@ const GamesScreen: React.FC = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Ranking Section */}
+                <div className="max-w-5xl mx-auto">
+                    <div className="mt-6 p-4 bg-black border border-[#00E5FF] rounded-xl shadow-[0_0_10px_#00E5FF55]">
+                        <h2 className="text-[#00E5FF] font-orbitron font-bold text-lg mb-3 drop-shadow-[0_0_6px_#00E5FF]">
+                            🏆 Ranking Neon
+                        </h2>
+
+                        {/* 1º Lugar */}
+                        <div className="flex items-center gap-3 py-2 border-b border-[#00E5FF55]">
+                            <img src="https://i.pravatar.cc/150?u=nino" alt="Avatar @Nino" className="w-8 h-8 rounded-full" />
+                            <span className="text-white font-semibold">@Nino – 230 pts</span>
+                            <span className="ml-auto text-yellow-400 text-xl">🥇</span>
+                        </div>
+
+                        {/* 2º Lugar */}
+                        <div className="flex items-center gap-3 py-2 border-b border-[#00E5FF55]">
+                            <img src="https://i.pravatar.cc/150?u=daidon" alt="Avatar @Daidon" className="w-8 h-8 rounded-full" />
+                            <span className="text-white font-semibold">@Daidon – 180 pts</span>
+                            <span className="ml-auto text-gray-300 text-xl">🥈</span>
+                        </div>
+
+                        {/* 3º Lugar */}
+                        <div className="flex items-center gap-3 py-2">
+                            <img src="https://i.pravatar.cc/150?u=well" alt="Avatar @Well" className="w-8 h-8 rounded-full" />
+                            <span className="text-white font-semibold">@Well – 150 pts</span>
+                            <span className="ml-auto text-orange-400 text-xl">🥉</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {activeGame && (
