@@ -7,9 +7,10 @@ interface GlobalChatScreenProps {
     messages: ChatMessage[];
     currentUser: UserProfile;
     onSendMessage: (content: string, type: 'text' | 'sticker') => void;
+    onReaction: (messageId: string, emoji: string) => void;
 }
 
-const GlobalChatScreen: React.FC<GlobalChatScreenProps> = ({ messages, currentUser, onSendMessage }) => {
+const GlobalChatScreen: React.FC<GlobalChatScreenProps> = ({ messages, currentUser, onSendMessage, onReaction }) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -36,6 +37,8 @@ const GlobalChatScreen: React.FC<GlobalChatScreenProps> = ({ messages, currentUs
                         key={msg.id}
                         message={msg}
                         isOwnMessage={msg.author.name === currentUser.name}
+                        currentUser={currentUser}
+                        onReaction={onReaction}
                     />
                 ))}
                 <div ref={messagesEndRef} />

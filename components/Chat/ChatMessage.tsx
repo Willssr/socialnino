@@ -1,13 +1,31 @@
-import React from 'react';
-import { ChatMessage } from '../../types';
+import React, { useState, useRef, useMemo } from 'react';
+import { ChatMessage, UserProfile } from '../../types';
+import ReactionPicker from './ReactionPicker';
 
 interface ChatMessageBubbleProps {
     message: ChatMessage;
     isOwnMessage: boolean;
+    onReaction: (messageId: string, emoji: string) => void;
+    currentUser: UserProfile;
 }
 
-const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMessage }) => {
-    const { author, content, type, timestamp } = message;
+const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMessage, onReaction, currentUser }) => {
+    const [isPickerOpen, setPickerOpen] = useState(false);
+    const longPressTimer = useRef<number>();
+
+    const handlePressStart = () => {
+        // Ignorar long press em mídias clicáveis como figurinhas
+        if (message.type === 'sticker') return;
+        longPressTimer.current = window.setTimeout(() => {
+            setPickerOpen(true);
+        }, 500); // 500ms para um long press
+    };
+
+    const handlePressEnd = () => {
+        clearTimeout(longPressTimer.current);
+    };
+
+    const { author, content, type, timestamp, reactions } = message;
 
     const formattedTime = new Date(timestamp).toLocaleTimeString('pt-BR', {
         hour: '2-digit',
@@ -15,31 +33,73 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMes
     });
 
     const alignmentClass = isOwnMessage ? 'items-end' : 'items-start';
-    
-    // Classes de estilo modernizadas para os balões de mensagem
     const bubbleClass = isOwnMessage
-        ? 'bg-gradient-to-br from-primary to-accent/80 text-white shadow-lg shadow-primary/20' // Gradiente e brilho para mensagens próprias
-        : 'bg-cardDark text-neutral-200 shadow-lg shadow-black/30'; // Fundo escuro para mensagens de outros
+        ? 'bg-gradient-to-br from-primary to-accent/80 text-white shadow-lg shadow-primary/20'
+        : 'bg-cardDark text-neutral-200 shadow-lg shadow-black/30';
+
+    const reactionsSummary = useMemo(() => {
+        if (!reactions) return [];
+        const summary: { [emoji: string]: string[] } = {};
+        for (const [user, emoji] of Object.entries(reactions) as [string, string][]) {
+            if (!summary[emoji]) summary[emoji] = [];
+            summary[emoji].push(user);
+        }
+        return Object.entries(summary);
+    }, [reactions]);
 
     return (
         <div className={`flex flex-col ${alignmentClass}`}>
-            {/* Nome de usuário com destaque neon */}
             <div className="flex items-center gap-2 mb-1" style={{ flexDirection: isOwnMessage ? 'row-reverse' : 'row' }}>
                 <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full" />
                 <span className="text-sm font-bold text-[#00C6FF] drop-shadow-[0_0_4px_#00C6FF]">
                     {author.name}
                 </span>
             </div>
-            
-            {/* Balão com bordas mais arredondadas e sombra */}
-            <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isOwnMessage ? 'rounded-br-none' : 'rounded-bl-none'} ${bubbleClass}`}>
-                {type === 'sticker' ? (
-                    <img src={content} alt="Sticker" className="w-32 h-32 object-contain" />
-                ) : (
-                    // Texto com alto contraste
-                    <p className="text-sm break-words">{content}</p>
+
+            <div
+                className="relative"
+                onMouseDown={handlePressStart}
+                onMouseUp={handlePressEnd}
+                onTouchStart={handlePressStart}
+                onTouchEnd={handlePressEnd}
+                onMouseLeave={handlePressEnd}
+            >
+                {isPickerOpen && (
+                    <ReactionPicker 
+                        onSelect={(emoji) => onReaction(message.id, emoji)}
+                        onClose={() => setPickerOpen(false)}
+                    />
                 )}
+                <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isOwnMessage ? 'rounded-br-none' : 'rounded-bl-none'} ${bubbleClass}`}>
+                    {type === 'sticker' ? (
+                        <img src={content} alt="Sticker" className="w-32 h-32 object-contain" />
+                    ) : (
+                        <p className="text-sm break-words">{content}</p>
+                    )}
+                </div>
             </div>
+
+            {reactionsSummary.length > 0 && (
+                <div className={`flex flex-wrap gap-1 mt-1.5 px-1 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                    {reactionsSummary.map(([emoji, users]) => {
+                        const userHasReacted = users.includes(currentUser.name);
+                        return (
+                            <button
+                                key={emoji}
+                                onClick={() => onReaction(message.id, emoji)}
+                                className={`px-2 py-0.5 text-xs rounded-full flex items-center gap-1 transition-all duration-200 hover:scale-110 ${
+                                    userHasReacted ? 'bg-primary/80 border border-primary text-white' : 'bg-cardDark border border-borderNeon/50 text-textDark hover:bg-primary/20'
+                                }`}
+                                title={`Reagido por: ${users.join(', ')}`}
+                            >
+                                <span>{emoji}</span>
+                                <span>{users.length}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+
             <span className="text-xs text-textDark mt-1 px-1">{formattedTime}</span>
         </div>
     );

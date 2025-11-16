@@ -43,6 +43,7 @@ import {
   orderByChild,
   off,
   increment,
+  get,
 } from "firebase/database";
 
 // 🔍 Modal de perfil público
@@ -377,6 +378,20 @@ const App: React.FC = () => {
       await set(newMessageRef, newMessage);
   };
 
+  // 👋 REAÇÃO À MENSAGEM GLOBAL
+  const handleReaction = async (messageId: string, emoji: string) => {
+    const reactionRef = dbRef(db, `global-chat/${messageId}/reactions/${userProfile.name}`);
+    
+    const snapshot = await get(reactionRef);
+    if (snapshot.exists() && snapshot.val() === emoji) {
+      // Se o usuário clicar no mesmo emoji, remove a reação
+      await set(reactionRef, null);
+    } else {
+      // Adiciona ou atualiza a reação
+      await set(reactionRef, emoji);
+    }
+  };
+
   // 🟪 SALVAR STORY GLOBAL
   const handleSaveStory = (storyFile: File) => {
     const reader = new FileReader();
@@ -457,6 +472,7 @@ const App: React.FC = () => {
             messages={chatMessages}
             currentUser={userProfile}
             onSendMessage={handleSendMessage}
+            onReaction={handleReaction}
           />
         );
         break;

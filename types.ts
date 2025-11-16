@@ -119,4 +119,5 @@ export interface ChatMessage {
   content: string; // can be text or a sticker URL
   type: 'text' | 'sticker';
   timestamp: string;
+  reactions?: { [username: string]: string };
 }
