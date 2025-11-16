@@ -69,7 +69,7 @@ const ChatInputBar: React.FC<ChatInputBarProps> = ({ onSendMessage }) => {
                     className="flex-1 bg-cardDark border border-borderNeon rounded-xl px-4 py-2 text-sm text-textLight placeholder-textDark resize-none max-h-32 focus:outline-none focus:ring-1 focus:ring-primary"
                     rows={1}
                 />
-                <button onClick={handleSendText} className="p-2 text-secondary disabled:text-textDark hover:text-white transition-colors" disabled={!text.trim()}>
+                <button onClick={handleSendText} className="p-2 text-[#00E5FF] disabled:text-textDark hover:text-white transition-colors" disabled={!text.trim()}>
                     <PaperAirplaneIcon className="w-6 h-6" />
                 </button>
             </div>
