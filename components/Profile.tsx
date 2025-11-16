@@ -165,11 +165,11 @@ const Profile: React.FC<ProfileProps> = ({
         <div className="flex items-center gap-2 my-4">
           <button
             onClick={() => setIsEditing(true)}
-            className="flex-1 bg-cardDark border border-borderNeon px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors"
+            className="flex-1 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md shadow-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/70 transform hover:-translate-y-0.5"
           >
             Editar Perfil
           </button>
-          <button className="flex-1 bg-cardDark border border-borderNeon px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-primary/20 transition-colors">
+          <button className="flex-1 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md shadow-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/70 transform hover:-translate-y-0.5">
             Compartilhar Perfil
           </button>
         </div>
