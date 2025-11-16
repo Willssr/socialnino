@@ -77,7 +77,7 @@ const PostCard: React.FC<Props> = ({
 
   return (
     <>
-      <div className="rgb-border rounded-xl overflow-hidden mb-6">
+      <div className="rgb-border rounded-xl overflow-hidden mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary/50">
         
         {/* HEADER DO POST */}
         <div className="flex items-center space-x-3 p-4">
