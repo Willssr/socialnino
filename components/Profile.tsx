@@ -70,13 +70,13 @@ const Profile: React.FC<ProfileProps> = ({
   // Componente interno para inputs reutilizáveis
   const AboutInput = ({ name, label, value, onChange, as: Component = 'input' }: any) => (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-xs font-bold text-primary uppercase tracking-wider">{label}</label>
+      <label htmlFor={name} className="text-xs font-bold text-[#a855f7] uppercase tracking-wider">{label}</label>
       <Component
         id={name}
         name={name}
         value={value || ''}
         onChange={onChange}
-        className="w-full bg-backgroundLight/80 border border-borderNeon/50 rounded-md px-3 py-1.5 text-sm text-textLight placeholder-textDark focus:outline-none focus:ring-1 focus:ring-secondary"
+        className="w-full bg-backgroundLight/80 border border-[#00E5FF55] rounded-md px-3 py-1.5 text-sm text-white placeholder-textDark focus:outline-none focus:ring-1 focus:ring-secondary"
       />
     </div>
   );
@@ -132,7 +132,7 @@ const Profile: React.FC<ProfileProps> = ({
         {/* Sobre Section */}
         <div className="mt-6 border-t border-borderNeon/30 pt-4">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-orbitron font-bold text-gradient-neon">SOBRE</h3>
+            <h3 className="text-lg font-orbitron font-bold text-[#00E5FF] drop-shadow-[0_0_4px_#00E5FF]">SOBRE</h3>
             {!isEditingAbout && (
               <button onClick={() => setIsEditingAbout(true)} className="text-xs font-bold text-secondary hover:text-white transition-colors">Editar informações</button>
             )}
@@ -151,12 +151,12 @@ const Profile: React.FC<ProfileProps> = ({
                 </div>
             </div>
           ) : (
-            <div className="space-y-3 text-sm text-textLight">
-                {userProfile.about?.location && <div className="flex items-center gap-3 border-b border-borderNeon/20 pb-2"><LocationMarkerIcon className="w-5 h-5 text-primary" /><span className="text-primary font-semibold mr-2">Localização:</span> {userProfile.about.location}</div>}
-                {userProfile.about?.age && <div className="flex items-center gap-3 border-b border-borderNeon/20 pb-2"><CakeIcon className="w-5 h-5 text-primary" /><span className="text-primary font-semibold mr-2">Idade:</span> {userProfile.about.age}</div>}
-                {userProfile.about?.interests && <div className="flex items-center gap-3 border-b border-borderNeon/20 pb-2"><SparklesIcon className="w-5 h-5 text-primary" /><span className="text-primary font-semibold mr-2">Interesses:</span> {userProfile.about.interests}</div>}
-                {userProfile.about?.website && <div className="flex items-center gap-3 border-b border-borderNeon/20 pb-2"><LinkIcon className="w-5 h-5 text-primary" /><span className="text-primary font-semibold mr-2">Link:</span> <a href={`https://${userProfile.about.website}`} target="_blank" rel="noopener noreferrer" className="text-secondary hover:underline">{userProfile.about.website}</a></div>}
-                {userProfile.about?.extendedBio && <p className="text-textDark pt-2 !mt-4">{userProfile.about.extendedBio}</p>}
+            <div className="space-y-3 text-sm">
+                {userProfile.about?.location && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><LocationMarkerIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Localização:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.location}</span></div>}
+                {userProfile.about?.age && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><CakeIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Idade:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.age}</span></div>}
+                {userProfile.about?.interests && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><SparklesIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Interesses:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.interests}</span></div>}
+                {userProfile.about?.website && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><LinkIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Link:</span> <a href={`https://${userProfile.about.website}`} target="_blank" rel="noopener noreferrer" className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)] hover:underline">{userProfile.about.website}</a></div>}
+                {userProfile.about?.extendedBio && <p className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)] pt-2 !mt-4">{userProfile.about.extendedBio}</p>}
             </div>
           )}
         </div>
