@@ -18,7 +18,6 @@ import { useLocalStorage } from "./hooks/useLocalStorage";
 import {
   INITIAL_USER_PROFILE,
   INITIAL_PEOPLE,
-  INITIAL_NOTIFICATIONS,
 } from "./constants";
 import AddStoryModal from "./components/AddStoryModal";
 import StoryViewerModal from "./components/StoryViewerModal";
@@ -80,6 +79,9 @@ const App: React.FC = () => {
   
   // 💬 CHAT GLOBAL (Realtime DB)
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  
+  // 🔔 NOTIFICAÇÕES (Realtime DB)
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   // RESTO continua local
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>(
@@ -89,10 +91,6 @@ const App: React.FC = () => {
   const [people, setPeople] = useLocalStorage<Person[]>(
     "socialnino-people-v1",
     INITIAL_PEOPLE
-  );
-  const [notifications, setNotifications] = useLocalStorage<Notification[]>(
-    "socialnino-notifications-v1",
-    INITIAL_NOTIFICATIONS
   );
 
   const { addPoints } = useNinoPoints();
@@ -224,6 +222,27 @@ const App: React.FC = () => {
         off(chatQuery, 'value', callback);
     };
   }, []);
+  
+  // 🔔 BUSCAR NOTIFICAÇÕES EM TEMPO REAL
+  useEffect(() => {
+    if (!userProfile.name) return;
+
+    const notifRef = dbRef(db, `notifications/${userProfile.name}`);
+    const q = query(notifRef, orderByChild("createdAt"));
+
+    const unsub = onValue(q, (snapshot) => {
+        const data = snapshot.val() || {};
+        const list = Object.values(data) as Notification[];
+        // mais recentes primeiro
+        list.sort(
+        (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setNotifications(list);
+    });
+
+    return () => off(q, "value", unsub);
+  }, [userProfile.name]);
 
   // 🔔 EFFECT PARA NOTIFICAÇÕES TOAST
   useEffect(() => {
@@ -292,24 +311,60 @@ const App: React.FC = () => {
     setNewPostInitialCaption("");
   };
 
-  // 🔁 SEGUIR ainda local (só mexe no estado local)
-  const handleToggleFollow = (personId: number) => {
+  // 🔔 FUNÇÃO PARA CRIAR NOTIFICAÇÃO
+  const createNotification = async (
+    targetUsername: string,
+    notificationData: Omit<Notification, "id" | "read" | "createdAt">
+  ) => {
+    // Não notificar a si mesmo
+    if (targetUsername === userProfile.name) return;
+
+    const notifRef = push(dbRef(db, `notifications/${targetUsername}`));
+    const id = notifRef.key as string;
+
+    const payload: Notification = {
+      id,
+      ...notificationData,
+      createdAt: new Date().toISOString(),
+      read: false,
+    };
+
+    await set(notifRef, payload);
+  };
+
+  // 🔁 SEGUIR (agora async para notificação)
+  const handleToggleFollow = async (personId: number) => {
     let isFollowingAction = false;
-    setPeople((prevPeople) =>
-      prevPeople.map((p) => {
-        if (p.id === personId) {
-          isFollowingAction = !p.isFollowing;
-          return {
-            ...p,
-            isFollowing: !p.isFollowing,
-            followers: p.isFollowing ? p.followers - 1 : p.followers + 1,
-          };
+    let followedPerson: Person | undefined;
+    
+    const newPeople = people.map((p) => {
+      if (p.id === personId) {
+        isFollowingAction = !p.isFollowing;
+        if (isFollowingAction) {
+            followedPerson = p;
         }
-        return p;
-      })
-    );
-    if (isFollowingAction) {
+        return {
+          ...p,
+          isFollowing: !p.isFollowing,
+          followers: p.isFollowing ? p.followers - 1 : p.followers + 1,
+        };
+      }
+      return p;
+    });
+
+    setPeople(newPeople);
+
+    if (isFollowingAction && followedPerson) {
       addPoints("FOLLOW");
+      await createNotification(followedPerson.username, {
+        type: "follow",
+        fromUser: {
+          id: 0,
+          username: userProfile.name,
+          avatar: userProfile.avatar,
+        },
+        message: `${userProfile.name} começou a seguir você.`,
+      });
     }
 
     // efeito visual nos posts
@@ -381,7 +436,19 @@ const App: React.FC = () => {
       likes: increment(likesIncrement),
     });
 
-    if (newLiked) addPoints("LIKE");
+    if (newLiked) {
+      addPoints("LIKE");
+      await createNotification(post.author.username, {
+        type: "like",
+        fromUser: {
+            id: 0,
+            username: userProfile.name,
+            avatar: userProfile.avatar,
+        },
+        postId: post.id,
+        message: `${userProfile.name} curtiu seu post.`,
+      });
+    }
   };
 
   // 🔖 BOOKMARK GLOBAL
@@ -415,6 +482,16 @@ const App: React.FC = () => {
     });
 
     addPoints("COMMENT");
+    await createNotification(post.author.username, {
+        type: "comment",
+        fromUser: {
+            id: 0,
+            username: userProfile.name,
+            avatar: userProfile.avatar,
+        },
+        postId: post.id,
+        message: `${userProfile.name} comentou no seu post.`,
+    });
   };
   
   // 👁️ VIEW GLOBAL
@@ -521,8 +598,16 @@ const App: React.FC = () => {
   };
 
 
-  const handleMarkAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  const handleMarkAllAsRead = async () => {
+    const unreadNotifs = notifications.filter(n => !n.read);
+    if (unreadNotifs.length === 0) return;
+
+    const updates: { [key: string]: any } = {};
+    unreadNotifs.forEach(notif => {
+        updates[`notifications/${userProfile.name}/${notif.id}/read`] = true;
+    });
+
+    await update(dbRef(db), updates);
   };
 
   // 🔍 ABRIR PERFIL PÚBLICO
@@ -668,6 +753,7 @@ const App: React.FC = () => {
         {isNotificationsOpen && (
           <NotificationsPanel
             notifications={notifications}
+            posts={posts}
             onClose={() => setIsNotificationsOpen(false)}
             onMarkAllAsRead={handleMarkAllAsRead}
           />

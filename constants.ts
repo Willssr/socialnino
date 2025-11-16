@@ -1,7 +1,7 @@
 
 
 
-import { Post, Song, Story, UserProfile, Person, Notification } from './types';
+import { Post, Song, Story, UserProfile, Person } from './types';
 
 export const INITIAL_PEOPLE: Person[] = [
   {
@@ -184,37 +184,3 @@ export const INITIAL_USER_PROFILE: UserProfile = {
         extendedBio: 'Desenvolvedor apaixonado por criar interfaces futuristas e explorar o universo cyberpunk através da fotografia e da música. Sempre em busca do próximo desafio.'
     }
 };
-
-export const INITIAL_NOTIFICATIONS: Notification[] = [
-    {
-        id: 'notif-1',
-        type: 'like',
-        user: { username: 'nina_dev', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d' },
-        postPreview: 'https://picsum.photos/id/1074/800/600',
-        timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-        read: false,
-    },
-    {
-        id: 'notif-2',
-        type: 'comment',
-        user: { username: 'rafael.art', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d' },
-        postPreview: 'https://picsum.photos/id/1074/800/600',
-        timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-        read: false,
-    },
-    {
-        id: 'notif-3',
-        type: 'follow',
-        user: { username: 'lucas_s', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d' },
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        read: false,
-    },
-    {
-        id: 'notif-4',
-        type: 'like',
-        user: { username: 'carla.codes', avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d' },
-        postPreview: 'https://picsum.photos/id/1015/800/600',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
-        read: true,
-    }
-];

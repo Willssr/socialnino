@@ -1,15 +1,21 @@
 import React from 'react';
-import { Notification } from '../types';
+import { Notification, Post } from '../types';
 import { HeartIcon, CommentIcon, UserIcon } from './Icons';
 
 interface NotificationsPanelProps {
   notifications: Notification[];
+  posts: Post[];
   onClose: () => void;
   onMarkAllAsRead: () => void;
 }
 
-const NotificationItem: React.FC<{ notification: Notification }> = ({ notification }) => {
-    const { type, user, timestamp, postPreview, read } = notification;
+interface NotificationItemProps {
+    notification: Notification;
+    post?: Post;
+}
+
+const NotificationItem: React.FC<NotificationItemProps> = ({ notification, post }) => {
+    const { type, fromUser, createdAt, message, read } = notification;
 
     const renderIcon = () => {
         const iconClass = "w-5 h-5 text-white";
@@ -38,14 +44,12 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
     }
 
     const renderText = () => {
-        switch(type) {
-            case 'like':
-                return <><strong className="text-textLight">@{user.username}</strong> curtiu sua foto.</>;
-            case 'comment':
-                return <><strong className="text-textLight">@{user.username}</strong> comentou na sua foto.</>;
-            case 'follow':
-                return <><strong className="text-textLight">@{user.username}</strong> começou a seguir você.</>;
-        }
+        return (
+            <p className="text-sm text-textDark">
+                <strong className="text-textLight">@{fromUser.username}</strong>
+                {message.substring(fromUser.username.length)}
+            </p>
+        );
     }
 
     const formatDate = (dateString: string) => {
@@ -55,9 +59,9 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
         const diffMinutes = Math.round(diffSeconds / 60);
         const diffHours = Math.round(diffMinutes / 60);
         
-        if (diffSeconds < 60) return `${diffSeconds}s`;
-        if (diffMinutes < 60) return `${diffMinutes}m`;
-        if (diffHours < 24) return `${diffHours}h`;
+        if (diffSeconds < 60) return `${diffSeconds}s ago`;
+        if (diffMinutes < 60) return `${diffMinutes}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
         return date.toLocaleDateString('pt-BR');
     }
 
@@ -65,19 +69,17 @@ const NotificationItem: React.FC<{ notification: Notification }> = ({ notificati
         <div className={`flex items-start gap-3 p-3 transition-colors duration-200 ${!read ? 'bg-primary/10' : ''} hover:bg-primary/20`}>
             {renderIcon()}
             <div className="flex-grow">
-                <p className="text-sm text-textDark">
-                    {renderText()}
-                </p>
-                <p className="text-xs text-textDark/70 mt-0.5">{formatDate(timestamp)}</p>
+                {renderText()}
+                <p className="text-xs text-textDark/70 mt-0.5">{formatDate(createdAt)}</p>
             </div>
-            {postPreview && (
-                <img src={postPreview} alt="Post preview" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
+            {post && (
+                <img src={post.media.src} alt="Post preview" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
             )}
         </div>
     )
 }
 
-const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, onClose, onMarkAllAsRead }) => {
+const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, posts, onClose, onMarkAllAsRead }) => {
 
     return (
         <div className="fixed inset-0 z-40" onClick={onClose}>
@@ -93,7 +95,10 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, 
                 </div>
                 <div className="max-h-[70vh] overflow-y-auto">
                     {notifications.length > 0 ? (
-                        notifications.map(n => <NotificationItem key={n.id} notification={n} />)
+                        notifications.map(n => {
+                            const post = n.postId ? posts.find(p => p.id === n.postId) : undefined;
+                            return <NotificationItem key={n.id} notification={n} post={post} />
+                        })
                     ) : (
                         <p className="p-8 text-center text-sm text-textDark">
                             Você não tem nenhuma notificação.
