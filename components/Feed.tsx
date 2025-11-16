@@ -7,6 +7,7 @@ type FeedProps = {
   posts: Post[];
   handleLike: (postId: string) => void;
   handleComment: (postId: string, commentText: string) => void;
+  handleView: (postId: string) => void;
   currentUserName: string;
   userProfile: UserProfile;
   onAddStoryClick: () => void;
@@ -23,6 +24,7 @@ const Feed: React.FC<FeedProps> = ({
   posts,
   handleLike,
   handleComment,
+  handleView,
   currentUserName,
   userProfile,
   onAddStoryClick,
@@ -50,6 +52,7 @@ const Feed: React.FC<FeedProps> = ({
             post={post}
             handleLike={handleLike}
             handleComment={handleComment}
+            handleView={handleView}
             currentUserName={currentUserName}
             handleToggleFollow={handleToggleFollow}
             handleBookmark={handleBookmark}

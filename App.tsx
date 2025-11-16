@@ -137,6 +137,7 @@ const App: React.FC = () => {
             src: raw.media?.src ?? "",
           },
           likes: typeof raw.likes === "number" ? raw.likes : 0,
+          views: typeof raw.views === "number" ? raw.views : 0,
           isLiked: !!raw.isLiked,
           isBookmarked: !!raw.isBookmarked,
           comments,
@@ -294,6 +295,7 @@ const App: React.FC = () => {
           src: reader.result as string,
         },
         likes: 0,
+        views: 0,
         isLiked: false,
         isBookmarked: false,
         comments: [],
@@ -359,6 +361,13 @@ const App: React.FC = () => {
     addPoints("COMMENT");
   };
   
+  // 👁️ VIEW GLOBAL
+  const handleView = async (postId: string) => {
+    await update(dbRef(db, `posts/${postId}`), {
+        views: increment(1)
+    });
+  };
+
   // 💬 ENVIAR MENSAGEM GLOBAL
   const handleSendMessage = async (content: string, type: 'text' | 'sticker') => {
       const newMessageRef = push(dbRef(db, 'global-chat'));
@@ -498,6 +507,7 @@ const App: React.FC = () => {
             posts={posts}
             handleLike={handleLike}
             handleComment={handleComment}
+            handleView={handleView}
             currentUserName={userProfile.name}
             userProfile={userProfile}
             onAddStoryClick={() => setIsAddStoryModalOpen(true)}
@@ -594,6 +604,7 @@ const App: React.FC = () => {
             handleLike={handleLike}
             handleComment={handleComment}
             handleBookmark={handleBookmark}
+            handleView={handleView}
             currentUserName={userProfile.name}
             onOpenProfile={handleOpenPublicProfile}
           />

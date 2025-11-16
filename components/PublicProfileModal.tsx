@@ -12,6 +12,7 @@ interface PublicProfileModalProps {
   handleLike: (postId: string) => void;
   handleComment: (postId: string, text: string) => void;
   handleBookmark: (postId: string) => void;
+  handleView: (postId: string) => void;
   currentUserName: string;
   onOpenProfile: (username: string) => void;
 }
@@ -26,6 +27,7 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
   handleLike,
   handleComment,
   handleBookmark,
+  handleView,
   currentUserName,
   onOpenProfile,
 }) => {
@@ -81,6 +83,7 @@ const PublicProfileModal: React.FC<PublicProfileModalProps> = ({
                 post={post}
                 handleLike={handleLike}
                 handleComment={handleComment}
+                handleView={handleView}
                 currentUserName={currentUserName}
                 handleToggleFollow={onToggleFollow}
                 handleBookmark={handleBookmark}

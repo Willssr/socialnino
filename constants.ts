@@ -107,6 +107,7 @@ export const INITIAL_POSTS: Post[] = [
       src: 'https://picsum.photos/id/1015/800/600',
     },
     likes: 128,
+    views: 1345,
     isLiked: false,
     isBookmarked: false,
     comments: [
@@ -129,6 +130,7 @@ export const INITIAL_POSTS: Post[] = [
       src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
     },
     likes: 256,
+    views: 5823,
     isLiked: true,
     isBookmarked: true,
     comments: [],
@@ -148,6 +150,7 @@ export const INITIAL_POSTS: Post[] = [
       src: 'https://picsum.photos/id/1074/800/600',
     },
     likes: 95,
+    views: 876,
     isLiked: false,
     isBookmarked: false,
     comments: [

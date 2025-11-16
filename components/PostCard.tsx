@@ -1,6 +1,6 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Post } from "../types";
-import { DotsHorizontalIcon, HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon } from './Icons';
+import { DotsHorizontalIcon, HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon, EyeIcon } from './Icons';
 import CommentsModal from './CommentsModal';
 import FollowButton from "./FollowButton";
 
@@ -8,6 +8,7 @@ type Props = {
   post: Post;
   handleLike: (postId: string) => void;
   handleComment: (postId: string, text: string) => void;
+  handleView: (postId: string) => void;
   currentUserName: string;
   handleToggleFollow: (personId: number) => void;
   handleBookmark: (postId: string) => void;
@@ -18,6 +19,7 @@ const PostCard: React.FC<Props> = ({
   post,
   handleLike,
   handleComment,
+  handleView,
   currentUserName,
   handleToggleFollow,
   handleBookmark,
@@ -28,6 +30,10 @@ const PostCard: React.FC<Props> = ({
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
   const [isMediaLoaded, setIsMediaLoaded] = useState(false);
   const lastClickTime = useRef(0);
+  
+  const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const viewHandled = useRef(false);
 
   const handleDoubleClick = () => {
     const now = new Date().getTime();
@@ -41,15 +47,19 @@ const PostCard: React.FC<Props> = ({
     lastClickTime.current = now;
   };
 
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-
-  React.useEffect(() => {
+  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (videoRef.current) {
-          if (entry.isIntersecting) {
+        if (entry.isIntersecting) {
+          if (videoRef.current) {
             videoRef.current.play().catch(() => {});
-          } else {
+          }
+          if (!viewHandled.current) {
+            handleView(post.id);
+            viewHandled.current = true;
+          }
+        } else {
+          if (videoRef.current) {
             videoRef.current.pause();
           }
         }
@@ -57,16 +67,17 @@ const PostCard: React.FC<Props> = ({
       { threshold: 0.5 }
     );
 
-    if (videoRef.current) {
-      observer.observe(videoRef.current);
+    const currentCard = cardRef.current;
+    if (currentCard) {
+      observer.observe(currentCard);
     }
 
     return () => {
-      if (videoRef.current) {
-        observer.unobserve(videoRef.current);
+      if (currentCard) {
+        observer.unobserve(currentCard);
       }
     };
-  }, []);
+  }, [post.id, handleView]);
 
   // 📌 Formatação da data + hora
   const formattedDateTime = new Date(post.timestamp).toLocaleString("pt-BR", {
@@ -79,7 +90,7 @@ const PostCard: React.FC<Props> = ({
 
   return (
     <>
-      <div className="rgb-border rounded-xl overflow-hidden mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary/50">
+      <div ref={cardRef} className="rgb-border rounded-xl overflow-hidden mb-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-glow-primary/50">
         
         {/* HEADER DO POST */}
         <div className="flex items-center space-x-3 p-4">
@@ -97,10 +108,16 @@ const PostCard: React.FC<Props> = ({
               {post.author.username}
             </p>
 
-            {/* 📌 Agora exibe data + hora */}
             <p className="text-xs text-textDark">
               {formattedDateTime}
             </p>
+            
+            <div className="flex items-center space-x-1.5 mt-1 text-secondary drop-shadow-[0_0_4px_#00E5FF]">
+                <EyeIcon className="w-4 h-4" />
+                <p className="text-xs font-semibold">
+                    {post.views.toLocaleString('pt-BR')} visualizações
+                </p>
+            </div>
           </div>
           
           {post.author.username !== currentUserName && (

@@ -4,6 +4,8 @@
 
 
 
+
+
 export interface Comment {
   id: string;
   author: string;
@@ -30,6 +32,7 @@ export interface Post {
     src: string;
   };
   likes: number;
+  views: number;
   isLiked: boolean; // To track liked state for the demo
   isBookmarked: boolean;
   comments: Comment[];
