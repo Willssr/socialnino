@@ -26,7 +26,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMes
             {/* Nome de usuário com destaque neon */}
             <div className="flex items-center gap-2 mb-1" style={{ flexDirection: isOwnMessage ? 'row-reverse' : 'row' }}>
                 <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full" />
-                <span className="text-sm font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text drop-shadow-[0_0_4px_rgba(123,47,247,0.5)]">
+                <span className="text-sm font-bold text-[#00C6FF] drop-shadow-[0_0_4px_#00C6FF]">
                     {author.name}
                 </span>
             </div>
