@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, SearchIcon, PlusSquareIcon, DownloadIcon, UsersIcon } from './Icons';
+import { HomeIcon, PlusSquareIcon, DownloadIcon, UsersIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
@@ -50,7 +50,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, onNewPost
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-backgroundLight/80 backdrop-blur-sm border-t border-borderNeon shadow-[0_-5px_20px_-5px_rgba(123,47,247,0.2)] h-16 flex md:hidden justify-around items-center z-50">
       <NavButton Icon={HomeIcon} isActive={activePage === 'feed'} onClick={() => onNavigate('feed')} useGradient={true} />
-      <NavButton Icon={SearchIcon} isActive={activePage === 'search'} onClick={() => onNavigate('search')} useGradient={true} />
       <NavButton Icon={UsersIcon} isActive={activePage === 'friends'} onClick={() => onNavigate('friends')} useGradient={true} />
       <NavButton Icon={PlusSquareIcon} isActive={false} onClick={onNewPostClick} special={true} useGradient={true} />
       <NavButton Icon={DownloadIcon} isActive={activePage === 'download'} onClick={() => onNavigate('download')} useGradient={true} />
