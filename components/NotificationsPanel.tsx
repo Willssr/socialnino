@@ -45,8 +45,8 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, post 
 
     const renderText = () => {
         return (
-            <p className="text-sm text-textDark">
-                <strong className="text-textLight">@{fromUser.username}</strong>
+            <p className="text-sm text-white/90">
+                <strong className="font-semibold text-white">@{fromUser.username}</strong>
                 {message.substring(fromUser.username.length)}
             </p>
         );
@@ -70,7 +70,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({ notification, post 
             {renderIcon()}
             <div className="flex-grow">
                 {renderText()}
-                <p className="text-xs text-textDark/70 mt-0.5">{formatDate(createdAt)}</p>
+                <p className="text-xs text-white/60 mt-0.5">{formatDate(createdAt)}</p>
             </div>
             {post && (
                 <img src={post.media.src} alt="Post preview" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
@@ -84,11 +84,11 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, 
     return (
         <div className="fixed inset-0 z-40" onClick={onClose}>
             <div 
-                className="absolute top-20 right-4 sm:right-6 lg:right-8 w-full max-w-sm bg-cardDark rounded-lg shadow-2xl border border-borderNeon overflow-hidden"
+                className="absolute top-20 right-4 sm:right-6 lg:right-8 w-full max-w-sm bg-[#0b0b20]/85 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(0,229,255,0.4)] border border-[#00E5FF77] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-3 border-b border-borderNeon">
-                    <h3 className="font-bold text-lg text-textLight">Notificações</h3>
+                <div className="flex items-center justify-between p-3 border-b border-[#00E5FF55]">
+                    <h3 className="font-bold text-lg text-[#00E5FF] drop-shadow-[0_0_4px_#00E5FF]">Notificações</h3>
                     <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-secondary hover:underline">
                         Marcar como lidas
                     </button>
@@ -100,7 +100,7 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, 
                             return <NotificationItem key={n.id} notification={n} post={post} />
                         })
                     ) : (
-                        <p className="p-8 text-center text-sm text-textDark">
+                        <p className="p-8 text-center text-sm text-white">
                             Você não tem nenhuma notificação.
                         </p>
                     )}
