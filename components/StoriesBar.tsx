@@ -38,8 +38,8 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
               className="block rounded-full"
             >
               {hasMyStory ? (
-                // Se tem story, mostra o anel neon
-                <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse">
+                // Se tem story, mostra o anel neon rotativo
+                <div className="story-border w-16 h-16 rounded-full p-0.5">
                   <div className="bg-backgroundDark p-0.5 rounded-full">
                     <img 
                       src={userProfile.avatar} 
@@ -71,7 +71,7 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
           return (
             <div key={story.author} className="flex-shrink-0 text-center w-20 cursor-pointer" onClick={() => onViewStory(story.author)}>
               <div className="relative inline-block">
-                <div className={`w-16 h-16 rounded-full p-0.5 ${isOnline ? 'bg-[#00FF7F] shadow-[0_0_8px_rgba(0,255,127,0.7)]' : 'bg-gradient-to-br from-primary via-accent to-secondary animate-neon-pulse'}`}>
+                <div className="story-border w-16 h-16 rounded-full p-0.5">
                     <div className="bg-backgroundDark p-0.5 rounded-full h-full">
                         <img 
                           src={story.avatar} 

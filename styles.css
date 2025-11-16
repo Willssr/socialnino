@@ -45,6 +45,37 @@ body {
   animation: rgb-spin 4s linear infinite;
 }
 
+/* Nova animação para a borda dos Stories */
+@keyframes story-spin {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}
+
+/* Nova classe para a borda dos Stories */
+.story-border {
+  position: relative;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  background-color: #0A0A0D; /* Fundo escuro */
+  z-index: 1;
+}
+
+.story-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--angle),
+    #00E5FF, /* Azul */
+    #7B2FF7, /* Roxo */
+    #FF2CDF, /* Rosa */
+    #00E5FF  /* Azul para loop suave */
+  );
+  animation: story-spin 10s linear infinite;
+}
+
 
 /* Classe para o gradiente de texto neon */
 .text-gradient-neon {

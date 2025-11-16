@@ -140,7 +140,7 @@ const Profile: React.FC<ProfileProps> = ({
 
         <div>
           <p className="font-bold text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.name}</p>
-          <p className="text-sm mt-1 text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.bio}</p>
+          <p className="text-sm mt-1 text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md animate-fade-in-up">{userProfile.bio}</p>
         </div>
 
         {/* Action Buttons */}
