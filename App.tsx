@@ -547,7 +547,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center">
-      <div className="w-full md:max-w-xl bg-backgroundDark">
+      <div className={`w-full md:max-w-xl ${activePage === 'feed' ? 'min-h-screen bg-gradient-to-b from-[#05010F] via-[#050509] to-[#05010F]' : 'bg-backgroundDark'}`}>
         <Header
           unreadCount={unreadCount}
           onNotificationsClick={() =>
