@@ -158,7 +158,7 @@ const Profile: React.FC<ProfileProps> = ({
           <p className="font-bold text-sm text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">
             {userProfile.name}
           </p>
-          <p className="text-sm text-textLight mt-1">{userProfile.bio}</p>
+          <p className="text-sm mt-1 text-transparent bg-clip-text bg-gradient-to-r from-[#4cc9ff] to-[#c77dff] drop-shadow-md">{userProfile.bio}</p>
         </div>
 
         {/* Action Buttons */}
