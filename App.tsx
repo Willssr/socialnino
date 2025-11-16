@@ -288,7 +288,7 @@ const App: React.FC = () => {
     const newLiked = !post.isLiked;
     const likesIncrement = newLiked ? 1 : -1;
 
-    // FIX: Use Firebase's atomic increment to prevent race conditions and ensure accurate like counts.
+    // A contagem de curtidas é atualizada de forma atômica no Firebase.
     await update(dbRef(db, `posts/${postId}`), {
       isLiked: newLiked,
       likes: increment(likesIncrement),
