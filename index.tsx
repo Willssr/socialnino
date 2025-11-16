@@ -16,7 +16,7 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 
-// FIX: Explicitly nest providers to resolve type errors where the `children` prop was not being inferred correctly.
+// FIX: Nest providers correctly to ensure the `children` prop is passed implicitly, resolving type errors.
 root.render(
   <React.StrictMode>
     <AuthProvider>

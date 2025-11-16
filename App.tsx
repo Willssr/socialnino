@@ -45,6 +45,7 @@ import {
 
 // 🔍 Modal de perfil público
 import PublicProfileModal from "./components/PublicProfileModal";
+import FriendsScreen from "./components/FriendsScreen";
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -56,6 +57,7 @@ const App: React.FC = () => {
   const [pageOrder] = useState<ActivePage[]>([
     "feed",
     "search",
+    "friends",
     "download",
     "music",
     "profile",
@@ -393,6 +395,11 @@ const App: React.FC = () => {
       case "search":
         pageComponent = (
           <Suggestions people={people} onToggleFollow={handleToggleFollow} />
+        );
+        break;
+      case "friends":
+        pageComponent = (
+          <FriendsScreen people={people} onToggleFollow={handleToggleFollow} />
         );
         break;
       case "download":

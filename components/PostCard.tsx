@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Post } from "../types";
 import { DotsHorizontalIcon, HeartIcon, CommentIcon, PaperAirplaneIcon, BookmarkIcon } from './Icons';
 import CommentsModal from './CommentsModal';
+import FollowButton from "./FollowButton";
 
 type Props = {
   post: Post;
@@ -101,6 +102,14 @@ const PostCard: React.FC<Props> = ({
               {formattedDateTime}
             </p>
           </div>
+          
+          {post.author.username !== currentUserName && (
+            <FollowButton
+              isFollowing={post.author.isFollowing}
+              onClick={() => handleToggleFollow(post.author.id)}
+              variant="text"
+            />
+          )}
 
           <button className="text-textDark hover:text-textLight">
             <DotsHorizontalIcon className="w-6 h-6" />

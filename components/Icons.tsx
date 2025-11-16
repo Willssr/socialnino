@@ -158,6 +158,24 @@ export const SearchIcon = ({ className, solid, useGradient }: { className?: stri
     );
 };
 
+export const UsersIcon = ({ className, solid, useGradient }: { className?: string, solid?: boolean, useGradient?: boolean }) => {
+    const gradientId = "icon-gradient-users";
+    const isActive = solid || useGradient;
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={useGradient ? `url(#${gradientId})` : "currentColor"}>
+            {useGradient && isActive && (
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#7B2FF7" />
+                        <stop offset="100%" stopColor="#00E5FF" />
+                    </linearGradient>
+                </defs>
+            )}
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m-7.289 2.72a3 3 0 01-4.682-2.72 9.094 9.094 0 013.741-.479m7.289 2.72a8.97 8.97 0 01-7.289 0M12 12.75a3 3 0 110-6 3 3 0 010 6z" />
+        </svg>
+    )
+};
+
 
 export const XIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
