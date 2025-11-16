@@ -69,16 +69,25 @@ export const DotsHorizontalIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-export const HomeIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-        {solid ? (
-             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
-        ) : (
-             <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
-        )}
-    </svg>
+export const HomeIcon = ({ className, solid, useGradient }: { className?: string, solid?: boolean, useGradient?: boolean }) => {
+    const gradientId = "icon-gradient-home";
+    const pathData = "M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5";
+    
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={useGradient ? `url(#${gradientId})` : "currentColor"}>
+            {useGradient && (
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#7B2FF7" />
+                        <stop offset="100%" stopColor="#00E5FF" />
+                    </linearGradient>
+                </defs>
+            )}
+            <path strokeLinecap="round" strokeLinejoin="round" d={pathData} />
+        </svg>
+    );
+};
 
-);
 
 export const MusicNoteIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" >
@@ -126,15 +135,29 @@ export const BellIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-export const SearchIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-       {solid ? (
-         <path fill="currentColor" strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-       ) : (
-         <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-       )}
-    </svg>
-);
+export const SearchIcon = ({ className, solid, useGradient }: { className?: string, solid?: boolean, useGradient?: boolean }) => {
+    const gradientId = "icon-gradient-search";
+    const isActive = solid || useGradient;
+
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            {useGradient && isActive && (
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#7B2FF7" />
+                        <stop offset="100%" stopColor="#00E5FF" />
+                    </linearGradient>
+                </defs>
+            )}
+           {isActive ? (
+             <path fill={useGradient ? `url(#${gradientId})` : "currentColor"} stroke="none" strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75l-2.489-2.489m0 0a3.375 3.375 0 10-4.773-4.773 3.375 3.375 0 004.774 4.774zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+           ) : (
+             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+           )}
+        </svg>
+    );
+};
+
 
 export const XIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -142,18 +165,44 @@ export const XIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
-export const PlusSquareIcon = ({ className }: { className?: string }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-  </svg>
-);
+export const PlusSquareIcon = ({ className, useGradient }: { className?: string, useGradient?: boolean }) => {
+    const gradientId = "icon-gradient-plus-square";
+
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={useGradient ? `url(#${gradientId})` : "currentColor"} className={className}>
+            {useGradient && (
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#7B2FF7" />
+                        <stop offset="100%" stopColor="#00E5FF" />
+                    </linearGradient>
+                </defs>
+            )}
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    );
+};
+
 
 // Fix: Add DownloadIcon to fix import error.
-export const DownloadIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-       <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-    </svg>
-);
+export const DownloadIcon = ({ className, solid, useGradient }: { className?: string, solid?: boolean, useGradient?: boolean }) => {
+    const gradientId = "icon-gradient-download";
+
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={useGradient ? `url(#${gradientId})` : "currentColor"}>
+           {useGradient && (
+                <defs>
+                    <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#7B2FF7" />
+                        <stop offset="100%" stopColor="#00E5FF" />
+                    </linearGradient>
+                </defs>
+            )}
+           <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+        </svg>
+    );
+};
+
 
 export const LogoutIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

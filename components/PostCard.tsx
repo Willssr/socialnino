@@ -25,6 +25,7 @@ const PostCard: React.FC<Props> = ({
   const [commentText, setCommentText] = useState("");
   const [showHeart, setShowHeart] = useState(false);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
+  const [isMediaLoaded, setIsMediaLoaded] = useState(false);
   const lastClickTime = useRef(0);
 
   const handleDoubleClick = () => {
@@ -107,12 +108,16 @@ const PostCard: React.FC<Props> = ({
         </div>
 
         {/* MÍDIA */}
-        <div className="relative" onClick={handleDoubleClick}>
+        <div 
+          className="relative aspect-square bg-cardDark bg-gradient-to-r from-backgroundLight via-cardDark to-backgroundLight animate-shimmer bg-[length:200%_100%]" 
+          onClick={handleDoubleClick}
+        >
           {post.media?.type === "image" ? (
             <img
               src={post.media.src}
               alt="post"
-              className="w-full object-cover"
+              onLoad={() => setIsMediaLoaded(true)}
+              className={`w-full h-full object-cover transition-opacity duration-500 ${isMediaLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           ) : (
             <video
@@ -121,7 +126,8 @@ const PostCard: React.FC<Props> = ({
               loop
               muted
               playsInline
-              className="w-full object-cover"
+              onLoadedData={() => setIsMediaLoaded(true)}
+              className={`w-full h-full object-cover transition-opacity duration-500 ${isMediaLoaded ? 'opacity-100' : 'opacity-0'}`}
             />
           )}
 
