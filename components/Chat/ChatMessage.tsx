@@ -52,7 +52,7 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMes
         <div className={`flex flex-col ${alignmentClass}`}>
             <div className="flex items-center gap-2 mb-1" style={{ flexDirection: isOwnMessage ? 'row-reverse' : 'row' }}>
                 <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full" />
-                <span className="text-sm font-bold text-[#00C6FF] drop-shadow-[0_0_4px_#00C6FF]">
+                <span className="text-sm font-bold text-secondary animate-username-glow-pulse">
                     {author.name}
                 </span>
             </div>

@@ -102,7 +102,7 @@ const PostCard: React.FC<Props> = ({
           />
           <div className="flex-grow">
             <p
-              className="font-bold text-sm cursor-pointer hover:text-secondary"
+              className="font-bold text-sm cursor-pointer text-secondary animate-username-glow-pulse"
               onClick={() => onOpenProfile(post.author.username)}
             >
               {post.author.username}
@@ -204,7 +204,7 @@ const PostCard: React.FC<Props> = ({
 
           <p className="mt-1 text-sm">
             <span
-              className="font-bold cursor-pointer hover:text-secondary"
+              className="font-bold cursor-pointer text-secondary animate-username-glow-pulse"
               onClick={() => onOpenProfile(post.author.username)}
             >
               {post.author.username}
