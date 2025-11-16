@@ -76,7 +76,7 @@ const Profile: React.FC<ProfileProps> = ({
         name={name}
         value={value || ''}
         onChange={onChange}
-        className="w-full bg-backgroundLight/80 border border-[#00E5FF55] rounded-md px-3 py-1.5 text-sm text-white placeholder-textDark focus:outline-none focus:ring-1 focus:ring-secondary"
+        className="w-full bg-backgroundLight/80 border border-[#00E5FF55] rounded-md px-3 py-1.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-secondary"
       />
     </div>
   );
