@@ -495,6 +495,31 @@ const App: React.FC = () => {
       setStoryViewerState({ isOpen: true, stories: userStories });
     }
   };
+  
+  // 🎮 PONTUAÇÃO DE JOGOS GLOBAL
+  const handleGamePoints = async (points: number) => {
+    if (!userProfile.name) return;
+    const userRef = dbRef(db, `users/${userProfile.name}`);
+    const snapshot = await get(userRef);
+
+    if (!snapshot.exists()) {
+        // Se o usuário não existe no ranking, cria com os metadados
+        await set(userRef, {
+            username: userProfile.name,
+            avatar: userProfile.avatar,
+            points: {
+                total: points
+            }
+        });
+    } else {
+        // Se já existe, apenas incrementa os pontos
+        const pointsRef = dbRef(db, `users/${userProfile.name}/points`);
+        await update(pointsRef, {
+            total: increment(points)
+        });
+    }
+  };
+
 
   const handleMarkAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
@@ -532,7 +557,7 @@ const App: React.FC = () => {
         );
         break;
       case "games":
-        pageComponent = <GamesScreen />;
+        pageComponent = <GamesScreen handleGamePoints={handleGamePoints} />;
         break;
       case "chat":
         pageComponent = (

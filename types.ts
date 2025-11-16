@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 export interface Comment {
   id: string;
   author: string;
@@ -143,4 +132,12 @@ export interface ToastNotificationData {
     avatar: string;
   };
   content: string;
+}
+
+export interface RankedUser {
+  username: string;
+  avatar: string;
+  points?: {
+    total: number;
+  };
 }

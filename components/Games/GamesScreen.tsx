@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { GameControllerIcon, CubeIcon, BoltIcon } from '../Icons';
 import AstroPuzzleGame from "./AstroPuzzleGame";
+import { RankedUser } from '../../types';
+import { db } from '../../services/firebase';
+import { ref as dbRef, query, onValue, orderByChild, off } from 'firebase/database';
 
 // === TAP NINJA MINI-GAME ===
-const TapNinjaGame = ({ onClose }: { onClose: () => void }) => {
+const TapNinjaGame = ({ onFinish }: { onFinish: (score: number) => void }) => {
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(10);
   const [isRunning, setIsRunning] = useState(true);
@@ -79,7 +82,7 @@ const TapNinjaGame = ({ onClose }: { onClose: () => void }) => {
                 <button onClick={resetGame} className="flex-1 py-2 rounded-lg font-bold bg-cardDark border border-borderNeon text-textLight hover:bg-primary/30 hover:border-primary transition-colors">
                     Jogar de novo
                 </button>
-                <button onClick={onClose} className="flex-1 py-2 rounded-lg font-bold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse">
+                <button onClick={() => onFinish(score)} className="flex-1 py-2 rounded-lg font-bold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse">
                     Fechar
                 </button>
             </div>
@@ -124,8 +127,37 @@ const GamePlaceholderModal = ({ onClose }: { onClose: () => void }) => (
     </div>
 );
 
-const GamesScreen: React.FC = () => {
+interface GamesScreenProps {
+    handleGamePoints: (points: number) => Promise<void>;
+}
+
+const GamesScreen: React.FC<GamesScreenProps> = ({ handleGamePoints }) => {
     const [activeGame, setActiveGame] = useState<string | null>(null);
+    const [ranking, setRanking] = useState<RankedUser[]>([]);
+
+    useEffect(() => {
+      const rankQuery = query(dbRef(db, "users"), orderByChild("points/total"));
+      
+      const callback = (snapshot: any) => {
+        const data = snapshot.val();
+        if (!data) {
+          setRanking([]);
+          return;
+        }
+        const users: RankedUser[] = Object.values(data);
+        const sorted = users.sort((a, b) => (b.points?.total || 0) - (a.points?.total || 0));
+        setRanking(sorted.slice(0, 10)); // Mostrar top 10
+      };
+
+      onValue(rankQuery, callback);
+
+      return () => off(rankQuery, 'value', callback);
+    }, []);
+
+    const handleFinishGame = (points: number) => {
+      handleGamePoints(points);
+      setActiveGame(null);
+    };
 
     return (
         <>
@@ -154,31 +186,25 @@ const GamesScreen: React.FC = () => {
 
                 {/* Ranking Section */}
                 <div className="max-w-5xl mx-auto">
-                    <div className="mt-6 p-4 bg-black border border-[#00E5FF] rounded-xl shadow-[0_0_10px_#00E5FF55]">
+                    <div className="mt-6 p-4 border border-[#00E5FF] rounded-xl shadow-[0_0_10px_#00E5FF55]">
                         <h2 className="text-[#00E5FF] font-orbitron font-bold text-lg mb-3 drop-shadow-[0_0_6px_#00E5FF]">
                             🏆 Ranking Neon
                         </h2>
-
-                        {/* 1º Lugar */}
-                        <div className="flex items-center gap-3 py-2 border-b border-[#00E5FF55]">
-                            <img src="https://i.pravatar.cc/150?u=nino" alt="Avatar @Nino" className="w-8 h-8 rounded-full" />
-                            <span className="text-white font-semibold">@Nino – 230 pts</span>
-                            <span className="ml-auto text-yellow-400 text-xl">🥇</span>
-                        </div>
-
-                        {/* 2º Lugar */}
-                        <div className="flex items-center gap-3 py-2 border-b border-[#00E5FF55]">
-                            <img src="https://i.pravatar.cc/150?u=daidon" alt="Avatar @Daidon" className="w-8 h-8 rounded-full" />
-                            <span className="text-white font-semibold">@Daidon – 180 pts</span>
-                            <span className="ml-auto text-gray-300 text-xl">🥈</span>
-                        </div>
-
-                        {/* 3º Lugar */}
-                        <div className="flex items-center gap-3 py-2">
-                            <img src="https://i.pravatar.cc/150?u=well" alt="Avatar @Well" className="w-8 h-8 rounded-full" />
-                            <span className="text-white font-semibold">@Well – 150 pts</span>
-                            <span className="ml-auto text-orange-400 text-xl">🥉</span>
-                        </div>
+                        {ranking.length > 0 ? (
+                          ranking.map((user, index) => (
+                            <div key={user.username} className="flex items-center gap-3 py-2 border-b border-[#00E5FF33] last:border-b-0">
+                                <img src={user.avatar} className="w-8 h-8 rounded-full" />
+                                <span className="text-white font-semibold">@{user.username} – {user.points?.total || 0} pts</span>
+                                <span className="ml-auto text-xl">
+                                    {index === 0 && "🥇"}
+                                    {index === 1 && "🥈"}
+                                    {index === 2 && "🥉"}
+                                </span>
+                            </div>
+                          ))
+                        ) : (
+                          <p className="text-center text-textDark py-4">O ranking está sendo formado. Jogue para aparecer aqui!</p>
+                        )}
                     </div>
                 </div>
             </div>
@@ -189,8 +215,8 @@ const GamesScreen: React.FC = () => {
                   onClick={() => setActiveGame(null)}
                 >
                     <div onClick={(e) => e.stopPropagation()}>
-                        {activeGame === "tap-ninja" && <TapNinjaGame onClose={() => setActiveGame(null)} />}
-                        {activeGame === "astro-puzzle" && <AstroPuzzleGame onClose={() => setActiveGame(null)} />}
+                        {activeGame === "tap-ninja" && <TapNinjaGame onFinish={handleFinishGame} />}
+                        {activeGame === "astro-puzzle" && <AstroPuzzleGame onFinish={handleFinishGame} />}
                         {activeGame === "neon-grid" && <GamePlaceholderModal onClose={() => setActiveGame(null)} />}
                     </div>
                 </div>

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 interface AstroPuzzleGameProps {
-  onClose: () => void;
+  onFinish: (score: number) => void;
 }
 
 const GRID_SIZE = 9;
 const SEQUENCE_DELAY = 600; // ms between each light-up
 const LIT_DURATION = 300; // ms for how long a cell stays lit
 
-const AstroPuzzleGame: React.FC<AstroPuzzleGameProps> = ({ onClose }) => {
+const AstroPuzzleGame: React.FC<AstroPuzzleGameProps> = ({ onFinish }) => {
   const [level, setLevel] = useState(1);
   const [sequence, setSequence] = useState<number[]>([]);
   const [playerSequence, setPlayerSequence] = useState<number[]>([]);
@@ -136,7 +136,7 @@ const AstroPuzzleGame: React.FC<AstroPuzzleGameProps> = ({ onClose }) => {
           Jogar de novo
         </button>
         <button
-          onClick={onClose}
+          onClick={() => onFinish(level)}
           className="flex-1 py-2 rounded-lg font-bold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse"
         >
           Fechar
