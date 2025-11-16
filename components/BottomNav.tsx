@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, SearchIcon, PlusSquareIcon, PlayIcon } from './Icons';
+import { HomeIcon, SearchIcon, PlusSquareIcon, DownloadIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
@@ -15,7 +15,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, onNewPost
       <NavButton Icon={HomeIcon} isActive={activePage === 'feed'} onClick={() => onNavigate('feed')} />
       <NavButton Icon={SearchIcon} isActive={activePage === 'search'} onClick={() => onNavigate('search')} />
       <NavButton Icon={PlusSquareIcon} isActive={false} onClick={onNewPostClick} special={true} />
-      <NavButton Icon={PlayIcon} isActive={activePage === 'play'} onClick={() => onNavigate('play')} />
+      <NavButton Icon={DownloadIcon} isActive={activePage === 'download'} onClick={() => onNavigate('download')} />
       <ProfileNavButton avatar={userAvatar} isActive={activePage === 'profile'} onClick={() => onNavigate('profile')} />
     </nav>
   );

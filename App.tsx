@@ -23,7 +23,7 @@ import AddStoryModal from "./components/AddStoryModal";
 import StoryViewerModal from "./components/StoryViewerModal";
 import NewPostModal from "./components/NewPostModal";
 import Suggestions from "./components/Suggestions";
-import Play from "./components/Play";
+import DownloadApp from "./components/DownloadApp";
 import NotificationsPanel from "./components/NotificationsPanel";
 import SearchModal from "./components/SearchModal";
 import { useNinoPoints } from "./context/NinoPointsContext";
@@ -56,7 +56,7 @@ const App: React.FC = () => {
   const [pageOrder] = useState<ActivePage[]>([
     "feed",
     "search",
-    "play",
+    "download",
     "music",
     "profile",
   ]);
@@ -365,11 +365,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleParticipateInChallenge = ({ legenda }: { legenda: string }) => {
-    addPoints("CHALLENGE");
-    handleOpenNewPostModal(legenda);
-  };
-
   const handleMarkAllAsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
@@ -400,13 +395,8 @@ const App: React.FC = () => {
           <Suggestions people={people} onToggleFollow={handleToggleFollow} />
         );
         break;
-      case "play":
-        pageComponent = (
-          <Play
-            onParticipateInChallenge={handleParticipateInChallenge}
-            currentUser={userProfile.name}
-          />
-        );
+      case "download":
+        pageComponent = <DownloadApp />;
         break;
       case "profile":
         const userPosts = posts.filter(

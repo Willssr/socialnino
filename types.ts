@@ -1,6 +1,7 @@
 
 
 
+
 export interface Comment {
   id: string;
   author: string;
@@ -89,7 +90,7 @@ export interface Notification {
 }
 
 
-export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'play';
+export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'download';
 
 export type PointsEvent =
   | "LIKE"
