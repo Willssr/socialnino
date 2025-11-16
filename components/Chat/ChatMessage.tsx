@@ -34,8 +34,8 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMes
 
     const alignmentClass = isOwnMessage ? 'items-end' : 'items-start';
     const bubbleClass = isOwnMessage
-        ? 'bg-gradient-to-br from-primary to-accent/80 text-white shadow-lg shadow-primary/20'
-        : 'bg-cardDark text-neutral-200 shadow-lg shadow-black/30';
+        ? 'bg-[#00E5FF33] text-textLight shadow-lg shadow-secondary/30'
+        : 'bg-[#1F2937] text-textLight shadow-lg shadow-black/30';
 
     const reactionsSummary = useMemo(() => {
         if (!reactions) return [];
