@@ -1,5 +1,6 @@
 
 
+
 import { Post, Song, Story, UserProfile, Person, Notification } from './types';
 
 export const INITIAL_PEOPLE: Person[] = [
@@ -172,6 +173,13 @@ export const INITIAL_USER_PROFILE: UserProfile = {
         followers: 1380,
         following: 210,
     },
+    about: {
+        location: 'São Paulo, Brasil',
+        age: '28',
+        interests: 'Código, Games, Fotografia Noturna',
+        website: 'meusite.dev',
+        extendedBio: 'Desenvolvedor apaixonado por criar interfaces futuristas e explorar o universo cyberpunk através da fotografia e da música. Sempre em busca do próximo desafio.'
+    }
 };
 
 export const INITIAL_NOTIFICATIONS: Notification[] = [

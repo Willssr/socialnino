@@ -66,6 +66,13 @@ export interface UserProfile {
     followers: number;
     following: number;
   };
+  about?: {
+    location?: string;
+    age?: string;
+    interests?: string;
+    website?: string;
+    extendedBio?: string;
+  };
 }
 
 export interface Person {
