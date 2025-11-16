@@ -29,7 +29,7 @@ const PostCard: React.FC<Props> = ({
 
   const handleDoubleClick = () => {
     const now = new Date().getTime();
-    if (now - lastClickTime.current < 400) { // Double-click threshold
+    if (now - lastClickTime.current < 400) { 
       if (!post.isLiked) {
         handleLike(post.id);
       }
@@ -66,9 +66,19 @@ const PostCard: React.FC<Props> = ({
     };
   }, []);
 
+  // 📌 Formatação da data + hora
+  const formattedDateTime = new Date(post.timestamp).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
   return (
     <>
       <div className="rgb-border rounded-xl overflow-hidden mb-6">
+        
         {/* HEADER DO POST */}
         <div className="flex items-center space-x-3 p-4">
           <img
@@ -84,12 +94,15 @@ const PostCard: React.FC<Props> = ({
             >
               {post.author.username}
             </p>
+
+            {/* 📌 Agora exibe data + hora */}
             <p className="text-xs text-textDark">
-              {new Date(post.timestamp).toLocaleDateString('pt-BR')}
+              {formattedDateTime}
             </p>
           </div>
+
           <button className="text-textDark hover:text-textLight">
-              <DotsHorizontalIcon className="w-6 h-6" />
+            <DotsHorizontalIcon className="w-6 h-6" />
           </button>
         </div>
 
@@ -111,81 +124,117 @@ const PostCard: React.FC<Props> = ({
               className="w-full object-cover"
             />
           )}
+
           {showHeart && (
-              <HeartIcon solid className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 text-accent/90 animate-heart-burst" />
+            <HeartIcon
+              solid
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 text-accent/90 animate-heart-burst"
+            />
           )}
         </div>
-        
+
         {/* AÇÕES */}
         <div className="flex items-center justify-between p-4">
           <div className="flex space-x-4">
-              <button onClick={() => handleLike(post.id)}>
-                  <HeartIcon className={`w-7 h-7 transition-all duration-200 ${post.isLiked ? 'text-accent' : 'text-textDark hover:text-textLight'}`} solid={post.isLiked} />
-              </button>
-              <button onClick={() => setIsCommentsModalOpen(true)}>
-                  <CommentIcon className="w-7 h-7 text-textDark hover:text-textLight" />
-              </button>
-              <button>
-                  <PaperAirplaneIcon className="w-7 h-7 text-textDark hover:text-textLight" />
-              </button>
+            <button onClick={() => handleLike(post.id)}>
+              <HeartIcon
+                className={`w-7 h-7 transition-all duration-200 ${
+                  post.isLiked ? "text-accent" : "text-textDark hover:text-textLight"
+                }`}
+                solid={post.isLiked}
+              />
+            </button>
+
+            <button onClick={() => setIsCommentsModalOpen(true)}>
+              <CommentIcon className="w-7 h-7 text-textDark hover:text-textLight" />
+            </button>
+
+            <button>
+              <PaperAirplaneIcon className="w-7 h-7 text-textDark hover:text-textLight" />
+            </button>
           </div>
+
           <button onClick={() => handleBookmark(post.id)}>
-              <BookmarkIcon className={`w-7 h-7 transition-all duration-200 ${post.isBookmarked ? 'text-secondary' : 'text-textDark hover:text-textLight'}`} solid={post.isBookmarked} />
+            <BookmarkIcon
+              className={`w-7 h-7 transition-all duration-200 ${
+                post.isBookmarked ? "text-secondary" : "text-textDark hover:text-textLight"
+              }`}
+              solid={post.isBookmarked}
+            />
           </button>
         </div>
 
         {/* LIKES E LEGENDA */}
         <div className="px-4 pb-2">
-          <p className="font-bold text-sm">{post.likes.toLocaleString('pt-BR')} curtidas</p>
+          <p className="font-bold text-sm">
+            {post.likes.toLocaleString("pt-BR")} curtidas
+          </p>
+
           <p className="mt-1 text-sm">
-              <span className="font-bold cursor-pointer hover:text-secondary" onClick={() => onOpenProfile(post.author.username)}>{post.author.username}</span>
-              <span className="text-textLight"> {post.caption}</span>
+            <span
+              className="font-bold cursor-pointer hover:text-secondary"
+              onClick={() => onOpenProfile(post.author.username)}
+            >
+              {post.author.username}
+            </span>
+            <span className="text-textLight"> {post.caption}</span>
           </p>
         </div>
-        
+
         {/* COMENTÁRIOS */}
         {post.comments?.length > 0 && (
           <div className="px-4 pb-2">
-              <p className="text-sm text-textDark cursor-pointer" onClick={() => setIsCommentsModalOpen(true)}>Ver todos os {post.comments.length} comentários</p>
-              {post.comments.slice(0,1).map(c => (
-                  <p key={c.id} className="text-sm mt-1">
-                      <strong className="font-semibold">{c.author}</strong> {c.text}
-                  </p>
-              ))}
+            <p
+              className="text-sm text-textDark cursor-pointer"
+              onClick={() => setIsCommentsModalOpen(true)}
+            >
+              Ver todos os {post.comments.length} comentários
+            </p>
+
+            {post.comments.slice(0, 1).map((c) => (
+              <p key={c.id} className="text-sm mt-1">
+                <strong className="font-semibold">{c.author}</strong> {c.text}
+              </p>
+            ))}
           </div>
         )}
 
         {/* INPUT DE COMENTÁRIO */}
         <div className="px-4 py-2 border-t border-borderNeon/50">
-          <form className="flex" onSubmit={(e) => {
+          <form
+            className="flex"
+            onSubmit={(e) => {
               e.preventDefault();
               if (commentText.trim()) {
                 handleComment(post.id, commentText);
                 setCommentText("");
               }
-          }}>
-              <input
-                  type="text"
-                  value={commentText}
-                  placeholder="Adicionar comentário..."
-                  onChange={(e) => setCommentText(e.target.value)}
-                  className="flex-grow bg-transparent text-sm placeholder-textDark focus:outline-none"
-              />
-              <button
-                  type="submit"
-                  className="text-secondary font-bold text-sm disabled:opacity-50"
-                  disabled={!commentText.trim()}
-              >
+            }}
+          >
+            <input
+              type="text"
+              value={commentText}
+              placeholder="Adicionar comentário..."
+              onChange={(e) => setCommentText(e.target.value)}
+              className="flex-grow bg-transparent text-sm placeholder-textDark focus:outline-none"
+            />
+
+            <button
+              type="submit"
+              className="text-secondary font-bold text-sm disabled:opacity-50"
+              disabled={!commentText.trim()}
+            >
               Publicar
-              </button>
+            </button>
           </form>
         </div>
       </div>
+
       {isCommentsModalOpen && (
-        <CommentsModal 
-          comments={post.comments} 
+        <CommentsModal
+          comments={post.comments}
           postAuthor={post.author.username}
-          onClose={() => setIsCommentsModalOpen(false)} 
+          onClose={() => setIsCommentsModalOpen(false)}
         />
       )}
     </>
