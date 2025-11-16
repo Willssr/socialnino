@@ -52,6 +52,7 @@ import FriendsScreen from "./components/FriendsScreen";
 import GlobalChatScreen from "./components/Chat/GlobalChatScreen";
 import { useToast } from "./context/ToastContext";
 import { usePrevious } from "./hooks/usePrevious";
+import GamesScreen from "./components/Games/GamesScreen";
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -65,6 +66,7 @@ const App: React.FC = () => {
     "search",
     "friends",
     "chat",
+    "games",
     "download",
     "music",
     "profile",
@@ -528,6 +530,9 @@ const App: React.FC = () => {
         pageComponent = (
           <FriendsScreen people={people} onToggleFollow={handleToggleFollow} />
         );
+        break;
+      case "games":
+        pageComponent = <GamesScreen />;
         break;
       case "chat":
         pageComponent = (
