@@ -22,9 +22,9 @@ const GlobalChatScreen: React.FC<GlobalChatScreenProps> = ({ messages, currentUs
     }, [messages]);
 
     return (
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col bg-gradient-to-br from-[#090012] via-[#140033] to-[#000014] text-white shadow-[inset_0_0_40px_#00E5FF25]">
             {/* Header */}
-            <div className="p-4 border-b border-borderNeon">
+            <div className="p-4 border-b border-borderNeon bg-transparent">
                 <h1 className="text-xl font-orbitron font-bold text-gradient-neon text-center">
                     Chat Global 🌎
                 </h1>

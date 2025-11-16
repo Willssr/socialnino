@@ -11,7 +11,8 @@ interface ChatMessageBubbleProps {
 
 const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMessage, onReaction, currentUser }) => {
     const [isPickerOpen, setPickerOpen] = useState(false);
-    const longPressTimer = useRef<number>();
+    // FIX: Explicitly initialize useRef with `undefined` to resolve the "Expected 1 arguments, but got 0" error. This satisfies stricter linting rules that require an initial value for useRef.
+    const longPressTimer = useRef<number | undefined>(undefined);
 
     const handlePressStart = () => {
         // Ignorar long press em mídias clicáveis como figurinhas

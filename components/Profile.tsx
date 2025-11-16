@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UserProfile, Post } from "../types";
 import EditProfileModal from "./EditProfileModal";
 import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon, LocationMarkerIcon, CakeIcon, SparklesIcon, LinkIcon } from "./Icons";
@@ -21,27 +21,47 @@ const Profile: React.FC<ProfileProps> = ({
 
   // Estados para a seção "Sobre"
   const [isEditingAbout, setIsEditingAbout] = useState(false);
-  const [aboutForm, setAboutForm] = useState(userProfile.about || {});
+
+  // FIX: Use individual states for each form field to create controlled components
+  // and prevent text from disappearing on input.
+  const [location, setLocation] = useState("");
+  const [age, setAge] = useState("");
+  const [interests, setInterests] = useState("");
+  const [website, setWebsite] = useState("");
+  const [extendedBio, setExtendedBio] = useState("");
 
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Sync form state with userProfile when entering edit mode
+  useEffect(() => {
+    if (isEditingAbout) {
+      setLocation(userProfile.about?.location || "");
+      setAge(userProfile.about?.age || "");
+      setInterests(userProfile.about?.interests || "");
+      setWebsite(userProfile.about?.website || "");
+      setExtendedBio(userProfile.about?.extendedBio || "");
+    }
+  }, [isEditingAbout, userProfile.about]);
 
   const handleSaveLegacyProfile = (updatedProfile: UserProfile) => {
     onUpdateProfile(updatedProfile);
     setIsEditingLegacy(false);
   };
 
-  const handleAboutChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setAboutForm({ ...aboutForm, [e.target.name]: e.target.value });
-  };
-
   const handleSaveAbout = () => {
-    onUpdateProfile({ ...userProfile, about: aboutForm });
+    const updatedAbout = {
+        location,
+        age,
+        interests,
+        website,
+        extendedBio,
+    };
+    onUpdateProfile({ ...userProfile, about: updatedAbout });
     setIsEditingAbout(false);
   };
 
   const handleCancelAbout = () => {
-    setAboutForm(userProfile.about || {});
     setIsEditingAbout(false);
   };
 
@@ -68,13 +88,13 @@ const Profile: React.FC<ProfileProps> = ({
   };
 
   // Componente interno para inputs reutilizáveis
-  const AboutInput = ({ name, label, value, onChange, as: Component = 'input' }: any) => (
+  const AboutInput = ({ name, label, value, onChange, as: Component = 'input' }: { name: string, label: string, value: string, onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void, as?: 'input' | 'textarea' }) => (
     <div className="flex flex-col gap-1">
       <label htmlFor={name} className="text-xs font-bold text-[#a855f7] uppercase tracking-wider">{label}</label>
       <Component
         id={name}
         name={name}
-        value={value || ''}
+        value={value}
         onChange={onChange}
         className="w-full bg-backgroundLight/80 border border-[#00E5FF55] rounded-md px-3 py-1.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-secondary"
       />
@@ -134,17 +154,17 @@ const Profile: React.FC<ProfileProps> = ({
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-orbitron font-bold text-[#00E5FF] drop-shadow-[0_0_4px_#00E5FF]">SOBRE</h3>
             {!isEditingAbout && (
-              <button onClick={() => setIsEditingAbout(true)} className="text-xs font-bold text-secondary hover:text-white transition-colors">Editar informações</button>
+              <button onClick={() => setIsEditingAbout(true)} className="text-xs font-bold text-white hover:text-secondary transition-colors">Editar informações</button>
             )}
           </div>
 
           {isEditingAbout ? (
             <div className="space-y-4">
-                <AboutInput name="location" label="Localização" value={aboutForm.location} onChange={handleAboutChange} />
-                <AboutInput name="age" label="Idade" value={aboutForm.age} onChange={handleAboutChange} />
-                <AboutInput name="interests" label="Interesses" value={aboutForm.interests} onChange={handleAboutChange} />
-                <AboutInput name="website" label="Link" value={aboutForm.website} onChange={handleAboutChange} />
-                <AboutInput name="extendedBio" label="Biografia Estendida" value={aboutForm.extendedBio} onChange={handleAboutChange} as="textarea" />
+                <AboutInput name="location" label="Localização" value={location} onChange={(e) => setLocation(e.target.value)} />
+                <AboutInput name="age" label="Idade" value={age} onChange={(e) => setAge(e.target.value)} />
+                <AboutInput name="interests" label="Interesses" value={interests} onChange={(e) => setInterests(e.target.value)} />
+                <AboutInput name="website" label="Link" value={website} onChange={(e) => setWebsite(e.target.value)} />
+                <AboutInput name="extendedBio" label="Biografia Estendida" value={extendedBio} onChange={(e) => setExtendedBio(e.target.value)} as="textarea" />
                 <div className="flex justify-end gap-2 pt-2">
                     <button onClick={handleCancelAbout} className="px-4 py-1.5 rounded-md text-sm font-semibold text-textDark hover:bg-cardDark transition-colors">Cancelar</button>
                     <button onClick={handleSaveAbout} className="px-5 py-1.5 rounded-md text-sm font-semibold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse">Salvar</button>
