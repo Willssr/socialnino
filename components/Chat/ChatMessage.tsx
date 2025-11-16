@@ -15,21 +15,28 @@ const ChatMessageBubble: React.FC<ChatMessageBubbleProps> = ({ message, isOwnMes
     });
 
     const alignmentClass = isOwnMessage ? 'items-end' : 'items-start';
+    
+    // Classes de estilo modernizadas para os balões de mensagem
     const bubbleClass = isOwnMessage
-        ? 'bg-primary text-white rounded-br-none'
-        : 'bg-cardDark text-textLight rounded-bl-none';
-    const nameClass = isOwnMessage ? 'text-right' : 'text-left';
+        ? 'bg-gradient-to-br from-primary to-accent/80 text-white shadow-lg shadow-primary/20' // Gradiente e brilho para mensagens próprias
+        : 'bg-cardDark text-neutral-200 shadow-lg shadow-black/30'; // Fundo escuro para mensagens de outros
 
     return (
         <div className={`flex flex-col ${alignmentClass}`}>
-            <div className="flex items-center gap-2" style={{ flexDirection: isOwnMessage ? 'row-reverse' : 'row' }}>
+            {/* Nome de usuário com destaque neon */}
+            <div className="flex items-center gap-2 mb-1" style={{ flexDirection: isOwnMessage ? 'row-reverse' : 'row' }}>
                 <img src={author.avatar} alt={author.name} className="w-6 h-6 rounded-full" />
-                <span className={`text-xs font-bold ${isOwnMessage ? 'text-primary' : 'text-secondary'}`}>{author.name}</span>
+                <span className="text-sm font-bold bg-gradient-to-r from-primary to-secondary text-transparent bg-clip-text drop-shadow-[0_0_4px_rgba(123,47,247,0.5)]">
+                    {author.name}
+                </span>
             </div>
-            <div className={`mt-1 max-w-xs md:max-w-md p-3 rounded-xl ${bubbleClass}`}>
+            
+            {/* Balão com bordas mais arredondadas e sombra */}
+            <div className={`max-w-xs md:max-w-md p-3 rounded-2xl ${isOwnMessage ? 'rounded-br-none' : 'rounded-bl-none'} ${bubbleClass}`}>
                 {type === 'sticker' ? (
                     <img src={content} alt="Sticker" className="w-32 h-32 object-contain" />
                 ) : (
+                    // Texto com alto contraste
                     <p className="text-sm break-words">{content}</p>
                 )}
             </div>
