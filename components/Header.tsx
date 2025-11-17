@@ -11,9 +11,27 @@ const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) =>
     <header className="bg-backgroundDark sticky top-0 z-50 border-b border-borderNeon h-16 w-full">
       <div className="container mx-auto px-4 flex items-center justify-between h-full">
           <div className="flex-shrink-0">
-            <span className="font-orbitron text-4xl text-gradient-neon tracking-wider">
-              SocialNino
-            </span>
+            <h1
+              className="
+                flex flex-col items-center
+                text-3xl md:text-4xl
+                font-orbitron font-bold
+                text-transparent bg-clip-text
+                bg-gradient-to-r from-[#00E5FF] via-[#4cc9ff] to-[#a855f7]
+                drop-shadow-[0_0_12px_#00E5FF]
+              "
+            >
+              <span>SocialNino</span>
+              <span
+                className="
+                  mt-1 h-[2px]
+                  w-20 md:w-24
+                  rounded-full
+                  bg-gradient-to-r from-[#00E5FF] to-[#a855f7]
+                  shadow-[0_0_10px_#00E5FF]
+                "
+              />
+            </h1>
           </div>
           <div className="flex items-center space-x-5">
              <button onClick={onNotificationsClick} className="relative p-1 group">
