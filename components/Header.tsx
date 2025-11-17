@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) =>
           </div>
           <div className="flex items-center space-x-5">
              <button onClick={onNotificationsClick} className="relative p-1 group">
-              <HeartIcon className="h-8 w-8 text-accent group-hover:text-white transition-all duration-300 group-hover:scale-110" />
+              <HeartIcon className="h-8 w-8 text-[#00E5FF] drop-shadow-[0_0_6px_#00E5FF] drop-shadow-[0_0_12px_#00E5FF] group-hover:text-white transition-all duration-300 group-hover:scale-110" />
               {unreadCount > 0 && (
                  <span className="absolute top-1 right-0.5 block h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-backgroundDark animate-pulse"></span>
               )}
