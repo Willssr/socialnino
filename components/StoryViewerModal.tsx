@@ -4,11 +4,12 @@ import { Story } from '../types';
 interface StoryViewerModalProps {
   stories: Story[];
   onClose: () => void;
+  onOpenProfile: (username: string) => void;
 }
 
 const STORY_DURATION = 5000; // 5 seconds
 
-const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose }) => {
+const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose, onOpenProfile }) => {
   const [currentIndex, setCurrentIndex] = React.useState(0);
   const [progress, setProgress] = React.useState(0);
   const videoRef = React.useRef<HTMLVideoElement>(null);
@@ -91,6 +92,13 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose })
 
   const currentStory = stories[currentIndex];
 
+  const handleProfileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onOpenProfile(currentStory.author);
+    onClose();
+  };
+
+
   return (
     <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center animation-fade" onClick={onClose}>
       <div className="relative w-full max-w-md h-full max-h-[95vh] bg-black rounded-lg overflow-hidden shadow-2xl animation-fade-zoom" onClick={(e) => e.stopPropagation()}>
@@ -107,9 +115,11 @@ const StoryViewerModal: React.FC<StoryViewerModalProps> = ({ stories, onClose })
         </div>
 
         {/* Header */}
-        <div className="absolute top-5 left-4 flex items-center space-x-2 z-20">
-          <img src={currentStory.avatar} alt={currentStory.author} className="w-8 h-8 rounded-full" />
-          <span className="text-white font-semibold text-sm">{currentStory.author}</span>
+        <div className="absolute top-5 left-4 z-20">
+          <button onClick={handleProfileClick} className="flex items-center space-x-2">
+            <img src={currentStory.avatar} alt={currentStory.author} className="w-8 h-8 rounded-full" />
+            <span className="text-white font-semibold text-sm">{currentStory.author}</span>
+          </button>
         </div>
 
         {/* Close Button */}
