@@ -140,3 +140,8 @@ export interface RankedUser {
     total: number;
   };
 }
+
+export interface TimelineEvent {
+  icon: string;
+  text: string;
+}

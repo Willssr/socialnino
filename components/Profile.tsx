@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
-import { UserProfile, Post } from "../types";
+import { UserProfile, Post, TimelineEvent } from "../types";
 import EditProfileModal from "./EditProfileModal";
 import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon } from "./Icons";
 import PostDetailModal from "./PostDetailModal";
 import LogoutButton from "./LogoutButton";
+import Timeline from "./Timeline";
 
 interface ProfileProps {
   userProfile: UserProfile;
@@ -48,6 +49,39 @@ const Profile: React.FC<ProfileProps> = ({
   const handleCoverChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files?.[0]) handleImageChange(e.target.files[0], "coverPhoto");
   };
+  
+  const timelineEvents: TimelineEvent[] = [];
+
+    // 1. Account Creation (Mocked)
+    timelineEvents.push({
+        icon: '🎉',
+        text: 'Conta criada há 5 meses.'
+    });
+
+    // 2. Followers
+    timelineEvents.push({
+        icon: '🔥',
+        text: `Atingiu ${userProfile.stats.followers.toLocaleString('pt-BR')} seguidores.`
+    });
+
+    // 3. First Post
+    if (userPosts.length > 0) {
+        const firstPost = [...userPosts].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())[0];
+        timelineEvents.push({
+            icon: '🚀',
+            text: `Primeira publicação em ${new Date(firstPost.timestamp).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' })}.`
+        });
+    }
+
+    // 4. Most Popular Post
+    if (userPosts.length > 0) {
+        const mostPopularPost = [...userPosts].sort((a, b) => b.likes - a.likes)[0];
+        const captionSnippet = mostPopularPost.caption.length > 25 ? `${mostPopularPost.caption.substring(0, 25)}...` : mostPopularPost.caption;
+        timelineEvents.push({
+            icon: '⭐',
+            text: `Post mais popular: "${captionSnippet}" com ${mostPopularPost.likes.toLocaleString('pt-BR')} curtidas.`
+        });
+    }
 
   return (
     <div className="w-full max-w-4xl mx-auto text-textLight">
@@ -97,8 +131,13 @@ const Profile: React.FC<ProfileProps> = ({
         </div>
       </div>
 
+      {/* Timeline */}
+      <div className="px-4">
+        <Timeline events={timelineEvents} />
+      </div>
+
       {/* User Posts Grid */}
-      <div className="mt-4 border-t border-borderNeon/50">
+      <div className="mt-8 border-t border-borderNeon/50">
         <div className="grid grid-cols-3 gap-0.5">
           {userPosts.map((post) => (
             <button key={post.id} onClick={() => setSelectedPost(post)} className="relative aspect-square bg-cardDark group">
