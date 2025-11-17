@@ -50,18 +50,9 @@ const PostCard: React.FC<Props> = ({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
-          }
-          if (!viewHandled.current) {
-            handleView(post.id);
-            viewHandled.current = true;
-          }
-        } else {
-          if (videoRef.current) {
-            videoRef.current.pause();
-          }
+        if (entry.isIntersecting && !viewHandled.current) {
+          handleView(post.id);
+          viewHandled.current = true;
         }
       },
       { threshold: 0.5 }
@@ -150,7 +141,7 @@ const PostCard: React.FC<Props> = ({
               ref={videoRef}
               src={post.media.src}
               loop
-              muted
+              controls
               playsInline
               onLoadedData={() => setIsMediaLoaded(true)}
               className={`w-full h-full object-cover transition-opacity duration-500 ${isMediaLoaded ? 'opacity-100' : 'opacity-0'}`}

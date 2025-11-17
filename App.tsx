@@ -193,12 +193,9 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // 🟪 BUSCAR STORIES GLOBAIS EM TEMPO REAL (normalizando também)
+  // 🟪 BUSCAR STORIES GLOBAIS, FILTRAR EXPIRADOS E REMOVER DO DB
   useEffect(() => {
-    const storiesQuery = query(
-      dbRef(db, "stories"),
-      orderByChild("timestamp")
-    );
+    const storiesQuery = query(dbRef(db, "stories")); // Não precisa ordenar aqui
 
     const callback = (snapshot: any) => {
       const data = snapshot.val();
@@ -207,20 +204,45 @@ const App: React.FC = () => {
         return;
       }
 
-      const list: Story[] = Object.values(data).map((raw: any) => ({
+      const allStories: Story[] = Object.values(data).map((raw: any) => ({
         id: raw.id ?? "",
         author: raw.author ?? "desconhecido",
         avatar: raw.avatar ?? "",
         mediaSrc: raw.mediaSrc ?? "",
         mediaType: raw.mediaType ?? "image",
-        timestamp: raw.timestamp ?? new Date().toISOString(),
+        createdAt: raw.createdAt ?? new Date(0).toISOString(),
       }));
 
-      list.sort(
+      const now = Date.now();
+      const twentyFourHours = 24 * 60 * 60 * 1000;
+      
+      const validStories: Story[] = [];
+      const expiredStoryIds: string[] = [];
+
+      allStories.forEach(story => {
+        const storyTime = new Date(story.createdAt).getTime();
+        if (now - storyTime < twentyFourHours) {
+          validStories.push(story);
+        } else {
+          expiredStoryIds.push(story.id);
+        }
+      });
+
+      // 🔥 Remove os stories expirados do Firebase em uma única operação
+      if (expiredStoryIds.length > 0) {
+        const updates: { [key: string]: null } = {};
+        expiredStoryIds.forEach(id => {
+          updates[`stories/${id}`] = null;
+        });
+        update(dbRef(db), updates);
+      }
+
+      // Seta o estado local apenas com os stories válidos, já ordenados
+      validStories.sort(
         (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
-      setStories(list);
+      setStories(validStories);
     };
 
     onValue(storiesQuery, callback);
@@ -577,7 +599,7 @@ const App: React.FC = () => {
         avatar: userProfile.avatar,
         mediaSrc: reader.result as string,
         mediaType: storyFile.type.startsWith("image/") ? "image" : "video",
-        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
       };
 
       await set(newStoryRef, newStory);
@@ -594,7 +616,7 @@ const App: React.FC = () => {
       .filter((s) => s.author === author)
       .sort(
         (a, b) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
       );
 
     if (userStories.length > 0) {

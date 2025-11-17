@@ -48,7 +48,7 @@ export interface Story {
     avatar: string;
     mediaSrc: string;
     mediaType: 'image' | 'video';
-    timestamp: string;
+    createdAt: string;
 }
 
 export interface UserProfile {

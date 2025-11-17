@@ -1,6 +1,3 @@
-
-
-
 import { Post, Song, Story, UserProfile, Person } from './types';
 
 export const INITIAL_PEOPLE: Person[] = [
@@ -54,7 +51,7 @@ export const INITIAL_STORIES: Story[] = [
         avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026705d', 
         mediaSrc: 'https://picsum.photos/id/10/1080/1920',
         mediaType: 'image',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString()
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString()
     },
     { 
         id: 'story-3', 
@@ -62,7 +59,7 @@ export const INITIAL_STORIES: Story[] = [
         avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026706d',
         mediaSrc: 'https://picsum.photos/id/20/1080/1920',
         mediaType: 'image',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString()
     },
     { 
         id: 'story-4', 
@@ -70,7 +67,7 @@ export const INITIAL_STORIES: Story[] = [
         avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
         mediaSrc: 'https://picsum.photos/id/30/1080/1920',
         mediaType: 'image',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString()
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 8).toISOString()
     },
      { 
         id: 'story-4b', 
@@ -78,7 +75,7 @@ export const INITIAL_STORIES: Story[] = [
         avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026707d',
         mediaSrc: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
         mediaType: 'video',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 7).toISOString()
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 7).toISOString()
     },
     { 
         id: 'story-5', 
@@ -86,7 +83,7 @@ export const INITIAL_STORIES: Story[] = [
         avatar: 'https://i.pravatar.cc/150?u=a042581f4e29026708d',
         mediaSrc: 'https://picsum.photos/id/40/1080/1920',
         mediaType: 'image',
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString()
     },
 ];
 
