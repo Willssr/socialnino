@@ -43,6 +43,7 @@ import {
   off,
   increment,
   get,
+  onDisconnect,
 } from "firebase/database";
 
 // 🔍 Modal de perfil público
@@ -111,6 +112,34 @@ const App: React.FC = () => {
   const [publicProfileOpen, setPublicProfileOpen] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // 🟢 Sistema de presença de usuários online
+  useEffect(() => {
+    if (!user) return;
+
+    // Reference to the user's online status in the database
+    const userStatusRef = dbRef(db, `onlineUsers/${user.uid}`);
+
+    // Reference to the special '.info/connected' path
+    const connectedRef = dbRef(db, '.info/connected');
+
+    const unsubscribe = onValue(connectedRef, (snapshot) => {
+      // If the user is not connected, we don't do anything
+      if (snapshot.val() === false) {
+        return;
+      }
+      
+      // When the user disconnects, remove their entry from 'onlineUsers'
+      onDisconnect(userStatusRef).remove();
+      
+      // When the user connects, set their status to true
+      set(userStatusRef, true);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
 
   // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL (normalizando dados)
   useEffect(() => {
