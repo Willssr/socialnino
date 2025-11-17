@@ -44,6 +44,7 @@ import {
   increment,
   get,
   onDisconnect,
+  remove,
 } from "firebase/database";
 
 // 🔍 Modal de perfil público
@@ -345,6 +346,50 @@ const App: React.FC = () => {
   }, [posts, prevPosts, userProfile.name, addToast, people]);
 
 
+  // 📊 EFFECT PARA SINCRONIZAR E CALCULAR ESTATÍSTICAS DO PERFIL
+  useEffect(() => {
+    if (!userProfile.name) return;
+
+    const statsRef = dbRef(db, `users/${userProfile.name}/stats`);
+    const followersRef = dbRef(db, `followers/${userProfile.name}`);
+    const followingRef = dbRef(db, `following/${userProfile.name}`);
+    
+    // 1. Ouvir por mudanças no DB e atualizar o estado local
+    const statsUnsub = onValue(statsRef, (snapshot) => {
+        const statsData = snapshot.val() || { posts: 0, followers: 0, following: 0 };
+        setUserProfile(prev => ({
+            ...prev,
+            stats: {
+                posts: statsData.posts || 0,
+                followers: statsData.followers || 0,
+                following: statsData.following || 0,
+            }
+        }));
+    });
+
+    // 2. Calcular contagem de seguidores e atualizar DB
+    const followersUnsub = onValue(followersRef, (snapshot) => {
+        update(statsRef, { followers: snapshot.size });
+    });
+
+    // 3. Calcular contagem de "seguindo" e atualizar DB
+    const followingUnsub = onValue(followingRef, (snapshot) => {
+        update(statsRef, { following: snapshot.size });
+    });
+
+    // 4. Calcular contagem de posts e atualizar DB (isso já depende do 'posts' state)
+    const userPostsCount = posts.filter(p => p.author.username === userProfile.name).length;
+    update(statsRef, { posts: userPostsCount });
+
+    // Cleanup
+    return () => {
+        off(statsRef, 'value', statsUnsub);
+        off(followersRef, 'value', followersUnsub);
+        off(followingRef, 'value', followingUnsub);
+    };
+
+  }, [userProfile.name, posts, setUserProfile]); // Roda quando o usuário loga ou quando a lista de posts muda
+
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);
     const ni = pageOrder.indexOf(newPage);
@@ -383,55 +428,48 @@ const App: React.FC = () => {
     await set(notifRef, payload);
   };
 
-  // 🔁 SEGUIR (agora async para notificação)
+  // 🔁 SEGUIR (com Realtime DB)
   const handleToggleFollow = async (personId: number) => {
-    let isFollowingAction = false;
-    let followedPerson: Person | undefined;
+    const targetPerson = people.find((p) => p.id === personId);
+    if (!targetPerson) return;
+  
+    const currentUser = userProfile.name;
+    const targetUser = targetPerson.username;
     
+    // Atualização otimista da UI
     const newPeople = people.map((p) => {
       if (p.id === personId) {
-        isFollowingAction = !p.isFollowing;
-        if (isFollowingAction) {
-            followedPerson = p;
-        }
-        return {
-          ...p,
-          isFollowing: !p.isFollowing,
-          followers: p.isFollowing ? p.followers - 1 : p.followers + 1,
-        };
+        return { ...p, isFollowing: !p.isFollowing };
       }
       return p;
     });
-
     setPeople(newPeople);
-
-    if (isFollowingAction && followedPerson) {
-      addPoints("FOLLOW");
-      await createNotification(followedPerson.username, {
-        type: "follow",
-        fromUser: {
-          id: 0,
-          username: userProfile.name,
-          avatar: userProfile.avatar,
-        },
-        message: `${userProfile.name} começou a seguir você.`,
-      });
-    }
-
-    // efeito visual nos posts
+  
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.author.id === personId
-          ? {
-              ...post,
-              author: {
-                ...post.author,
-                isFollowing: !post.author.isFollowing,
-              },
-            }
+          ? { ...post, author: { ...post.author, isFollowing: !post.author.isFollowing } }
           : post
       )
     );
+  
+    // Atualização do banco de dados
+    const followingRef = dbRef(db, `following/${currentUser}/${targetUser}`);
+    const followersRef = dbRef(db, `followers/${targetUser}/${currentUser}`);
+  
+    if (!targetPerson.isFollowing) { // Ação é SEGUIR
+      await set(followingRef, true);
+      await set(followersRef, true);
+      addPoints("FOLLOW");
+      await createNotification(targetPerson.username, {
+        type: "follow",
+        fromUser: { id: 0, username: currentUser, avatar: userProfile.avatar },
+        message: `${currentUser} começou a seguir você.`,
+      });
+    } else { // Ação é DEIXAR DE SEGUIR
+      await remove(followingRef);
+      await remove(followersRef);
+    }
   };
 
   // 🔥 CRIAR POST GLOBAL (Realtime DB)
