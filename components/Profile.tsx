@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { UserProfile, Post } from "../types";
 import EditProfileModal from "./EditProfileModal";
-import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon, LocationMarkerIcon, CakeIcon, SparklesIcon, LinkIcon } from "./Icons";
+import { HeartIcon, CommentIcon, PlayIcon, DotsHorizontalIcon } from "./Icons";
 import PostDetailModal from "./PostDetailModal";
 import LogoutButton from "./LogoutButton";
 
@@ -19,50 +19,12 @@ const Profile: React.FC<ProfileProps> = ({
   const [isEditingLegacy, setIsEditingLegacy] = useState(false);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
-  // Estados para a seção "Sobre"
-  const [isEditingAbout, setIsEditingAbout] = useState(false);
-
-  // FIX: Use individual states for each form field to create controlled components
-  // and prevent text from disappearing on input.
-  const [location, setLocation] = useState("");
-  const [age, setAge] = useState("");
-  const [interests, setInterests] = useState("");
-  const [website, setWebsite] = useState("");
-  const [extendedBio, setExtendedBio] = useState("");
-
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Sync form state with userProfile when entering edit mode
-  useEffect(() => {
-    if (isEditingAbout) {
-      setLocation(userProfile.about?.location || "");
-      setAge(userProfile.about?.age || "");
-      setInterests(userProfile.about?.interests || "");
-      setWebsite(userProfile.about?.website || "");
-      setExtendedBio(userProfile.about?.extendedBio || "");
-    }
-  }, [isEditingAbout, userProfile.about]);
 
   const handleSaveLegacyProfile = (updatedProfile: UserProfile) => {
     onUpdateProfile(updatedProfile);
     setIsEditingLegacy(false);
-  };
-
-  const handleSaveAbout = () => {
-    const updatedAbout = {
-        location,
-        age,
-        interests,
-        website,
-        extendedBio,
-    };
-    onUpdateProfile({ ...userProfile, about: updatedAbout });
-    setIsEditingAbout(false);
-  };
-
-  const handleCancelAbout = () => {
-    setIsEditingAbout(false);
   };
 
   const stats = [
@@ -86,21 +48,6 @@ const Profile: React.FC<ProfileProps> = ({
   const handleCoverChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     if (e.target.files?.[0]) handleImageChange(e.target.files[0], "coverPhoto");
   };
-
-  // Componente interno para inputs reutilizáveis
-  const AboutInput = ({ name, label, value, onChange, as: Component = 'input' }: { name: string, label: string, value: string, onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void, as?: 'input' | 'textarea' }) => (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-xs font-bold text-[#a855f7] uppercase tracking-wider">{label}</label>
-      <Component
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        className="w-full bg-backgroundLight/80 border border-[#00E5FF55] rounded-md px-3 py-1.5 text-sm text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-secondary"
-      />
-    </div>
-  );
-
 
   return (
     <div className="w-full max-w-4xl mx-auto text-textLight">
@@ -147,38 +94,6 @@ const Profile: React.FC<ProfileProps> = ({
         <div className="flex items-center gap-2 my-4">
           <button onClick={() => setIsEditingLegacy(true)} className="flex-1 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md shadow-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/70 transform hover:-translate-y-0.5">Editar Bio</button>
           <button className="flex-1 bg-gradient-to-r from-primary to-secondary text-white px-4 py-1.5 rounded-lg text-sm font-semibold shadow-md shadow-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/70 transform hover:-translate-y-0.5">Compartilhar</button>
-        </div>
-
-        {/* Sobre Section */}
-        <div className="mt-6 border-t border-borderNeon/30 pt-4">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-orbitron font-bold text-[#00E5FF] drop-shadow-[0_0_4px_#00E5FF]">SOBRE</h3>
-            {!isEditingAbout && (
-              <button onClick={() => setIsEditingAbout(true)} className="text-xs font-bold text-white hover:text-secondary transition-colors">Editar informações</button>
-            )}
-          </div>
-
-          {isEditingAbout ? (
-            <div className="space-y-4">
-                <AboutInput name="location" label="Localização" value={location} onChange={(e) => setLocation(e.target.value)} />
-                <AboutInput name="age" label="Idade" value={age} onChange={(e) => setAge(e.target.value)} />
-                <AboutInput name="interests" label="Interesses" value={interests} onChange={(e) => setInterests(e.target.value)} />
-                <AboutInput name="website" label="Link" value={website} onChange={(e) => setWebsite(e.target.value)} />
-                <AboutInput name="extendedBio" label="Biografia Estendida" value={extendedBio} onChange={(e) => setExtendedBio(e.target.value)} as="textarea" />
-                <div className="flex justify-end gap-2 pt-2">
-                    <button onClick={handleCancelAbout} className="px-4 py-1.5 rounded-md text-sm font-semibold text-textDark hover:bg-cardDark transition-colors">Cancelar</button>
-                    <button onClick={handleSaveAbout} className="px-5 py-1.5 rounded-md text-sm font-semibold bg-primary text-white shadow-glow-primary hover:animate-neon-pulse">Salvar</button>
-                </div>
-            </div>
-          ) : (
-            <div className="space-y-3 text-sm">
-                {userProfile.about?.location && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><LocationMarkerIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Localização:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.location}</span></div>}
-                {userProfile.about?.age && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><CakeIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Idade:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.age}</span></div>}
-                {userProfile.about?.interests && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><SparklesIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Interesses:</span> <span className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)]">{userProfile.about.interests}</span></div>}
-                {userProfile.about?.website && <div className="flex items-center gap-3 border-b border-[#00E5FF55] pb-2"><LinkIcon className="w-5 h-5 text-[#00E5FF]" /><span className="font-semibold mr-2 text-[#a855f7]">Link:</span> <a href={`https://${userProfile.about.website}`} target="_blank" rel="noopener noreferrer" className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)] hover:underline">{userProfile.about.website}</a></div>}
-                {userProfile.about?.extendedBio && <p className="text-white drop-shadow-[0_0_2px_rgba(255,255,255,0.3)] pt-2 !mt-4">{userProfile.about.extendedBio}</p>}
-            </div>
-          )}
         </div>
       </div>
 
