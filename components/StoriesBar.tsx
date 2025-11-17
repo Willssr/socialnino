@@ -31,38 +31,27 @@ const StoriesBar: React.FC<StoriesBarProps> = ({ userProfile, onAddStoryClick, s
       <div className="flex items-center space-x-4 overflow-x-auto pb-2 -mb-2">
         {/* Card do Usuário Logado (Sempre o primeiro) */}
         <div className="flex-shrink-0 text-center w-20">
-          <div className="relative">
-            {/* O botão principal muda de função: ver story existente ou adicionar um novo */}
-            <button 
-              onClick={hasMyStory ? () => onViewStory(userProfile.name) : onAddStoryClick} 
-              className="block rounded-full"
-            >
-              {hasMyStory ? (
-                // Se tem story, mostra o anel neon rotativo
-                <div className="story-border w-16 h-16 rounded-full p-0.5">
-                  <div className="bg-backgroundDark p-0.5 rounded-full">
-                    <img 
-                      src={userProfile.avatar} 
-                      alt="Seu story" 
-                      className="w-full h-full rounded-full object-cover"
-                    />
-                  </div>
-                </div>
-              ) : (
-                // Se não tem, mostra a borda tracejada para adicionar
+          <div className="flex flex-col items-center p-1.5 rounded-xl bg-[#0a0f1a]/60 border-2 border-secondary shadow-[0_0_10px_#00E5FF,0_0_20px_#00E5FF]">
+            <div className="relative">
+              <button 
+                onClick={hasMyStory ? () => onViewStory(userProfile.name) : onAddStoryClick} 
+                className="block rounded-full"
+              >
                 <img 
                   src={userProfile.avatar} 
-                  alt="Adicionar ao seu story" 
-                  className="w-16 h-16 rounded-full object-cover border-2 border-dashed border-textDark"
+                  alt="Seu story" 
+                  className="w-14 h-14 rounded-full object-cover drop-shadow-[0_0_6px_theme(colors.secondary)] animate-neon-pulse"
                 />
-              )}
-            </button>
-            {/* Ícone de adicionar sempre presente no story do usuário */}
-            <button onClick={onAddStoryClick} className="absolute -bottom-1 -right-1 bg-backgroundLight rounded-full">
-              <PlusSquareIcon className="w-6 h-6 text-secondary"/>
-            </button>
+              </button>
+              <button 
+                  onClick={onAddStoryClick} 
+                  className="absolute -bottom-1 -right-1 bg-backgroundDark rounded-full p-0.5 animate-pulse"
+              >
+                  <PlusSquareIcon className="w-7 h-7 text-secondary drop-shadow-[0_0_4px_theme(colors.secondary)]"/>
+              </button>
+            </div>
+            <p className="text-xs mt-1.5 font-semibold truncate text-white">Seu Story</p>
           </div>
-          <p className="text-xs mt-1 truncate text-textDark">Seu story</p>
         </div>
         
         {/* Stories dos Outros Usuários */}
