@@ -44,11 +44,10 @@ import {
   increment,
   get,
   onDisconnect,
-  remove,
 } from "firebase/database";
 
-// 🔍 Tela de perfil público
-import PublicProfileScreen from "./components/PublicProfileScreen";
+// 🔍 Modal de perfil público
+import PublicProfileModal from "./components/PublicProfileModal";
 import FriendsScreen from "./components/FriendsScreen";
 import GlobalChatScreen from "./components/Chat/GlobalChatScreen";
 import { useToast } from "./context/ToastContext";
@@ -108,8 +107,9 @@ const App: React.FC = () => {
   }>({ isOpen: false, stories: [] });
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
-  // 🔍 estado para TELA de perfil público
-  const [viewingProfileFor, setViewingProfileFor] = useState<string | null>(null);
+  // 🔍 estado para perfil público
+  const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
+  const [publicProfileOpen, setPublicProfileOpen] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -344,47 +344,6 @@ const App: React.FC = () => {
     });
   }, [posts, prevPosts, userProfile.name, addToast, people]);
 
-  // 📊 EFFECT PARA SINCRONIZAR ESTATÍSTICAS DO PERFIL COM O DB
-  useEffect(() => {
-    if (!userProfile.name) return;
-
-    // 1. Ouve por mudanças nas estatísticas do usuário no DB e atualiza o estado local.
-    const statsRef = dbRef(db, `users/${userProfile.name}/stats`);
-    const statsUnsub = onValue(statsRef, (snapshot) => {
-        const statsData = snapshot.val();
-        setUserProfile(prev => ({
-            ...prev,
-            stats: {
-                posts: statsData?.posts ?? 0,
-                followers: statsData?.followers ?? 0,
-                following: statsData?.following ?? 0,
-            }
-        }));
-    });
-
-    return () => {
-        off(statsRef, 'value', statsUnsub);
-    };
-  }, [userProfile.name, setUserProfile]);
-
-  // 📊 EFFECT SEPARADO PARA ATUALIZAR CONTAGEM DE POSTS NO DB
-  useEffect(() => {
-    if (!userProfile.name) return;
-
-    // Calcula a contagem de posts do usuário atual a partir da lista de posts global.
-    const userPostsCount = posts.filter(p => p.author.username === userProfile.name).length;
-    
-    const statsRef = dbRef(db, `users/${userProfile.name}/stats`);
-    
-    // Lê o valor atual no DB para evitar escritas desnecessárias
-    get(dbRef(db, `users/${userProfile.name}/stats/posts`)).then((snapshot) => {
-        if (snapshot.val() !== userPostsCount) {
-            update(statsRef, { posts: userPostsCount });
-        }
-    });
-
-  }, [userProfile.name, posts]);
-
 
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);
@@ -424,56 +383,55 @@ const App: React.FC = () => {
     await set(notifRef, payload);
   };
 
-  // 🔁 SEGUIR (com Realtime DB e contadores atômicos)
+  // 🔁 SEGUIR (agora async para notificação)
   const handleToggleFollow = async (personId: number) => {
-    const targetPerson = people.find((p) => p.id === personId);
-    if (!targetPerson) return;
-  
-    const currentUser = userProfile.name;
-    const targetUser = targetPerson.username;
-  
-    // Atualização otimista da UI
+    let isFollowingAction = false;
+    let followedPerson: Person | undefined;
+    
     const newPeople = people.map((p) => {
       if (p.id === personId) {
-        return { ...p, isFollowing: !p.isFollowing };
+        isFollowingAction = !p.isFollowing;
+        if (isFollowingAction) {
+            followedPerson = p;
+        }
+        return {
+          ...p,
+          isFollowing: !p.isFollowing,
+          followers: p.isFollowing ? p.followers - 1 : p.followers + 1,
+        };
       }
       return p;
     });
+
     setPeople(newPeople);
-  
+
+    if (isFollowingAction && followedPerson) {
+      addPoints("FOLLOW");
+      await createNotification(followedPerson.username, {
+        type: "follow",
+        fromUser: {
+          id: 0,
+          username: userProfile.name,
+          avatar: userProfile.avatar,
+        },
+        message: `${userProfile.name} começou a seguir você.`,
+      });
+    }
+
+    // efeito visual nos posts
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.author.id === personId
-          ? { ...post, author: { ...post.author, isFollowing: !post.author.isFollowing } }
+          ? {
+              ...post,
+              author: {
+                ...post.author,
+                isFollowing: !post.author.isFollowing,
+              },
+            }
           : post
       )
     );
-  
-    // Atualização do banco de dados com múltiplas rotas
-    const updates: { [key: string]: any } = {};
-  
-    if (!targetPerson.isFollowing) { // Ação é SEGUIR
-      updates[`following/${currentUser}/${targetUser}`] = true;
-      updates[`followers/${targetUser}/${currentUser}`] = true;
-      updates[`users/${currentUser}/stats/following`] = increment(1);
-      updates[`users/${targetUser}/stats/followers`] = increment(1);
-  
-      await update(dbRef(db), updates);
-  
-      addPoints("FOLLOW");
-      await createNotification(targetPerson.username, {
-        type: "follow",
-        fromUser: { id: 0, username: currentUser, avatar: userProfile.avatar },
-        message: `${currentUser} começou a seguir você.`,
-      });
-    } else { // Ação é DEIXAR DE SEGUIR
-      updates[`following/${currentUser}/${targetUser}`] = null;
-      updates[`followers/${targetUser}/${currentUser}`] = null;
-      updates[`users/${currentUser}/stats/following`] = increment(-1);
-      updates[`users/${targetUser}/stats/followers`] = increment(-1);
-  
-      await update(dbRef(db), updates);
-    }
   };
 
   // 🔥 CRIAR POST GLOBAL (Realtime DB)
@@ -703,13 +661,19 @@ const App: React.FC = () => {
     await update(dbRef(db), updates);
   };
 
-  // 🔍 ABRIR TELA DE PERFIL PÚBLICO
-  const handleOpenPublicProfile = (username: string) => {
-    if (username === userProfile.name) {
-      handleNavigate('profile');
-      return;
-    }
-    setViewingProfileFor(username);
+  // 🔍 ABRIR PERFIL PÚBLICO
+  const handleOpenPublicProfile = (personName: string) => {
+    // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
+    const person = people.find((p) => p.username === personName);
+    if (!person) return;
+
+    setSelectedPerson(person);
+    setPublicProfileOpen(true);
+  };
+
+  const handleClosePublicProfile = () => {
+    setPublicProfileOpen(false);
+    setSelectedPerson(null);
   };
 
   const renderPage = () => {
@@ -803,33 +767,15 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center">
-      <div className={`w-full md:max-w-xl ${activePage === 'feed' || viewingProfileFor ? 'min-h-screen bg-gradient-to-b from-[#05010F] via-[#050509] to-[#05010F]' : 'bg-backgroundDark'}`}>
+      <div className={`w-full md:max-w-xl ${activePage === 'feed' ? 'min-h-screen bg-gradient-to-b from-[#05010F] via-[#050509] to-[#05010F]' : 'bg-backgroundDark'}`}>
         <Header
           unreadCount={unreadCount}
-          onNotificationsClick={() => setIsNotificationsOpen((prev) => !prev)}
-          isPublicProfileView={!!viewingProfileFor}
-          profileUsername={viewingProfileFor ?? undefined}
-          onBackClick={() => setViewingProfileFor(null)}
+          onNotificationsClick={() =>
+            setIsNotificationsOpen((prev) => !prev)
+          }
         />
 
-        <main className="flex-grow pt-16 pb-16">
-          {viewingProfileFor ? (
-            <PublicProfileScreen
-              userId={viewingProfileFor}
-              allPosts={posts}
-              loggedInUserProfile={userProfile}
-              people={people}
-              onToggleFollow={handleToggleFollow}
-              handleLike={handleLike}
-              handleComment={handleComment}
-              handleBookmark={handleBookmark}
-              handleView={handleView}
-              onOpenProfile={handleOpenPublicProfile}
-            />
-          ) : (
-            renderPage()
-          )}
-        </main>
+        <main className="flex-grow pt-16 pb-16">{renderPage()}</main>
 
         {isNewPostModalOpen && (
           <NewPostModal
@@ -852,7 +798,6 @@ const App: React.FC = () => {
             onClose={() =>
               setStoryViewerState({ isOpen: false, stories: [] })
             }
-            onOpenProfile={handleOpenPublicProfile}
           />
         )}
 
@@ -865,15 +810,33 @@ const App: React.FC = () => {
           />
         )}
 
-        {/* A barra de navegação inferior só aparece se não estivermos vendo um perfil público */}
-        {!viewingProfileFor && (
-            <BottomNav
-                activePage={activePage}
-                onNavigate={handleNavigate}
-                onNewPostClick={() => handleOpenNewPostModal()}
-                userAvatar={userProfile.avatar}
-            />
+        {/* Modal de perfil público */}
+        {selectedPerson && (
+          <PublicProfileModal
+            person={selectedPerson}
+            posts={posts.filter(
+              // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
+              (p) => p.author.username === selectedPerson.username
+            )}
+            isOpen={publicProfileOpen}
+            onClose={handleClosePublicProfile}
+            onToggleFollow={handleToggleFollow}
+            // FIX: Pass required props to PostCard through PublicProfileModal
+            handleLike={handleLike}
+            handleComment={handleComment}
+            handleBookmark={handleBookmark}
+            handleView={handleView}
+            currentUserName={userProfile.name}
+            onOpenProfile={handleOpenPublicProfile}
+          />
         )}
+
+        <BottomNav
+          activePage={activePage}
+          onNavigate={handleNavigate}
+          onNewPostClick={() => handleOpenNewPostModal()}
+          userAvatar={userProfile.avatar}
+        />
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ const Profile: React.FC<ProfileProps> = ({
   };
 
   const stats = [
-    { label: "publicações", value: userProfile.stats?.posts.toLocaleString("pt-BR") ?? '0' },
+    { label: "publicações", value: userPosts.length },
     { label: "seguidores", value: userProfile.stats?.followers.toLocaleString("pt-BR") },
     { label: "seguindo", value: userProfile.stats?.following.toLocaleString("pt-BR") },
   ];
