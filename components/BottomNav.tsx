@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivePage } from '../types';
-import { HomeIcon, PlusSquareIcon, UsersIcon, ChatBubbleIcon, GameControllerIcon } from './Icons';
+import { HomeIcon, PlusSquareIcon, UsersIcon, ChatBubbleIcon, GameControllerIcon, DownloadIcon } from './Icons';
 
 interface BottomNavProps {
   activePage: ActivePage;
@@ -33,6 +33,12 @@ const NavButton: React.FC<NavButtonProps> = ({ Icon, isActive, onClick, special,
     </button>
 );
 
+interface ProfileNavButtonProps {
+    avatar: string;
+    isActive: boolean;
+    onClick: () => void;
+}
+
 const ProfileNavButton: React.FC<ProfileNavButtonProps> = ({ avatar, isActive, onClick }) => (
     <button onClick={onClick} className="w-full h-full flex items-center justify-center p-3.5">
         <div className={`rounded-full p-0.5 transition-all duration-300 ${isActive ? 'bg-gradient-to-r from-primary to-secondary shadow-glow-primary' : 'bg-transparent'}`}>
@@ -54,15 +60,10 @@ const BottomNav: React.FC<BottomNavProps> = ({ activePage, onNavigate, onNewPost
       <NavButton Icon={GameControllerIcon} isActive={activePage === 'games'} onClick={() => onNavigate('games')} useGradient={true} />
       <NavButton Icon={PlusSquareIcon} isActive={false} onClick={onNewPostClick} special={true} useGradient={true} />
       <NavButton Icon={ChatBubbleIcon} isActive={activePage === 'chat'} onClick={() => onNavigate('chat')} useGradient={true} />
+      <NavButton Icon={DownloadIcon} isActive={activePage === 'download'} onClick={() => onNavigate('download')} useGradient={true} />
       <ProfileNavButton avatar={userAvatar} isActive={activePage === 'profile'} onClick={() => onNavigate('profile')} />
     </nav>
   );
 };
-
-interface ProfileNavButtonProps {
-    avatar: string;
-    isActive: boolean;
-    onClick: () => void;
-}
 
 export default BottomNav;

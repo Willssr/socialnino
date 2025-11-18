@@ -1,6 +1,5 @@
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-// Fix: Use 'firebase/firestore/lite' to resolve import errors.
-import { collection, addDoc, Timestamp } from "firebase/firestore/lite";
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref as dbRef, push, set } from "firebase/database";
 import { storage, db } from "./firebase";
 
 export type UploadedTrack = {
@@ -23,25 +22,32 @@ export async function uploadTrackToFirebase(
 
   // 1. Upload file to Storage
   const path = `tracks/${Date.now()}-${file.name}`;
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  const downloadUrl = await getDownloadURL(storageRef);
+  const sRef = storageRef(storage, path);
+  await uploadBytes(sRef, file);
+  const downloadUrl = await getDownloadURL(sRef);
 
-  // 2. Save metadata to Firestore
+  // 2. Save metadata to Realtime Database
   const title =
     options?.title || file.name.replace(/\.[^/.]+$/, "") || "Música";
   const artist = options?.artist || "Você";
 
-  const docRef = await addDoc(collection(db, "tracks"), {
+  const tracksRef = dbRef(db, "tracks");
+  const newTrackRef = push(tracksRef);
+  const trackId = newTrackRef.key as string;
+
+  const trackData = {
+    id: trackId,
     title,
     artist,
     url: downloadUrl,
-    createdAt: Timestamp.now(),
-  });
+    createdAt: new Date().toISOString(),
+  };
+
+  await set(newTrackRef, trackData);
 
   // 4. Return the complete track object
   return {
-    id: docRef.id,
+    id: trackId,
     title,
     artist,
     url: downloadUrl,

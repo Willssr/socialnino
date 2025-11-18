@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { AppleIcon, AndroidIcon, XIcon } from './Icons';
+import { AppleIcon, XIcon, DownloadIcon } from './Icons';
 
 // Component for PWA instructions modal
 const PwaInstallModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
@@ -30,48 +31,59 @@ const PwaInstallModal: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 const DownloadApp: React.FC = () => {
   const [isPwaModalOpen, setIsPwaModalOpen] = useState(false);
 
-  // Placeholder link for the APK file
-  const apkLink = "data:text/plain;charset=utf-8,Placeholder for SocialNino.apk file";
+  // Link direto fornecido pelo usuário
+  const apkLink = "https://drive.google.com/uc?export=download&id=1JSwB8fR4_gDalzk7f7M5aVUE-lrXqMa8";
 
   return (
     <>
-      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl text-textLight text-center">
-        <h1 className="text-4xl font-orbitron font-bold text-gradient-neon mb-4">
-          Baixe o SocialNino no seu celular 📱
-        </h1>
-        <p className="max-w-2xl mx-auto text-textDark mb-10">
-          Leve a experiência completa do SocialNino com você. Instale nosso aplicativo para ter acesso a recursos exclusivos e uma interface otimizada.
-        </p>
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8 max-w-4xl text-textLight flex flex-col items-center justify-center min-h-[70vh]">
+        
+        <div className="text-center mb-10 animate-fade-in-up">
+            <h1 className="text-4xl md:text-5xl font-orbitron font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#4CAF50] to-[#00E5FF] mb-4 drop-shadow-[0_0_10px_rgba(76,175,80,0.5)]">
+            Download
+            </h1>
+            <p className="text-slate-400 text-lg max-w-md mx-auto">
+            Toque no botão abaixo para baixar o aplicativo oficial.
+            </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Android Button */}
-          <a
+        <div className="w-full max-w-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+            <a
             href={apkLink}
-            download="SocialNino.apk"
-            className="rgb-border rounded-xl p-6 flex flex-col items-center justify-center text-left transition-transform duration-300 hover:-translate-y-1 hover:shadow-glow-primary/50 no-underline"
-          >
-            <div className="flex items-center gap-4">
-              <AndroidIcon className="w-12 h-12 text-secondary" />
-              <div>
-                <h3 className="font-orbitron font-bold text-xl text-secondary">Baixar APK</h3>
-                <p className="text-sm text-textDark mt-1">Para dispositivos Android</p>
-              </div>
+            download
+            className="group relative w-full flex items-center justify-center gap-3 px-8 py-5 rounded-xl bg-[#4CAF50] hover:bg-[#43a047] text-white transition-all duration-300 shadow-[0_0_20px_rgba(76,175,80,0.4)] hover:shadow-[0_0_30px_rgba(76,175,80,0.6)] hover:-translate-y-1 overflow-hidden"
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+                
+                <DownloadIcon className="w-7 h-7" />
+                <span className="text-xl font-bold font-orbitron tracking-wide">BAIXAR APK</span>
+            </a>
+            
+            <div className="mt-4 text-center">
+                <p className="text-xs text-slate-500">
+                    Download direto • Seguro • Rápido
+                </p>
             </div>
-          </a>
+        </div>
 
-          {/* iPhone Button */}
-          <button
-            onClick={() => setIsPwaModalOpen(true)}
-            className="rgb-border rounded-xl p-6 flex flex-col items-center justify-center text-left transition-transform duration-300 hover:-translate-y-1 hover:shadow-glow-accent/50"
-          >
-            <div className="flex items-center gap-4">
-              <AppleIcon className="w-12 h-12 text-accent" />
-              <div>
-                <h3 className="font-orbitron font-bold text-xl text-accent">Instalar no iPhone</h3>
-                <p className="text-sm text-textDark mt-1">Via PWA (Progressive Web App)</p>
-              </div>
-            </div>
-          </button>
+        {/* Divider */}
+        <div className="w-full max-w-xs my-10 flex items-center gap-4 opacity-30">
+            <div className="h-px flex-1 bg-white" />
+            <span className="text-xs font-mono">OU</span>
+            <div className="h-px flex-1 bg-white" />
+        </div>
+
+        {/* Secondary Options */}
+        <div className="grid grid-cols-1 gap-4 w-full max-w-sm animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+             <button
+                onClick={() => setIsPwaModalOpen(true)}
+                className="flex items-center justify-center gap-3 p-4 rounded-xl bg-cardDark border border-borderNeon/30 hover:border-borderNeon hover:bg-primary/10 transition-all duration-300 group"
+            >
+                <AppleIcon className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+                <span className="text-slate-400 font-semibold group-hover:text-white transition-colors">
+                Instalar no iPhone (PWA)
+                </span>
+            </button>
         </div>
       </div>
 
