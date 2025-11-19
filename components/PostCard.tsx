@@ -25,6 +25,16 @@ const PostCard: React.FC<Props> = ({
   handleBookmark,
   onOpenProfile,
 }) => {
+  // ✨ ESTADO LOCAL PARA UI OTIMISTA (RESPOSTA IMEDIATA)
+  const [likesCount, setLikesCount] = useState(post.likes);
+  const [isLiked, setIsLiked] = useState(post.isLiked);
+
+  // Sincroniza com props quando o banco de dados atualizar (outros usuários)
+  useEffect(() => {
+    setLikesCount(post.likes);
+    setIsLiked(post.isLiked);
+  }, [post.likes, post.isLiked]);
+
   const [commentText, setCommentText] = useState("");
   const [showHeart, setShowHeart] = useState(false);
   const [isCommentsModalOpen, setIsCommentsModalOpen] = useState(false);
@@ -35,11 +45,23 @@ const PostCard: React.FC<Props> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const viewHandled = useRef(false);
 
+  // Função Wrapper para Like (UI Otimista)
+  const onLikeClick = () => {
+    const newIsLiked = !isLiked;
+    
+    // Atualiza UI instantaneamente
+    setIsLiked(newIsLiked);
+    setLikesCount((prev) => newIsLiked ? prev + 1 : Math.max(0, prev - 1));
+    
+    // Chama o backend
+    handleLike(post.id);
+  };
+
   const handleDoubleClick = () => {
     const now = new Date().getTime();
     if (now - lastClickTime.current < 400) { 
-      if (!post.isLiked) {
-        handleLike(post.id);
+      if (!isLiked) {
+        onLikeClick();
       }
       setShowHeart(true);
       setTimeout(() => setShowHeart(false), 800);
@@ -159,12 +181,12 @@ const PostCard: React.FC<Props> = ({
         {/* AÇÕES */}
         <div className="flex items-center justify-between p-4">
           <div className="flex space-x-4">
-            <button onClick={() => handleLike(post.id)}>
+            <button onClick={onLikeClick}>
               <HeartIcon
                 className={`w-7 h-7 transition-all duration-200 ${
-                  post.isLiked ? "text-accent" : "text-textDark hover:text-textLight"
+                  isLiked ? "text-accent" : "text-textDark hover:text-textLight"
                 }`}
-                solid={post.isLiked}
+                solid={isLiked}
               />
             </button>
 
@@ -190,7 +212,7 @@ const PostCard: React.FC<Props> = ({
         {/* LIKES E LEGENDA */}
         <div className="px-4 pb-2">
           <p className="font-bold text-sm">
-            {post.likes.toLocaleString("pt-BR")} {post.likes === 1 ? 'curtida' : 'curtidas'}
+            {likesCount.toLocaleString("pt-BR")} {likesCount === 1 ? 'curtida' : 'curtidas'}
           </p>
 
           <p className="mt-1 text-sm">

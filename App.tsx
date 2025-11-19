@@ -154,6 +154,9 @@ const App: React.FC = () => {
 
       const list: Post[] = Object.values(data).map((raw: any) => {
         const comments = Array.isArray(raw.comments) ? raw.comments : [];
+        
+        // Lógica de Like corrigida: verifica se o ID do usuário está no mapa de userLikes
+        const isLikedByCurrentUser = user && raw.userLikes ? !!raw.userLikes[user.uid] : false;
 
         return {
           id: raw.id ?? "",
@@ -171,7 +174,7 @@ const App: React.FC = () => {
           },
           likes: typeof raw.likes === "number" ? raw.likes : 0,
           views: typeof raw.views === "number" ? raw.views : 0,
-          isLiked: !!raw.isLiked,
+          isLiked: isLikedByCurrentUser, 
           isBookmarked: !!raw.isBookmarked,
           comments,
         } as Post;
@@ -191,7 +194,7 @@ const App: React.FC = () => {
     return () => {
       off(postsQuery, "value", callback);
     };
-  }, []);
+  }, [user]); // Adicionado user como dependência para recalcular isLiked quando logar
 
   // 🟪 BUSCAR STORIES GLOBAIS, FILTRAR EXPIRADOS E REMOVER DO DB
   useEffect(() => {
@@ -473,21 +476,38 @@ const App: React.FC = () => {
     reader.readAsDataURL(file);
   };
 
-  // ❤️ LIKE GLOBAL (Realtime DB)
+  // ❤️ LIKE GLOBAL (Realtime DB) - CORRIGIDO
   const handleLike = async (postId: string) => {
+    if (!user) return; // Segurança: precisa estar logado
+
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
-    const newLiked = !post.isLiked;
-    const likesIncrement = newLiked ? 1 : -1;
+    // A lógica agora depende do 'isLiked' que foi calculado corretamente no useEffect
+    // Se já está curtido (isLiked = true), vamos remover o like
+    const isCurrentlyLiked = post.isLiked;
 
-    // A contagem de curtidas é atualizada de forma atômica no Firebase.
-    await update(dbRef(db, `posts/${postId}`), {
-      isLiked: newLiked,
-      likes: increment(likesIncrement),
-    });
+    const updates: any = {};
 
-    if (newLiked) {
+    if (isCurrentlyLiked) {
+      // Remover like
+      // 1. Remove o ID do usuário da lista de userLikes
+      updates[`posts/${postId}/userLikes/${user.uid}`] = null;
+      // 2. Decrementa o contador global
+      updates[`posts/${postId}/likes`] = increment(-1);
+    } else {
+      // Adicionar like
+      // 1. Adiciona o ID do usuário na lista de userLikes
+      updates[`posts/${postId}/userLikes/${user.uid}`] = true;
+      // 2. Incrementa o contador global
+      updates[`posts/${postId}/likes`] = increment(1);
+    }
+
+    // Atualização atômica
+    await update(dbRef(db), updates);
+
+    // Notificação apenas se for um novo like
+    if (!isCurrentlyLiked) {
       addPoints("LIKE");
       await createNotification(post.author.username, {
         type: "like",
