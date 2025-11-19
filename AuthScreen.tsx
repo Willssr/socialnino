@@ -25,7 +25,7 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-backgroundDark p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center futuristic-bg p-4">
       <div className="w-full max-w-sm">
         <div className="rgb-border rounded-xl p-8 mb-4">
           <h1 className="font-orbitron text-5xl text-center mb-8 text-gradient-neon">

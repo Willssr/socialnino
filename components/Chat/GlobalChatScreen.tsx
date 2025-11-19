@@ -21,8 +21,9 @@ const GlobalChatScreen: React.FC<GlobalChatScreenProps> = ({ messages, currentUs
         scrollToBottom();
     }, [messages]);
 
+    // Using futuristic-bg via parent or transparent to allow global BG
     return (
-        <div className="h-full flex flex-col bg-gradient-to-br from-[#090012] via-[#140033] to-[#000014] text-white shadow-[inset_0_0_40px_#00E5FF25]">
+        <div className="h-full flex flex-col bg-transparent text-white shadow-[inset_0_0_40px_#00E5FF25]">
             {/* Header */}
             <div className="p-4 border-b border-borderNeon bg-transparent">
                 <h1 className="text-xl font-orbitron font-bold text-gradient-neon text-center">

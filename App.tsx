@@ -765,9 +765,10 @@ const App: React.FC = () => {
     return <AuthScreen />;
   }
 
+  // Applies the new futuristic-bg class to the main app container for a consistent background
   return (
-    <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center">
-      <div className={`w-full md:max-w-xl ${activePage === 'feed' ? 'min-h-screen bg-gradient-to-b from-[#05010F] via-[#050509] to-[#05010F]' : 'bg-backgroundDark'}`}>
+    <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center futuristic-bg">
+      <div className="w-full md:max-w-xl bg-transparent min-h-screen">
         <Header
           unreadCount={unreadCount}
           onNotificationsClick={() =>

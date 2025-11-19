@@ -161,7 +161,7 @@ const GamesScreen: React.FC<GamesScreenProps> = ({ handleGamePoints }) => {
 
     return (
         <>
-            <div className="min-h-screen w-full bg-gradient-to-br from-[#090012] via-[#140033] to-[#000014] p-4 sm:p-6 lg:p-8">
+            <div className="min-h-screen w-full bg-transparent p-4 sm:p-6 lg:p-8">
                 <h1 className="text-4xl font-orbitron font-bold text-secondary text-center mb-10" style={{ textShadow: '0 0 8px #00E5FF, 0 0 12px #00E5FF' }}>
                     GAMES
                 </h1>
@@ -186,7 +186,7 @@ const GamesScreen: React.FC<GamesScreenProps> = ({ handleGamePoints }) => {
 
                 {/* Ranking Section */}
                 <div className="max-w-5xl mx-auto">
-                    <div className="mt-6 p-4 border border-[#00E5FF] rounded-xl shadow-[0_0_10px_#00E5FF55]">
+                    <div className="mt-6 p-4 border border-[#00E5FF] rounded-xl shadow-[0_0_10px_#00E5FF55] bg-cardDark/50 backdrop-blur-sm">
                         <h2 className="text-[#00E5FF] font-orbitron font-bold text-lg mb-3 drop-shadow-[0_0_6px_#00E5FF]">
                             🏆 Ranking Neon
                         </h2>
