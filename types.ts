@@ -1,3 +1,4 @@
+
 export interface Comment {
   id: string;
   author: string;
@@ -94,7 +95,7 @@ export interface Notification {
   read: boolean;
 }
 
-export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'download' | 'friends' | 'chat' | 'games';
+export type ActivePage = 'feed' | 'music' | 'search' | 'profile' | 'suggestions' | 'download' | 'friends' | 'chat' | 'games' | 'messages';
 
 export type PointsEvent =
   | "LIKE"
@@ -122,6 +123,16 @@ export interface ChatMessage {
   type: 'text' | 'sticker';
   timestamp: string;
   reactions?: { [username: string]: string };
+}
+
+export interface DirectMessage {
+    id: string;
+    sender: string; // username
+    receiver: string; // username
+    content: string;
+    type: 'text' | 'sticker';
+    timestamp: string;
+    read: boolean;
 }
 
 export interface ToastNotificationData {

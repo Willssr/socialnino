@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Header from "./components/Header";
 import Feed from "./components/Feed";
@@ -13,6 +14,7 @@ import {
   Person,
   Notification,
   ChatMessage,
+  DirectMessage,
 } from "./types";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import {
@@ -22,7 +24,7 @@ import {
 import AddStoryModal from "./components/AddStoryModal";
 import StoryViewerModal from "./components/StoryViewerModal";
 import NewPostModal from "./components/NewPostModal";
-import UserSearchScreen from "./components/UserSearchScreen"; // Changed import
+import UserSearchScreen from "./components/UserSearchScreen"; 
 import DownloadApp from "./components/DownloadApp";
 import NotificationsPanel from "./components/NotificationsPanel";
 import SearchModal from "./components/SearchModal";
@@ -53,6 +55,14 @@ import GlobalChatScreen from "./components/Chat/GlobalChatScreen";
 import { useToast } from "./context/ToastContext";
 import { usePrevious } from "./hooks/usePrevious";
 import GamesScreen from "./components/Games/GamesScreen";
+import DirectMessagesScreen from "./components/DirectMessages/DirectMessagesScreen";
+
+// Mock Initial DMs
+const INITIAL_DMS: DirectMessage[] = [
+    { id: 'dm-1', sender: 'nina_dev', receiver: 'Você', content: 'Olá! Adorei sua foto de perfil 📸', type: 'text', timestamp: new Date(Date.now() - 1000000).toISOString(), read: false },
+    { id: 'dm-2', sender: 'Você', receiver: 'nina_dev', content: 'Obrigado! A sua também é incrível.', type: 'text', timestamp: new Date(Date.now() - 900000).toISOString(), read: true },
+    { id: 'dm-3', sender: 'rafael.art', receiver: 'Você', content: 'Viu o novo desafio do dia?', type: 'text', timestamp: new Date(Date.now() - 500000).toISOString(), read: true }
+];
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
@@ -70,6 +80,7 @@ const App: React.FC = () => {
     "download",
     "music",
     "profile",
+    "messages" // Added messages to page order
   ]);
 
   // 🔥 POSTS GLOBAIS (Realtime DB)
@@ -87,6 +98,10 @@ const App: React.FC = () => {
   // 👥 SISTEMA DE SEGUIR (Novo)
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const [userStats, setUserStats] = useState({ followers: 0, following: 0, posts: 0 });
+
+  // 📨 MENSAGENS DIRETAS (MOCK / In-Memory state)
+  const [directMessages, setDirectMessages] = useState<DirectMessage[]>(INITIAL_DMS);
+  const [selectedDmUser, setSelectedDmUser] = useState<Person | null>(null);
 
   // RESTO continua local (fallback)
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>(
@@ -506,7 +521,6 @@ const App: React.FC = () => {
     });
   };
 
-  // Updated to handle nested replies
   const handleComment = async (postId: string, commentText: string, parentId?: string) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
@@ -519,13 +533,9 @@ const App: React.FC = () => {
       replies: []
     };
 
-    // Clone existing comments to modify them locally before sending
-    // This is required because we can't easily use array updates with deep nesting in Firebase simple list structure
-    // without knowing exact index paths.
     const updatedComments = [...(post.comments || [])];
 
     if (parentId) {
-        // Find parent and add reply
         const parentIndex = updatedComments.findIndex(c => c.id === parentId);
         if (parentIndex !== -1) {
             const parent = { ...updatedComments[parentIndex] };
@@ -536,7 +546,6 @@ const App: React.FC = () => {
         updatedComments.push(newComment);
     }
 
-    // Update entire comments array for the post
     await update(dbRef(db, `posts/${postId}`), { comments: updatedComments });
 
     addPoints("COMMENT");
@@ -559,6 +568,22 @@ const App: React.FC = () => {
           author: { name: userProfile.name, avatar: userProfile.avatar },
           content, type, timestamp: new Date().toISOString()
       });
+  };
+
+  // 📨 Handle sending direct messages
+  const handleSendDirectMessage = (receiverUsername: string, content: string, type: 'text' | 'sticker') => {
+      const newMsg: DirectMessage = {
+          id: `dm-${Date.now()}`,
+          sender: userProfile.name,
+          receiver: receiverUsername,
+          content,
+          type,
+          timestamp: new Date().toISOString(),
+          read: false
+      };
+      
+      // In a real app, this would be an API/Firebase call
+      setDirectMessages(prev => [...prev, newMsg]);
   };
 
   const handleReaction = async (messageId: string, emoji: string) => {
@@ -642,6 +667,13 @@ const App: React.FC = () => {
     setPublicProfileOpen(true);
   };
 
+  // Go to chat with a specific person from profile
+  const handleMessageFromProfile = (person: Person) => {
+      setSelectedDmUser(person);
+      setPublicProfileOpen(false);
+      handleNavigate('messages');
+  };
+
   const renderPage = () => {
     let pageComponent;
     switch (activePage) {
@@ -672,6 +704,18 @@ const App: React.FC = () => {
       case "profile":
         const userPosts = posts.filter((post) => post.author.username === userProfile.name);
         pageComponent = <Profile userProfile={userProfile} onUpdateProfile={setUserProfile} userPosts={userPosts} />;
+        break;
+      case "messages":
+        pageComponent = (
+            <DirectMessagesScreen 
+                messages={directMessages} 
+                currentUser={userProfile} 
+                people={people} 
+                initialSelectedUser={selectedDmUser}
+                onSendMessage={handleSendDirectMessage}
+                onBack={() => setSelectedDmUser(null)}
+            />
+        );
         break;
       case "feed":
       default:
@@ -704,7 +748,11 @@ const App: React.FC = () => {
   return (
     <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center futuristic-bg">
       <div className="w-full md:max-w-xl bg-transparent min-h-screen">
-        <Header unreadCount={unreadCount} onNotificationsClick={() => setIsNotificationsOpen((prev) => !prev)} />
+        <Header 
+            unreadCount={unreadCount} 
+            onNotificationsClick={() => setIsNotificationsOpen((prev) => !prev)} 
+            onMessagesClick={() => handleNavigate('messages')}
+        />
 
         <main className="flex-grow pt-16 pb-16">{renderPage()}</main>
 
@@ -726,7 +774,8 @@ const App: React.FC = () => {
             handleView={handleView}
             currentUserName={userProfile.name}
             onOpenProfile={handleOpenPublicProfile}
-            followingIds={followingIds} // PASSANDO PARA O MODAL
+            followingIds={followingIds}
+            onMessageClick={handleMessageFromProfile} // Passando a função de mensagem
           />
         )}
 

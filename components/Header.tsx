@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HeartIcon, PaperAirplaneIcon, UserIcon } from './Icons';
 import { db } from '../services/firebase';
@@ -6,9 +7,10 @@ import { ref, onValue, off } from 'firebase/database';
 interface HeaderProps {
     unreadCount: number;
     onNotificationsClick: () => void;
+    onMessagesClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) => {
+const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick, onMessagesClick }) => {
   const [onlineCount, setOnlineCount] = useState(0);
 
   useEffect(() => {
@@ -73,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({ unreadCount, onNotificationsClick }) =>
                  <span className="absolute top-0.5 right-0 block h-2.5 w-2.5 rounded-full bg-accent ring-2 ring-backgroundDark animate-pulse shadow-[0_0_8px_#FF2CDF]"></span>
               )}
             </button>
-            <button className="p-1 group">
+            <button onClick={onMessagesClick} className="p-1 group">
                 <PaperAirplaneIcon className="h-7 w-7 text-[#a855f7] -rotate-12 group-hover:text-white transition-all duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_10px_#a855f7]" />
             </button>
           </div>
