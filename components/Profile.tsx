@@ -30,8 +30,8 @@ const Profile: React.FC<ProfileProps> = ({
 
   const stats = [
     { label: "publicações", value: userPosts.length },
-    { label: "seguidores", value: userProfile.stats?.followers.toLocaleString("pt-BR") },
-    { label: "seguindo", value: userProfile.stats?.following.toLocaleString("pt-BR") },
+    { label: "seguidores", value: userProfile.stats?.followers.toLocaleString("pt-BR") || 0 },
+    { label: "seguindo", value: userProfile.stats?.following.toLocaleString("pt-BR") || 0 },
   ];
 
   const handleImageChange = (file: File, field: "avatar" | "coverPhoto") => {

@@ -22,7 +22,7 @@ import {
 import AddStoryModal from "./components/AddStoryModal";
 import StoryViewerModal from "./components/StoryViewerModal";
 import NewPostModal from "./components/NewPostModal";
-import Suggestions from "./components/Suggestions";
+import UserSearchScreen from "./components/UserSearchScreen"; // Changed import
 import DownloadApp from "./components/DownloadApp";
 import NotificationsPanel from "./components/NotificationsPanel";
 import SearchModal from "./components/SearchModal";
@@ -84,7 +84,11 @@ const App: React.FC = () => {
   // 🔔 NOTIFICAÇÕES (Realtime DB)
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // RESTO continua local
+  // 👥 SISTEMA DE SEGUIR (Novo)
+  const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
+  const [userStats, setUserStats] = useState({ followers: 0, following: 0, posts: 0 });
+
+  // RESTO continua local (fallback)
   const [userProfile, setUserProfile] = useLocalStorage<UserProfile>(
     "socialnino-user-profile",
     INITIAL_USER_PROFILE
@@ -119,27 +123,67 @@ const App: React.FC = () => {
 
     // Reference to the user's online status in the database
     const userStatusRef = dbRef(db, `onlineUsers/${user.uid}`);
-
-    // Reference to the special '.info/connected' path
     const connectedRef = dbRef(db, '.info/connected');
 
     const unsubscribe = onValue(connectedRef, (snapshot) => {
-      // If the user is not connected, we don't do anything
-      if (snapshot.val() === false) {
-        return;
-      }
-      
-      // When the user disconnects, remove their entry from 'onlineUsers'
+      if (snapshot.val() === false) return;
       onDisconnect(userStatusRef).remove();
-      
-      // When the user connects, set their status to true
       set(userStatusRef, true);
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [user]);
+
+  // 👥 CARREGAR QUEM EU SIGO (Realtime DB)
+  useEffect(() => {
+    if (!user) return;
+
+    const followingRef = dbRef(db, `users/${user.uid}/following`);
+    
+    const unsubscribe = onValue(followingRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        // Cria um Set com os IDs dos usuários que eu sigo
+        setFollowingIds(new Set(Object.keys(data)));
+      } else {
+        setFollowingIds(new Set());
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // 📊 CARREGAR ESTATÍSTICAS DO MEU PERFIL (Realtime DB)
+  useEffect(() => {
+    if (!user) return;
+
+    const statsRef = dbRef(db, `users/${user.uid}/stats`);
+    
+    const unsubscribe = onValue(statsRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setUserStats(snapshot.val());
+      } else {
+        // Se não existir, inicializa
+        setUserStats({ followers: 0, following: 0, posts: 0 });
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // 🔁 Sincronizar stats do Firebase com userProfile local visual
+  useEffect(() => {
+    setUserProfile(prev => ({
+      ...prev,
+      stats: {
+        ...prev.stats,
+        followers: userStats.followers || 0,
+        following: userStats.following || 0,
+        posts: posts.filter(p => p.author.username === prev.name).length // Calcula posts localmente baseado no feed
+      }
+    }));
+  }, [userStats, posts, setUserProfile]);
+
 
   // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL (normalizando dados)
   useEffect(() => {
@@ -153,10 +197,19 @@ const App: React.FC = () => {
       }
 
       const list: Post[] = Object.values(data).map((raw: any) => {
-        const comments = Array.isArray(raw.comments) ? raw.comments : [];
+        const commentsRaw = raw.comments || [];
+        // Normaliza comentários e respostas
+        const comments: Comment[] = Array.isArray(commentsRaw) 
+            ? commentsRaw.map((c: any) => ({
+                ...c,
+                replies: Array.isArray(c.replies) ? c.replies : []
+            })) 
+            : [];
         
-        // Lógica de Like corrigida: verifica se o ID do usuário está no mapa de userLikes
         const isLikedByCurrentUser = user && raw.userLikes ? !!raw.userLikes[user.uid] : false;
+        // Verifica se seguimos o autor deste post
+        const authorIdString = String(raw.author?.id);
+        const isFollowingAuthor = followingIds.has(authorIdString);
 
         return {
           id: raw.id ?? "",
@@ -164,7 +217,7 @@ const App: React.FC = () => {
             id: raw.author?.id ?? 0,
             username: raw.author?.username ?? "desconhecido",
             avatar: raw.author?.avatar ?? "",
-            isFollowing: raw.author?.isFollowing ?? false,
+            isFollowing: isFollowingAuthor, // Estado real vindo do DB
           },
           timestamp: raw.timestamp ?? new Date().toISOString(),
           caption: raw.caption ?? "",
@@ -180,7 +233,6 @@ const App: React.FC = () => {
         } as Post;
       });
 
-      // mais recentes primeiro
       list.sort(
         (a, b) =>
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
@@ -194,11 +246,11 @@ const App: React.FC = () => {
     return () => {
       off(postsQuery, "value", callback);
     };
-  }, [user]); // Adicionado user como dependência para recalcular isLiked quando logar
+  }, [user, followingIds]); // Recalcula quando user muda ou quando a lista de quem sigo muda
 
-  // 🟪 BUSCAR STORIES GLOBAIS, FILTRAR EXPIRADOS E REMOVER DO DB
+  // 🟪 BUSCAR STORIES GLOBAIS
   useEffect(() => {
-    const storiesQuery = query(dbRef(db, "stories")); // Não precisa ordenar aqui
+    const storiesQuery = query(dbRef(db, "stories"));
 
     const callback = (snapshot: any) => {
       const data = snapshot.val();
@@ -231,7 +283,6 @@ const App: React.FC = () => {
         }
       });
 
-      // 🔥 Remove os stories expirados do Firebase em uma única operação
       if (expiredStoryIds.length > 0) {
         const updates: { [key: string]: null } = {};
         expiredStoryIds.forEach(id => {
@@ -240,7 +291,6 @@ const App: React.FC = () => {
         update(dbRef(db), updates);
       }
 
-      // Seta o estado local apenas com os stories válidos, já ordenados
       validStories.sort(
         (a, b) =>
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -255,98 +305,34 @@ const App: React.FC = () => {
     };
   }, []);
   
-    // 💬 BUSCAR MENSAGENS DO CHAT GLOBAL EM TEMPO REAL
+  // 💬 CHAT GLOBAL
   useEffect(() => {
     const chatQuery = query(dbRef(db, "global-chat"), orderByChild("timestamp"));
-    
     const callback = (snapshot: any) => {
         const data = snapshot.val();
         if (!data) {
             setChatMessages([]);
             return;
         }
-
-        const list: ChatMessage[] = Object.values(data);
-        setChatMessages(list);
+        setChatMessages(Object.values(data));
     };
-
     onValue(chatQuery, callback);
-    
-    return () => {
-        off(chatQuery, 'value', callback);
-    };
+    return () => off(chatQuery, 'value', callback);
   }, []);
   
-  // 🔔 BUSCAR NOTIFICAÇÕES EM TEMPO REAL
+  // 🔔 NOTIFICAÇÕES
   useEffect(() => {
     if (!userProfile.name) return;
-
     const notifRef = dbRef(db, `notifications/${userProfile.name}`);
     const q = query(notifRef, orderByChild("createdAt"));
-
     const unsub = onValue(q, (snapshot) => {
         const data = snapshot.val() || {};
         const list = Object.values(data) as Notification[];
-        // mais recentes primeiro
-        list.sort(
-        (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         setNotifications(list);
     });
-
     return () => off(q, "value", unsub);
   }, [userProfile.name]);
-
-  // 🔔 EFFECT PARA NOTIFICAÇÕES TOAST
-  useEffect(() => {
-    if (!prevPosts || !userProfile.name || posts.length === 0) return;
-
-    // 1. Check for new posts from others
-    if (posts.length > prevPosts.length) {
-      const newPost = posts.find(p => !prevPosts.some(op => op.id === p.id));
-      if (newPost && newPost.author.username !== userProfile.name) {
-        addToast({
-          type: 'post',
-          user: newPost.author,
-          content: 'adicionou uma nova publicação.'
-        });
-      }
-    }
-
-    // 2. Check for new likes and comments on my posts
-    posts.forEach(post => {
-      if (post.author.username === userProfile.name) {
-        const oldPost = prevPosts.find(p => p.id === post.id);
-        if (oldPost) {
-          // New Like
-          if (post.likes > oldPost.likes) {
-            const likerCandidates = people.filter(p => p.username !== userProfile.name);
-            const randomLiker = likerCandidates[Math.floor(Math.random() * likerCandidates.length)] || { username: 'Alguém', avatar: 'https://i.pravatar.cc/150' };
-            addToast({
-              type: 'like',
-              user: { username: randomLiker.username, avatar: randomLiker.avatar },
-              content: 'curtiu sua publicação.'
-            });
-          }
-
-          // New Comment
-          if (post.comments.length > oldPost.comments.length) {
-            const newComment = post.comments[post.comments.length - 1];
-            if (newComment.author !== userProfile.name) {
-              const commenter = people.find(p => p.username === newComment.author) || { username: newComment.author, avatar: 'https://i.pravatar.cc/150?u=' + newComment.author };
-              addToast({
-                type: 'comment',
-                user: { username: commenter.username, avatar: commenter.avatar },
-                content: `comentou: "${newComment.text.substring(0, 25)}..."`
-              });
-            }
-          }
-        }
-      }
-    });
-  }, [posts, prevPosts, userProfile.name, addToast, people]);
-
 
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);
@@ -365,82 +351,85 @@ const App: React.FC = () => {
     setNewPostInitialCaption("");
   };
 
-  // 🔔 FUNÇÃO PARA CRIAR NOTIFICAÇÃO
   const createNotification = async (
     targetUsername: string,
     notificationData: Omit<Notification, "id" | "read" | "createdAt">
   ) => {
-    // Não notificar a si mesmo
     if (targetUsername === userProfile.name) return;
-
     const notifRef = push(dbRef(db, `notifications/${targetUsername}`));
-    const id = notifRef.key as string;
-
-    const payload: Notification = {
-      id,
+    await set(notifRef, {
+      id: notifRef.key,
       ...notificationData,
       createdAt: new Date().toISOString(),
       read: false,
-    };
-
-    await set(notifRef, payload);
+    });
   };
 
-  // 🔁 SEGUIR (agora async para notificação)
-  const handleToggleFollow = async (personId: number) => {
-    let isFollowingAction = false;
-    let followedPerson: Person | undefined;
+  // 🔁 SEGUIR
+  const handleToggleFollow = async (personId: number | string) => {
+    if (!user) return;
+
+    const personIdStr = String(personId);
+    const isFollowing = followingIds.has(personIdStr);
     
-    const newPeople = people.map((p) => {
-      if (p.id === personId) {
-        isFollowingAction = !p.isFollowing;
-        if (isFollowingAction) {
-            followedPerson = p;
+    let targetPerson = people.find(p => String(p.id) === personIdStr);
+    let targetName = targetPerson?.username;
+    
+    if (!targetPerson) {
+        const postFromAuthor = posts.find(p => String(p.author.id) === personIdStr);
+        if (postFromAuthor) {
+            targetName = postFromAuthor.author.username;
         }
-        return {
-          ...p,
-          isFollowing: !p.isFollowing,
-          followers: p.isFollowing ? p.followers - 1 : p.followers + 1,
-        };
-      }
-      return p;
-    });
-
-    setPeople(newPeople);
-
-    if (isFollowingAction && followedPerson) {
-      addPoints("FOLLOW");
-      await createNotification(followedPerson.username, {
-        type: "follow",
-        fromUser: {
-          id: 0,
-          username: userProfile.name,
-          avatar: userProfile.avatar,
-        },
-        message: `${userProfile.name} começou a seguir você.`,
-      });
     }
 
-    // efeito visual nos posts
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.author.id === personId
-          ? {
-              ...post,
-              author: {
-                ...post.author,
-                isFollowing: !post.author.isFollowing,
-              },
-            }
-          : post
-      )
-    );
+    if (!targetName) {
+        console.warn("Não foi possível encontrar o usuário alvo para seguir.");
+        return;
+    }
+
+    const updates: any = {};
+    const myFollowingPath = `users/${user.uid}/following/${personIdStr}`;
+    const myStatsPath = `users/${user.uid}/stats/following`;
+
+    if (isFollowing) {
+        updates[myFollowingPath] = null; 
+        updates[myStatsPath] = increment(-1);
+
+        if (targetPerson) {
+            const newPeople = people.map(p => p.id === Number(personId) ? { ...p, isFollowing: false, followers: p.followers - 1 } : p);
+            setPeople(newPeople);
+        }
+
+    } else {
+        updates[myFollowingPath] = true;
+        updates[myStatsPath] = increment(1);
+
+        addPoints("FOLLOW");
+        await createNotification(targetName, {
+            type: "follow",
+            fromUser: {
+                id: user.uid,
+                username: userProfile.name,
+                avatar: userProfile.avatar,
+            },
+            message: `${userProfile.name} começou a seguir você.`,
+        });
+
+        if (targetPerson) {
+            const newPeople = people.map(p => p.id === Number(personId) ? { ...p, isFollowing: true, followers: p.followers + 1 } : p);
+            setPeople(newPeople);
+        }
+    }
+
+    try {
+        await update(dbRef(db), updates);
+    } catch (error) {
+        console.error("Erro ao seguir/deixar de seguir:", error);
+    }
   };
 
-  // 🔥 CRIAR POST GLOBAL (Realtime DB)
   const handleAddPost = (caption: string, file: File) => {
     const reader = new FileReader();
-
     reader.onloadend = async () => {
       const newPostRef = push(dbRef(db, "posts"));
       const postId = newPostRef.key as string;
@@ -448,7 +437,7 @@ const App: React.FC = () => {
       const newPost: Post = {
         id: postId,
         author: {
-          id: 0,
+          id: user ? user.uid : 0, // Usa UID real se disponível
           username: userProfile.name,
           avatar: userProfile.avatar,
           isFollowing: false,
@@ -467,73 +456,58 @@ const App: React.FC = () => {
       };
 
       await set(newPostRef, newPost);
+      if(user) {
+        update(dbRef(db, `users/${user.uid}/stats`), {
+            posts: increment(1)
+        });
+      }
 
       addPoints("POST");
       handleCloseNewPostModal();
       handleNavigate("feed");
     };
-
     reader.readAsDataURL(file);
   };
 
-  // ❤️ LIKE GLOBAL (Realtime DB) - CORRIGIDO
   const handleLike = async (postId: string) => {
-    if (!user) return; // Segurança: precisa estar logado
-
+    if (!user) return; 
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
-    // A lógica agora depende do 'isLiked' que foi calculado corretamente no useEffect
-    // Se já está curtido (isLiked = true), vamos remover o like
     const isCurrentlyLiked = post.isLiked;
-
     const updates: any = {};
 
     if (isCurrentlyLiked) {
-      // Remover like
-      // 1. Remove o ID do usuário da lista de userLikes
       updates[`posts/${postId}/userLikes/${user.uid}`] = null;
-      // 2. Decrementa o contador global
       updates[`posts/${postId}/likes`] = increment(-1);
     } else {
-      // Adicionar like
-      // 1. Adiciona o ID do usuário na lista de userLikes
       updates[`posts/${postId}/userLikes/${user.uid}`] = true;
-      // 2. Incrementa o contador global
       updates[`posts/${postId}/likes`] = increment(1);
     }
 
-    // Atualização atômica
     await update(dbRef(db), updates);
 
-    // Notificação apenas se for um novo like
     if (!isCurrentlyLiked) {
       addPoints("LIKE");
       await createNotification(post.author.username, {
         type: "like",
-        fromUser: {
-            id: 0,
-            username: userProfile.name,
-            avatar: userProfile.avatar,
-        },
+        fromUser: { id: 0, username: userProfile.name, avatar: userProfile.avatar },
         postId: post.id,
         message: `${userProfile.name} curtiu seu post.`,
       });
     }
   };
 
-  // 🔖 BOOKMARK GLOBAL
   const handleBookmark = async (postId: string) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
-
     await update(dbRef(db, `posts/${postId}`), {
       isBookmarked: !post.isBookmarked,
     });
   };
 
-  // 💬 COMENTÁRIO GLOBAL
-  const handleComment = async (postId: string, commentText: string) => {
+  // Updated to handle nested replies
+  const handleComment = async (postId: string, commentText: string, parentId?: string) => {
     const post = posts.find((p) => p.id === postId);
     if (!post) return;
 
@@ -542,158 +516,130 @@ const App: React.FC = () => {
       author: userProfile.name,
       text: commentText,
       timestamp: new Date().toISOString(),
+      replies: []
     };
 
-    const newComments = Array.isArray(post.comments)
-      ? [...post.comments, newComment]
-      : [newComment];
+    // Clone existing comments to modify them locally before sending
+    // This is required because we can't easily use array updates with deep nesting in Firebase simple list structure
+    // without knowing exact index paths.
+    const updatedComments = [...(post.comments || [])];
 
-    await update(dbRef(db, `posts/${postId}`), {
-      comments: newComments,
-    });
+    if (parentId) {
+        // Find parent and add reply
+        const parentIndex = updatedComments.findIndex(c => c.id === parentId);
+        if (parentIndex !== -1) {
+            const parent = { ...updatedComments[parentIndex] };
+            parent.replies = [...(parent.replies || []), newComment];
+            updatedComments[parentIndex] = parent;
+        }
+    } else {
+        updatedComments.push(newComment);
+    }
+
+    // Update entire comments array for the post
+    await update(dbRef(db, `posts/${postId}`), { comments: updatedComments });
 
     addPoints("COMMENT");
     await createNotification(post.author.username, {
         type: "comment",
-        fromUser: {
-            id: 0,
-            username: userProfile.name,
-            avatar: userProfile.avatar,
-        },
+        fromUser: { id: 0, username: userProfile.name, avatar: userProfile.avatar },
         postId: post.id,
-        message: `${userProfile.name} comentou no seu post.`,
+        message: parentId ? `${userProfile.name} respondeu ao seu comentário.` : `${userProfile.name} comentou no seu post.`,
     });
   };
   
-  // 👁️ VIEW GLOBAL
   const handleView = async (postId: string) => {
-    await update(dbRef(db, `posts/${postId}`), {
-        views: increment(1)
-    });
+    await update(dbRef(db, `posts/${postId}`), { views: increment(1) });
   };
 
-  // 💬 ENVIAR MENSAGEM GLOBAL
   const handleSendMessage = async (content: string, type: 'text' | 'sticker') => {
       const newMessageRef = push(dbRef(db, 'global-chat'));
-      const messageId = newMessageRef.key as string;
-
-      const newMessage: ChatMessage = {
-          id: messageId,
-          author: {
-              name: userProfile.name,
-              avatar: userProfile.avatar
-          },
-          content,
-          type,
-          timestamp: new Date().toISOString()
-      };
-      
-      await set(newMessageRef, newMessage);
+      await set(newMessageRef, {
+          id: newMessageRef.key,
+          author: { name: userProfile.name, avatar: userProfile.avatar },
+          content, type, timestamp: new Date().toISOString()
+      });
   };
 
-  // 👋 REAÇÃO À MENSAGEM GLOBAL
   const handleReaction = async (messageId: string, emoji: string) => {
     const reactionRef = dbRef(db, `global-chat/${messageId}/reactions/${userProfile.name}`);
-    
     const snapshot = await get(reactionRef);
     if (snapshot.exists() && snapshot.val() === emoji) {
-      // Se o usuário clicar no mesmo emoji, remove a reação
       await set(reactionRef, null);
     } else {
-      // Adiciona ou atualiza a reação
       await set(reactionRef, emoji);
     }
   };
 
-  // 🟪 SALVAR STORY GLOBAL
   const handleSaveStory = (storyFile: File) => {
     const reader = new FileReader();
-
     reader.onloadend = async () => {
       const newStoryRef = push(dbRef(db, "stories"));
-      const storyId = newStoryRef.key as string;
-
-      const newStory: Story = {
-        id: storyId,
+      await set(newStoryRef, {
+        id: newStoryRef.key,
         author: userProfile.name,
         avatar: userProfile.avatar,
         mediaSrc: reader.result as string,
         mediaType: storyFile.type.startsWith("image/") ? "image" : "video",
         createdAt: new Date().toISOString(),
-      };
-
-      await set(newStoryRef, newStory);
-
+      });
       setIsAddStoryModalOpen(false);
     };
-
     reader.readAsDataURL(storyFile);
   };
 
-  // VER STORIES GLOBAIS
   const handleViewStory = (author: string) => {
     const userStories = stories
       .filter((s) => s.author === author)
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
-
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     if (userStories.length > 0) {
       setStoryViewerState({ isOpen: true, stories: userStories });
     }
   };
   
-  // 🎮 PONTUAÇÃO DE JOGOS GLOBAL
   const handleGamePoints = async (points: number) => {
     if (!userProfile.name) return;
     const userRef = dbRef(db, `users/${userProfile.name}`);
     const snapshot = await get(userRef);
-
     if (!snapshot.exists()) {
-        // Se o usuário não existe no ranking, cria com os metadados
         await set(userRef, {
             username: userProfile.name,
             avatar: userProfile.avatar,
-            points: {
-                total: points
-            }
+            points: { total: points }
         });
     } else {
-        // Se já existe, apenas incrementa os pontos
-        const pointsRef = dbRef(db, `users/${userProfile.name}/points`);
-        await update(pointsRef, {
-            total: increment(points)
-        });
+        await update(dbRef(db, `users/${userProfile.name}/points`), { total: increment(points) });
     }
   };
-
 
   const handleMarkAllAsRead = async () => {
     const unreadNotifs = notifications.filter(n => !n.read);
     if (unreadNotifs.length === 0) return;
-
     const updates: { [key: string]: any } = {};
     unreadNotifs.forEach(notif => {
         updates[`notifications/${userProfile.name}/${notif.id}/read`] = true;
     });
-
     await update(dbRef(db), updates);
   };
 
-  // 🔍 ABRIR PERFIL PÚBLICO
   const handleOpenPublicProfile = (personName: string) => {
-    // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
-    const person = people.find((p) => p.username === personName);
+    let person = people.find((p) => p.username === personName);
+    if (!person) {
+        const post = posts.find(p => p.author.username === personName);
+        if (post) {
+            person = {
+                id: post.author.id as number,
+                username: post.author.username,
+                avatar: post.author.avatar,
+                bio: "Usuário do SocialNino",
+                followers: 0, 
+                isFollowing: post.author.isFollowing
+            };
+        }
+    }
     if (!person) return;
-
     setSelectedPerson(person);
     setPublicProfileOpen(true);
-  };
-
-  const handleClosePublicProfile = () => {
-    setPublicProfileOpen(false);
-    setSelectedPerson(null);
   };
 
   const renderPage = () => {
@@ -704,47 +650,35 @@ const App: React.FC = () => {
         break;
       case "search":
         pageComponent = (
-          <Suggestions people={people} onToggleFollow={handleToggleFollow} />
+          <UserSearchScreen 
+            people={people} 
+            onToggleFollow={handleToggleFollow} 
+            onOpenProfile={handleOpenPublicProfile}
+          />
         );
         break;
       case "friends":
-        pageComponent = (
-          <FriendsScreen people={people} onToggleFollow={handleToggleFollow} />
-        );
+        pageComponent = <FriendsScreen people={people} onToggleFollow={handleToggleFollow} />;
         break;
       case "games":
         pageComponent = <GamesScreen handleGamePoints={handleGamePoints} />;
         break;
       case "chat":
-        pageComponent = (
-          <GlobalChatScreen 
-            messages={chatMessages}
-            currentUser={userProfile}
-            onSendMessage={handleSendMessage}
-            onReaction={handleReaction}
-          />
-        );
+        pageComponent = <GlobalChatScreen messages={chatMessages} currentUser={userProfile} onSendMessage={handleSendMessage} onReaction={handleReaction} />;
         break;
       case "download":
         pageComponent = <DownloadApp />;
         break;
       case "profile":
-        const userPosts = posts.filter(
-          (post) => post.author.username === userProfile.name
-        );
-        pageComponent = (
-          <Profile
-            userProfile={userProfile}
-            onUpdateProfile={setUserProfile}
-            userPosts={userPosts}
-          />
-        );
+        const userPosts = posts.filter((post) => post.author.username === userProfile.name);
+        pageComponent = <Profile userProfile={userProfile} onUpdateProfile={setUserProfile} userPosts={userPosts} />;
         break;
       case "feed":
       default:
         pageComponent = (
           <Feed
             posts={posts}
+            followingIds={followingIds} // PASSANDO LISTA DE SEGUINDO
             handleLike={handleLike}
             handleComment={handleComment}
             handleView={handleView}
@@ -760,104 +694,43 @@ const App: React.FC = () => {
         );
         break;
     }
-    const animationClass =
-      pageDirection === "left"
-        ? "animate-slide-in-left"
-        : pageDirection === "right"
-        ? "animate-slide-in-right"
-        : "";
-    return (
-      <div key={activePage} className={animationClass}>
-        {pageComponent}
-      </div>
-    );
+    const animationClass = pageDirection === "left" ? "animate-slide-in-left" : pageDirection === "right" ? "animate-slide-in-right" : "";
+    return <div key={activePage} className={animationClass}>{pageComponent}</div>;
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
-        <p className="text-gray-500">Carregando...</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-black text-white">Carregando...</div>;
+  if (!user) return <AuthScreen />;
 
-  if (!user) {
-    return <AuthScreen />;
-  }
-
-  // Applies the new futuristic-bg class to the main app container for a consistent background
   return (
     <div className="min-h-screen text-black dark:text-white flex flex-col md:items-center futuristic-bg">
       <div className="w-full md:max-w-xl bg-transparent min-h-screen">
-        <Header
-          unreadCount={unreadCount}
-          onNotificationsClick={() =>
-            setIsNotificationsOpen((prev) => !prev)
-          }
-        />
+        <Header unreadCount={unreadCount} onNotificationsClick={() => setIsNotificationsOpen((prev) => !prev)} />
 
         <main className="flex-grow pt-16 pb-16">{renderPage()}</main>
 
-        {isNewPostModalOpen && (
-          <NewPostModal
-            onClose={handleCloseNewPostModal}
-            onAddPost={handleAddPost}
-            initialCaption={newPostInitialCaption}
-          />
-        )}
+        {isNewPostModalOpen && <NewPostModal onClose={handleCloseNewPostModal} onAddPost={handleAddPost} initialCaption={newPostInitialCaption} />}
+        {isAddStoryModalOpen && <AddStoryModal onClose={() => setIsAddStoryModalOpen(false)} onSave={handleSaveStory} />}
+        {storyViewerState.isOpen && <StoryViewerModal stories={storyViewerState.stories} onClose={() => setStoryViewerState({ isOpen: false, stories: [] })} />}
+        {isNotificationsOpen && <NotificationsPanel notifications={notifications} posts={posts} onClose={() => setIsNotificationsOpen(false)} onMarkAllAsRead={handleMarkAllAsRead} />}
 
-        {isAddStoryModalOpen && (
-          <AddStoryModal
-            onClose={() => setIsAddStoryModalOpen(false)}
-            onSave={handleSaveStory}
-          />
-        )}
-
-        {storyViewerState.isOpen && (
-          <StoryViewerModal
-            stories={storyViewerState.stories}
-            onClose={() =>
-              setStoryViewerState({ isOpen: false, stories: [] })
-            }
-          />
-        )}
-
-        {isNotificationsOpen && (
-          <NotificationsPanel
-            notifications={notifications}
-            posts={posts}
-            onClose={() => setIsNotificationsOpen(false)}
-            onMarkAllAsRead={handleMarkAllAsRead}
-          />
-        )}
-
-        {/* Modal de perfil público */}
         {selectedPerson && (
           <PublicProfileModal
             person={selectedPerson}
-            posts={posts.filter(
-              // FIX: Property 'name' does not exist on type 'Person'. Use 'username' instead.
-              (p) => p.author.username === selectedPerson.username
-            )}
+            posts={posts.filter((p) => p.author.username === selectedPerson.username)}
             isOpen={publicProfileOpen}
-            onClose={handleClosePublicProfile}
+            onClose={() => { setPublicProfileOpen(false); setSelectedPerson(null); }}
             onToggleFollow={handleToggleFollow}
-            // FIX: Pass required props to PostCard through PublicProfileModal
             handleLike={handleLike}
             handleComment={handleComment}
             handleBookmark={handleBookmark}
             handleView={handleView}
             currentUserName={userProfile.name}
             onOpenProfile={handleOpenPublicProfile}
+            followingIds={followingIds} // PASSANDO PARA O MODAL
           />
         )}
 
-        <BottomNav
-          activePage={activePage}
-          onNavigate={handleNavigate}
-          onNewPostClick={() => handleOpenNewPostModal()}
-          userAvatar={userProfile.avatar}
-        />
+        <BottomNav activePage={activePage} onNavigate={handleNavigate} onNewPostClick={() => handleOpenNewPostModal()} userAvatar={userProfile.avatar} />
       </div>
     </div>
   );

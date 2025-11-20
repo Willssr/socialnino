@@ -7,7 +7,7 @@ import FollowButton from "./FollowButton";
 type Props = {
   post: Post;
   handleLike: (postId: string) => void;
-  handleComment: (postId: string, text: string) => void;
+  handleComment: (postId: string, text: string, parentId?: string) => void;
   handleView: (postId: string) => void;
   currentUserName: string;
   handleToggleFollow: (personId: number) => void;
@@ -44,6 +44,11 @@ const PostCard: React.FC<Props> = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const viewHandled = useRef(false);
+
+  // Calculate total comments including replies
+  const totalComments = (post.comments || []).reduce((acc, comment) => {
+      return acc + 1 + (comment.replies ? comment.replies.length : 0);
+  }, 0);
 
   // Função Wrapper para Like (UI Otimista)
   const onLikeClick = () => {
@@ -227,15 +232,16 @@ const PostCard: React.FC<Props> = ({
         </div>
 
         {/* COMENTÁRIOS */}
-        {post.comments?.length > 0 && (
+        {totalComments > 0 && (
           <div className="px-4 pb-2">
             <p
               className="text-sm text-textDark cursor-pointer"
               onClick={() => setIsCommentsModalOpen(true)}
             >
-              Ver todos os {post.comments.length} comentários
+              Ver todos os {totalComments} comentários
             </p>
 
+            {/* Exibe apenas o último comentário raiz */}
             {post.comments.slice(0, 1).map((c) => (
               <p key={c.id} className="text-sm mt-1">
                 <strong className="font-semibold">{c.author}</strong> {c.text}
@@ -251,7 +257,7 @@ const PostCard: React.FC<Props> = ({
             onSubmit={(e) => {
               e.preventDefault();
               if (commentText.trim()) {
-                handleComment(post.id, commentText);
+                handleComment(post.id, commentText); // Default: no parentId (root comment)
                 setCommentText("");
               }
             }}
@@ -280,6 +286,7 @@ const PostCard: React.FC<Props> = ({
           comments={post.comments}
           postAuthor={post.author.username}
           onClose={() => setIsCommentsModalOpen(false)}
+          onAddComment={(text, parentId) => handleComment(post.id, text, parentId)}
         />
       )}
     </>
