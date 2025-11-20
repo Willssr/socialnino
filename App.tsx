@@ -31,6 +31,8 @@ import SearchModal from "./components/SearchModal";
 import { useNinoPoints } from "./context/NinoPointsContext";
 import { useAuth } from "./AuthContext";
 import AuthScreen from "./AuthScreen";
+import { DMService } from "./services/directMessagesService";
+import { playMessageSound } from "./utils/audio";
 
 // 🔥 Realtime Database
 import { db } from "./services/firebase";
@@ -57,13 +59,6 @@ import { usePrevious } from "./hooks/usePrevious";
 import GamesScreen from "./components/Games/GamesScreen";
 import DirectMessagesScreen from "./components/DirectMessages/DirectMessagesScreen";
 
-// Mock Initial DMs
-const INITIAL_DMS: DirectMessage[] = [
-    { id: 'dm-1', sender: 'nina_dev', receiver: 'Você', content: 'Olá! Adorei sua foto de perfil 📸', type: 'text', timestamp: new Date(Date.now() - 1000000).toISOString(), read: false },
-    { id: 'dm-2', sender: 'Você', receiver: 'nina_dev', content: 'Obrigado! A sua também é incrível.', type: 'text', timestamp: new Date(Date.now() - 900000).toISOString(), read: true },
-    { id: 'dm-3', sender: 'rafael.art', receiver: 'Você', content: 'Viu o novo desafio do dia?', type: 'text', timestamp: new Date(Date.now() - 500000).toISOString(), read: true }
-];
-
 const App: React.FC = () => {
   const { user, loading } = useAuth();
 
@@ -80,7 +75,7 @@ const App: React.FC = () => {
     "download",
     "music",
     "profile",
-    "messages" // Added messages to page order
+    "messages"
   ]);
 
   // 🔥 POSTS GLOBAIS (Realtime DB)
@@ -99,8 +94,8 @@ const App: React.FC = () => {
   const [followingIds, setFollowingIds] = useState<Set<string>>(new Set());
   const [userStats, setUserStats] = useState({ followers: 0, following: 0, posts: 0 });
 
-  // 📨 MENSAGENS DIRETAS (MOCK / In-Memory state)
-  const [directMessages, setDirectMessages] = useState<DirectMessage[]>(INITIAL_DMS);
+  // 📨 MENSAGENS DIRETAS (Gerenciadas pelo DMService)
+  const [directMessages, setDirectMessages] = useState<DirectMessage[]>([]);
   const [selectedDmUser, setSelectedDmUser] = useState<Person | null>(null);
 
   // RESTO continua local (fallback)
@@ -116,6 +111,7 @@ const App: React.FC = () => {
   const { addPoints } = useNinoPoints();
   const { addToast } = useToast();
   const prevPosts = usePrevious(posts);
+  const prevDMs = usePrevious(directMessages);
 
   const [isAddStoryModalOpen, setIsAddStoryModalOpen] = useState(false);
   const [isNewPostModalOpen, setIsNewPostModalOpen] = useState(false);
@@ -132,11 +128,34 @@ const App: React.FC = () => {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  // 📨 Inicializar DMs do Serviço
+  useEffect(() => {
+    // Carrega mensagens salvas ao iniciar
+    const loadedMsgs = DMService.getAllMessages();
+    setDirectMessages(loadedMsgs);
+  }, []);
+
+  // 🔊 Efeito para tocar som quando chega nova DM
+  useEffect(() => {
+    if (!prevDMs) return;
+    if (directMessages.length > prevDMs.length) {
+        const newMsg = directMessages[directMessages.length - 1];
+        // Toca som se a mensagem não foi enviada por mim
+        if (newMsg.sender !== userProfile.name) {
+            playMessageSound();
+            addToast({
+                type: 'comment', // usando ícone de balão
+                content: `Nova mensagem de @${newMsg.sender}`,
+                user: { username: newMsg.sender, avatar: '' } // Avatar vazio por enquanto
+            });
+        }
+    }
+  }, [directMessages, userProfile.name]);
+
   // 🟢 Sistema de presença de usuários online
   useEffect(() => {
     if (!user) return;
 
-    // Reference to the user's online status in the database
     const userStatusRef = dbRef(db, `onlineUsers/${user.uid}`);
     const connectedRef = dbRef(db, '.info/connected');
 
@@ -158,7 +177,6 @@ const App: React.FC = () => {
     const unsubscribe = onValue(followingRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        // Cria um Set com os IDs dos usuários que eu sigo
         setFollowingIds(new Set(Object.keys(data)));
       } else {
         setFollowingIds(new Set());
@@ -178,7 +196,6 @@ const App: React.FC = () => {
       if (snapshot.exists()) {
         setUserStats(snapshot.val());
       } else {
-        // Se não existir, inicializa
         setUserStats({ followers: 0, following: 0, posts: 0 });
       }
     });
@@ -194,13 +211,13 @@ const App: React.FC = () => {
         ...prev.stats,
         followers: userStats.followers || 0,
         following: userStats.following || 0,
-        posts: posts.filter(p => p.author.username === prev.name).length // Calcula posts localmente baseado no feed
+        posts: posts.filter(p => p.author.username === prev.name).length
       }
     }));
   }, [userStats, posts, setUserProfile]);
 
 
-  // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL (normalizando dados)
+  // 🟦 BUSCAR POSTS GLOBAIS EM TEMPO REAL
   useEffect(() => {
     const postsQuery = query(dbRef(db, "posts"), orderByChild("timestamp"));
 
@@ -213,7 +230,6 @@ const App: React.FC = () => {
 
       const list: Post[] = Object.values(data).map((raw: any) => {
         const commentsRaw = raw.comments || [];
-        // Normaliza comentários e respostas
         const comments: Comment[] = Array.isArray(commentsRaw) 
             ? commentsRaw.map((c: any) => ({
                 ...c,
@@ -222,7 +238,6 @@ const App: React.FC = () => {
             : [];
         
         const isLikedByCurrentUser = user && raw.userLikes ? !!raw.userLikes[user.uid] : false;
-        // Verifica se seguimos o autor deste post
         const authorIdString = String(raw.author?.id);
         const isFollowingAuthor = followingIds.has(authorIdString);
 
@@ -232,7 +247,7 @@ const App: React.FC = () => {
             id: raw.author?.id ?? 0,
             username: raw.author?.username ?? "desconhecido",
             avatar: raw.author?.avatar ?? "",
-            isFollowing: isFollowingAuthor, // Estado real vindo do DB
+            isFollowing: isFollowingAuthor,
           },
           timestamp: raw.timestamp ?? new Date().toISOString(),
           caption: raw.caption ?? "",
@@ -261,7 +276,7 @@ const App: React.FC = () => {
     return () => {
       off(postsQuery, "value", callback);
     };
-  }, [user, followingIds]); // Recalcula quando user muda ou quando a lista de quem sigo muda
+  }, [user, followingIds]);
 
   // 🟪 BUSCAR STORIES GLOBAIS
   useEffect(() => {
@@ -348,6 +363,28 @@ const App: React.FC = () => {
     });
     return () => off(q, "value", unsub);
   }, [userProfile.name]);
+
+  // MOCK BOT RESPONSE - Apenas para demonstração
+  // Se eu enviei uma mensagem para alguém, simula uma resposta depois de um tempo
+  useEffect(() => {
+    if (directMessages.length > 0) {
+      const lastMsg = directMessages[directMessages.length - 1];
+      // Se a última mensagem foi enviada por mim, simula resposta do bot
+      if (lastMsg.sender === userProfile.name) {
+        const timer = setTimeout(() => {
+           const autoReply = DMService.sendMessage(
+             lastMsg.receiver, 
+             userProfile.name, 
+             "🤖 Auto-reply: Recebi sua mensagem! (Simulação)", 
+             "text"
+           );
+           setDirectMessages(prev => [...prev, autoReply]);
+        }, 4000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [directMessages, userProfile.name]);
+
 
   const handleNavigate = (newPage: ActivePage) => {
     const ci = pageOrder.indexOf(activePage);
@@ -452,7 +489,7 @@ const App: React.FC = () => {
       const newPost: Post = {
         id: postId,
         author: {
-          id: user ? user.uid : 0, // Usa UID real se disponível
+          id: user ? user.uid : 0, 
           username: userProfile.name,
           avatar: userProfile.avatar,
           isFollowing: false,
@@ -570,19 +607,12 @@ const App: React.FC = () => {
       });
   };
 
-  // 📨 Handle sending direct messages
+  // 📨 MENSAGENS DIRETAS (Atualizado para usar Service)
   const handleSendDirectMessage = (receiverUsername: string, content: string, type: 'text' | 'sticker') => {
-      const newMsg: DirectMessage = {
-          id: `dm-${Date.now()}`,
-          sender: userProfile.name,
-          receiver: receiverUsername,
-          content,
-          type,
-          timestamp: new Date().toISOString(),
-          read: false
-      };
+      // Chama o serviço para persistir a mensagem
+      const newMsg = DMService.sendMessage(userProfile.name, receiverUsername, content, type);
       
-      // In a real app, this would be an API/Firebase call
+      // Atualiza o estado local imediatamente
       setDirectMessages(prev => [...prev, newMsg]);
   };
 
@@ -667,7 +697,6 @@ const App: React.FC = () => {
     setPublicProfileOpen(true);
   };
 
-  // Go to chat with a specific person from profile
   const handleMessageFromProfile = (person: Person) => {
       setSelectedDmUser(person);
       setPublicProfileOpen(false);
@@ -708,7 +737,7 @@ const App: React.FC = () => {
       case "messages":
         pageComponent = (
             <DirectMessagesScreen 
-                messages={directMessages} 
+                messages={directMessages} // Passando lista completa
                 currentUser={userProfile} 
                 people={people} 
                 initialSelectedUser={selectedDmUser}
@@ -722,7 +751,7 @@ const App: React.FC = () => {
         pageComponent = (
           <Feed
             posts={posts}
-            followingIds={followingIds} // PASSANDO LISTA DE SEGUINDO
+            followingIds={followingIds} 
             handleLike={handleLike}
             handleComment={handleComment}
             handleView={handleView}
@@ -775,7 +804,7 @@ const App: React.FC = () => {
             currentUserName={userProfile.name}
             onOpenProfile={handleOpenPublicProfile}
             followingIds={followingIds}
-            onMessageClick={handleMessageFromProfile} // Passando a função de mensagem
+            onMessageClick={handleMessageFromProfile} 
           />
         )}
 
