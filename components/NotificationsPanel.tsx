@@ -1,6 +1,8 @@
-import React from 'react';
+
+import React, { useMemo } from 'react';
 import { Notification, Post } from '../types';
-import { HeartIcon, CommentIcon, UserIcon } from './Icons';
+import { XIcon, BellIcon } from './Icons';
+import NotificationItem from './Notifications/NotificationItem';
 
 interface NotificationsPanelProps {
   notifications: Notification[];
@@ -9,100 +11,114 @@ interface NotificationsPanelProps {
   onMarkAllAsRead: () => void;
 }
 
-interface NotificationItemProps {
-    notification: Notification;
-    post?: Post;
-}
+const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ 
+    notifications, 
+    posts, 
+    onClose, 
+    onMarkAllAsRead 
+}) => {
 
-const NotificationItem: React.FC<NotificationItemProps> = ({ notification, post }) => {
-    const { type, fromUser, createdAt, message, read } = notification;
+    // Group notifications logic
+    const groupedNotifications = useMemo(() => {
+        const groups: { [key: string]: Notification[] } = {
+            'Hoje': [],
+            'Ontem': [],
+            'Esta Semana': [],
+            'Anteriores': []
+        };
 
-    const renderIcon = () => {
-        const iconClass = "w-5 h-5 text-white";
-        let bgColor = "";
-        let icon = null;
-
-        switch(type) {
-            case 'like':
-                bgColor = "bg-accent";
-                icon = <HeartIcon className={iconClass} solid={true} />;
-                break;
-            case 'comment':
-                bgColor = "bg-secondary";
-                icon = <CommentIcon className={iconClass} />;
-                break;
-            case 'follow':
-                bgColor = "bg-primary";
-                icon = <UserIcon className={iconClass} solid={true}/>;
-                break;
-        }
-        return (
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${bgColor} shadow-lg`}>
-                {icon}
-            </div>
-        )
-    }
-
-    const renderText = () => {
-        return (
-            <p className="text-sm text-white/90">
-                <strong className="font-semibold text-white">@{fromUser.username}</strong>
-                {message.substring(fromUser.username.length)}
-            </p>
-        );
-    }
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
         const now = new Date();
-        const diffSeconds = Math.round((now.getTime() - date.getTime()) / 1000);
-        const diffMinutes = Math.round(diffSeconds / 60);
-        const diffHours = Math.round(diffMinutes / 60);
-        
-        if (diffSeconds < 60) return `${diffSeconds}s ago`;
-        if (diffMinutes < 60) return `${diffMinutes}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        return date.toLocaleDateString('pt-BR');
-    }
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const lastWeek = new Date(today);
+        lastWeek.setDate(lastWeek.getDate() - 7);
+
+        notifications.forEach(note => {
+            const noteDate = new Date(note.createdAt);
+            // Strip time for comparison
+            const noteDay = new Date(noteDate.getFullYear(), noteDate.getMonth(), noteDate.getDate());
+
+            if (noteDay.getTime() === today.getTime()) {
+                groups['Hoje'].push(note);
+            } else if (noteDay.getTime() === yesterday.getTime()) {
+                groups['Ontem'].push(note);
+            } else if (noteDay > lastWeek) {
+                groups['Esta Semana'].push(note);
+            } else {
+                groups['Anteriores'].push(note);
+            }
+        });
+
+        return groups;
+    }, [notifications]);
 
     return (
-        <div className={`flex items-start gap-3 p-3 transition-colors duration-200 ${!read ? 'bg-primary/10' : ''} hover:bg-primary/20`}>
-            {renderIcon()}
-            <div className="flex-grow">
-                {renderText()}
-                <p className="text-xs text-white/60 mt-0.5">{formatDate(createdAt)}</p>
-            </div>
-            {post && (
-                <img src={post.media.src} alt="Post preview" className="w-12 h-12 rounded-md object-cover flex-shrink-0" />
-            )}
-        </div>
-    )
-}
-
-const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ notifications, posts, onClose, onMarkAllAsRead }) => {
-
-    return (
-        <div className="fixed inset-0 z-40" onClick={onClose}>
+        <div className="fixed inset-0 z-[100]" onClick={onClose}>
+            {/* Panel Container - Glassmorphism */}
             <div 
-                className="absolute top-20 right-4 sm:right-6 lg:right-8 w-full max-w-sm bg-[#0b0b20]/85 backdrop-blur-md rounded-xl shadow-[0_0_15px_rgba(0,229,255,0.4)] border border-[#00E5FF77] overflow-hidden"
+                className="absolute top-0 right-0 sm:top-20 sm:right-4 lg:right-8 w-full sm:max-w-sm h-full sm:h-auto sm:max-h-[80vh] bg-[#050510]/90 backdrop-blur-xl sm:rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.8)] border-l sm:border border-[#00E5FF]/30 flex flex-col overflow-hidden animate-slide-in-right"
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="flex items-center justify-between p-3 border-b border-[#00E5FF55]">
-                    <h3 className="font-bold text-lg text-[#00E5FF] drop-shadow-[0_0_4px_#00E5FF]">Notificações</h3>
-                    <button onClick={onMarkAllAsRead} className="text-sm font-semibold text-secondary hover:underline">
-                        Marcar como lidas
-                    </button>
+                {/* Header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 bg-white/5">
+                    <div className="flex items-center gap-2">
+                        <BellIcon className="w-5 h-5 text-secondary" />
+                        <h3 className="font-orbitron font-bold text-lg text-white tracking-wide">
+                            Notificações
+                        </h3>
+                        {notifications.filter(n => !n.read).length > 0 && (
+                            <span className="bg-secondary text-black text-xs font-bold px-1.5 py-0.5 rounded-full">
+                                {notifications.filter(n => !n.read).length}
+                            </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                         <button 
+                            onClick={onMarkAllAsRead} 
+                            className="text-xs font-semibold text-gray-400 hover:text-white transition-colors"
+                        >
+                            Ler todas
+                        </button>
+                        <button onClick={onClose} className="text-white hover:text-accent transition-colors">
+                            <XIcon className="w-6 h-6" />
+                        </button>
+                    </div>
                 </div>
-                <div className="max-h-[70vh] overflow-y-auto">
-                    {notifications.length > 0 ? (
-                        notifications.map(n => {
-                            const post = n.postId ? posts.find(p => p.id === n.postId) : undefined;
-                            return <NotificationItem key={n.id} notification={n} post={post} />
-                        })
+
+                {/* Content List */}
+                <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-thumb-secondary/20 scrollbar-track-transparent">
+                    {notifications.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center h-64 text-gray-500 opacity-70">
+                            <BellIcon className="w-16 h-16 mb-4 text-gray-700" />
+                            <p>Tudo tranquilo por aqui.</p>
+                        </div>
                     ) : (
-                        <p className="p-8 text-center text-sm text-white">
-                            Você não tem nenhuma notificação.
-                        </p>
+                        Object.entries(groupedNotifications).map(([label, notes]) => {
+                            const typedNotes = notes as Notification[];
+                            if (typedNotes.length === 0) return null;
+                            
+                            return (
+                                <div key={label} className="mb-6 last:mb-0">
+                                    <h4 className="text-xs font-bold text-secondary/80 uppercase tracking-widest mb-3 ml-1">
+                                        {label}
+                                    </h4>
+                                    <div className="space-y-2">
+                                        {typedNotes.map(n => {
+                                            // Find post if ID exists
+                                            const post = n.postId ? posts.find(p => p.id === n.postId) : undefined;
+                                            return (
+                                                <NotificationItem 
+                                                    key={n.id} 
+                                                    notification={n} 
+                                                    post={post} 
+                                                />
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })
                     )}
                 </div>
             </div>

@@ -25,13 +25,6 @@ const DirectMessagesScreen: React.FC<DirectMessagesScreenProps> = ({
     const [searchQuery, setSearchQuery] = useState("");
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    // Sync selectedUser if initialSelectedUser changes (e.g. coming from profile)
-    useEffect(() => {
-        if (initialSelectedUser) {
-            setSelectedUser(initialSelectedUser);
-        }
-    }, [initialSelectedUser]);
-
     // Scroll to bottom when messages change
     useEffect(() => {
         if (selectedUser && messagesEndRef.current) {
@@ -39,22 +32,12 @@ const DirectMessagesScreen: React.FC<DirectMessagesScreenProps> = ({
         }
     }, [messages, selectedUser]);
 
-    // 1. Agrupar mensagens por conversa
-    // Lógica crítica: Determinar quem é o "outro usuário" na conversa
+    // Agrupar mensagens por conversa (última mensagem)
     const conversations = useMemo(() => {
         const convMap = new Map<string, DirectMessage>();
         
         messages.forEach(msg => {
-            let otherUser = "";
-            if (msg.sender === currentUser.name) {
-                otherUser = msg.receiver;
-            } else if (msg.receiver === currentUser.name) {
-                otherUser = msg.sender;
-            } else {
-                // Mensagem não envolve o usuário atual (não deve acontecer aqui se filtrado corretamente, mas por segurança)
-                return;
-            }
-
+            const otherUser = msg.sender === currentUser.name ? msg.receiver : msg.sender;
             // Se ainda não tem ou essa msg é mais recente, atualiza
             if (!convMap.has(otherUser) || new Date(msg.timestamp) > new Date(convMap.get(otherUser)!.timestamp)) {
                 convMap.set(otherUser, msg);
@@ -67,13 +50,13 @@ const DirectMessagesScreen: React.FC<DirectMessagesScreenProps> = ({
         );
     }, [messages, currentUser.name]);
 
-    // Filtrar usuários para lista de conversas (busca)
+    // Filtrar usuários para nova conversa ou lista existente
     const filteredConversations = useMemo(() => {
         if (!searchQuery) return conversations;
         return conversations.filter(([username]) => username.toLowerCase().includes(searchQuery.toLowerCase()));
     }, [conversations, searchQuery]);
 
-    // Helper para dados de usuário (avatar, etc)
+    // Obter dados do usuário (avatar, etc)
     const getUserData = (username: string): { avatar: string, bio: string } => {
         const person = people.find(p => p.username === username);
         if (person) return { avatar: person.avatar, bio: person.bio };
@@ -93,8 +76,6 @@ const DirectMessagesScreen: React.FC<DirectMessagesScreenProps> = ({
 
     // --- RENDER: CHAT ATIVO ---
     if (selectedUser) {
-        // Filtra mensagens APENAS entre Eu e o Usuário Selecionado
-        // Isso garante que a conversa seja "privada" entre os dois
         const chatMessages = messages.filter(
             m => (m.sender === currentUser.name && m.receiver === selectedUser.username) ||
                  (m.sender === selectedUser.username && m.receiver === currentUser.name)
@@ -105,7 +86,7 @@ const DirectMessagesScreen: React.FC<DirectMessagesScreenProps> = ({
                 {/* Chat Header */}
                 <div className="p-3 border-b border-borderNeon/50 bg-backgroundDark/95 backdrop-blur-md flex items-center space-x-3 sticky top-0 z-10 shadow-lg">
                     <button 
-                        onClick={() => { setSelectedUser(null); onBack(); }} 
+                        onClick={() => setSelectedUser(null)} 
                         className="text-secondary hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"
                         aria-label="Voltar"
                     >

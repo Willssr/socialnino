@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export const HeartIcon = ({ className, solid }: { className?: string; solid?: boolean; }) => (
@@ -142,7 +143,6 @@ export const GameControllerIcon = ({ className, solid, useGradient }: { classNam
 
 export const BellIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        {/* FIX: Replaced invalid '_' character with a space in the SVG path data. */}
         <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.31 5.632l-1.42 1.42A9 9 0 006.11 21H7.9 l1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
     </svg>
 );
@@ -214,7 +214,6 @@ export const PlusSquareIcon = ({ className, useGradient }: { className?: string,
 };
 
 
-// Fix: Add DownloadIcon to fix import error.
 export const DownloadIcon = ({ className, solid, useGradient }: { className?: string, solid?: boolean, useGradient?: boolean }) => {
     const gradientId = "icon-gradient-download";
 
@@ -242,7 +241,7 @@ export const LogoutIcon = ({ className }: { className?: string }) => (
 
 export const AppleIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} viewBox="0 0 384 512" fill="currentColor">
-        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C39.2 141.1 0 183.2 0 241.2c0 61.6 44.8 143.2 101.5 183.9 31.4 22.3 64.2 34.5 101.2 34.5 11.2 0 22.5-1.6 33.5-4.4 2.8-.7 5.7-1.5 8.5-2.3 2.8-.8 5.7-1.7 8.5-2.6 2.8-.9 5.7-1.9 8.6-2.8 2.8-1 5.7-2 8.5-3.1 2.8-1.1 5.7-2.3 8.5-3.5 2.8-1.2 5.6-2.5 8.4-3.8 2.8-1.3 5.6-2.7 8.4-4.1 2.8-1.4 5.6-2.9 8.3-4.4 2.8-1.5 5.5-3.1 8.2-4.8 2.7-1.7 5.4-3.5 8.1-5.3 2.7-1.8 5.4-3.8 8-5.8 2.6-2 5.3-4.1 7.8-6.3 2.6-2.2 5.1-4.5 7.6-6.8 2.5-2.3 5-4.7 7.4-7.2 2.4-2.5 4.8-5.1 7.1-7.7 2.3-2.7 4.6-5.4 6.8-8.2 2.2-2.8 4.3-5.7 6.4-8.6 2.1-3 4.1-6 6.1-9.1 2-3.1 3.9-6.3 5.7-9.5 .2-.3 .3-.7 .5-1 .1-.2 .2-.4 .3-.6 .1-.2 .2-.4 .3-.6 .2-.3 .3-.7 .5-1 .1-.2 .2-.4 .3-.6 .1-.2 .2-.4 .3-.6 .2-.3 .3-.7 .5-1 .1-.2 .2-.4 .3-.6 .1-.2 .2-.4 .3-.6zm-180.3-159.4c14.4-18.7 14.4-44.4 0-62.5-14.4-18.7-37.5-18.7-51.9 0-14.4 18.7-14.4 44.4 0 62.5 14.4 18.7 37.5 18.7 51.9 0z"/>
+        <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C39.2 141.1 0 183.2 0 241.2c0 61.6 44.8 143.2 101.5 183.9 31.4 22.3 64.2 34.5 101.2 34.5 11.2 0 22.5-1.6 33.5-4.4 2.8-.7 5.7-1.5 8.5-2.3 2.8-.8 5.7-1.7 8.5-2.6 2.8-.9 5.7-1.9 8.6-2.8 2.8-1 5.7-2 8.5-3.1 2.8-1.1 5.7-2.3 8.5-3.5 2.8-1.2 5.6-2.5 8.4-3.8 2.8-1.3 5.6-2.7 8.4-4.1 2.8-1.4 5.6-2.9 8.3-4.4 2.8-1.5 5.5-3.1 8.2-4.8 2.7-1.7 5.4-3.5 8.1-5.3 2.7-1.8 5.4-3.8 8-5.8 2.6-2 5.3-4.1 7.8-6.3 2.6-2.2 5.1-4.5 7.6-6.8 2.5-2.3 5-4.7 7.4-7.2 2.4-2.5 4.8-5.1 7.1-7.7 2.3-2.7 4.6-5.4 6.8-8.2 2.2-2.8 4.3-5.7 6.4-8.6 2.1-3 4.1-6 6.1-9.1 2-3.1 3.9-6.3 5.7-9.5 .2-.3 .3-.7 .5-1 .1-.2 .2-.4 .3-.6 .1-.2 .2-.4 .3-.6 .2-.3 .3-.7 .5-1 .1-.2 .2-.4 .3-.6 .1-.2 .2-.4 .3-.6zm-180.3-159.4c14.4-18.7 14.4-44.4 0-62.5-14.4-18.7-37.5-18.7-51.9 0-14.4 18.7-14.4 44.4 0 62.5 14.4 18.7 37.5 18.7 51.9 0z"/>
     </svg>
 );
 
@@ -311,5 +310,11 @@ export const CubeIcon = ({ className }: { className?: string }) => (
 export const BoltIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+    </svg>
+);
+
+export const EnvelopeIcon = ({ className, solid }: { className?: string, solid?: boolean }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill={solid ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={solid ? 0 : 2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
     </svg>
 );
